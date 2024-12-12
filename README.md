@@ -40,8 +40,8 @@
 <br>
 
 ## 3. Team Rules (팀 규칙) - 수정 예정
->- #### Team Rules
->- #### Team Policy
+>- #### [Team Rules](https://github.com/Solving-Our-Meals/ukki-back/blob/main/.github/team_rules/team_rules/team_rules.md)
+>- #### [Team Policy](https://github.com/Solving-Our-Meals/ukki-back/blob/main/.github/team_rules/team_rules/team_guideline.md)
 [목차로 이동](https://github.com/Solving-Our-Meals/ukki?tab=readme-ov-file#%EB%AA%A9%EC%B0%A8)
 
 <br>
