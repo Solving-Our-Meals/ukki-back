@@ -1,9 +1,6 @@
 package com.ohgiraffers.ukki.inquiry.controller;
 
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
