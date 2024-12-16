@@ -1,16 +1,19 @@
 package com.ohgiraffers.ukki.inquiry.controller;
 
+import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
@@ -75,5 +78,18 @@ public class InquiryController {
         responseMap.put("message", message);
 
         return ResponseEntity.ok(responseMap);
+    }
+
+    @GetMapping(value = "/users", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> findUserInquiryCategory(){
+        List<InquiryCategoryDTO> category = inquiryService.findCategory();
+        List<InquiryCategoryDTO> userCategory = new ArrayList<>();
+
+        System.out.println("카테고리 하이");
+        for(int i = 0; i<4; i++) {
+            userCategory.add(category.get(i));
+        }
+
+        return ResponseEntity.ok(userCategory);
     }
 }
