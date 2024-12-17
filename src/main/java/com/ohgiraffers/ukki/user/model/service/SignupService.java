@@ -1,17 +1,8 @@
 package com.ohgiraffers.ukki.user.model.service;
 
 import com.ohgiraffers.ukki.user.model.dao.SignupMapper;
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.Properties;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class SignupService {
