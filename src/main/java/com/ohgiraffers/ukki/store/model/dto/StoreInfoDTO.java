@@ -13,10 +13,11 @@ public class StoreInfoDTO {
     private long storeCategoryNo;
     private long userNo;
     private int posNumber; // 예약 가능 인원
+    private KeywordDTO storeKeyword;
 
-    public StoreInfoDTO(){}
+    public StoreInfoDTO() {}
 
-    public StoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, long storeCategoryNo, long userNo, int posNumber) {
+    public StoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, long storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
@@ -28,6 +29,7 @@ public class StoreInfoDTO {
         this.storeCategoryNo = storeCategoryNo;
         this.userNo = userNo;
         this.posNumber = posNumber;
+        this.storeKeyword = storeKeyword;
     }
 
     public long getStoreNo() {
@@ -118,6 +120,14 @@ public class StoreInfoDTO {
         this.posNumber = posNumber;
     }
 
+    public KeywordDTO getStoreKeyword() {
+        return storeKeyword;
+    }
+
+    public void setStoreKeyword(KeywordDTO storeKeyword) {
+        this.storeKeyword = storeKeyword;
+    }
+
     @Override
     public String toString() {
         return "StoreInfoDTO{" +
@@ -132,6 +142,9 @@ public class StoreInfoDTO {
                 ", storeCategoryNo=" + storeCategoryNo +
                 ", userNo=" + userNo +
                 ", posNumber=" + posNumber +
+                ", storeKeyword=" + storeKeyword +
                 '}';
     }
 }
+
+
