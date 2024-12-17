@@ -69,4 +69,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 로그아웃 시 토큰 만료
+
+    // 리프레시 토큰 블랙리스트 추가
 }

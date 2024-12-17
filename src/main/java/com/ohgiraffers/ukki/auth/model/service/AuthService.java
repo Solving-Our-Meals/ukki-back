@@ -9,18 +9,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static javax.crypto.Cipher.SECRET_KEY;
-
 @Service
 public class AuthService {
-
-    // 엑세스 토큰
 
     // 보안을 위해 application.yml의 jwt.secret을 받아서 사용
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    // JWT 토큰 생성용
+    // JWT 토큰 생성용 (엑세스 토큰)
     public String createToken(String userId) {
         Claims claims = Jwts.claims().setSubject(userId);
         Date now = new Date();
@@ -30,7 +26,7 @@ public class AuthService {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expired)
-                .signWith(SignatureAlgorithm.ES512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
 
@@ -67,7 +63,32 @@ public class AuthService {
 
         return claims.getSubject(); // 본문에서 사용자 아이디 반환
     }
+    // 여기까지가 엑세스 토큰?
 
-    // 리프레시 토큰
+    // 리프레시 토큰 생성
+    public String createRefreshToken(String userId) {
+        Claims claims = Jwts.claims().setSubject(userId);
+        Date now = new Date();
+        Date refreshExpired = new Date(now.getTime() + 1209600000); // 2주 - 리프레시 토큰이므로
 
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(refreshExpired)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
+
+    // 리프레시 토큰 검증
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
