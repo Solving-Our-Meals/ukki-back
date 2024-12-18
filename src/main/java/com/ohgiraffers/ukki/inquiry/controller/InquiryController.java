@@ -163,15 +163,4 @@ public class InquiryController {
 
         return ResponseEntity.ok(category);
     }
-
-    @GetMapping(value = "/stores", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> findStoreInquiryCategory(){
-        List<InquiryCategoryDTO> category = inquiryService.findCategory();
-        List<InquiryCategoryDTO> storeCategory = new ArrayList<>();
-        for(int i = 4; i<7; i++) {
-            storeCategory.add(category.get(i));
-        }
-
-        return ResponseEntity.ok(storeCategory);
-    }
 }
