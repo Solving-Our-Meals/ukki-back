@@ -2,26 +2,26 @@ package com.ohgiraffers.ukki.user.model.dto;
 
 public class SignupUserDTO {
 
-    private String userName;
+    private String userId;
     private String userPass;
     private String email;
-    private String userNick;
+    private String userName;
 
     public SignupUserDTO() {}
 
-    public SignupUserDTO(String userName, String userPass, String email, String userNick) {
-        this.userName = userName;
+    public SignupUserDTO(String userId, String userPass, String email, String userName) {
+        this.userId = userId;
         this.userPass = userPass;
         this.email = email;
-        this.userNick = userNick;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserPass() {
@@ -40,11 +40,21 @@ public class SignupUserDTO {
         this.email = email;
     }
 
-    public String getUserNick() {
-        return userNick;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUserNick(String userNick) {
-        this.userNick = userNick;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String toString() {
+        return "SignupUserDTO{" +
+                "userId='" + userId + '\'' +
+                ", userPass='" + userPass + '\'' +
+                ", email='" + email + '\'' +
+                ", userName='" + userName + '\'' +
+                '}';
     }
 }
