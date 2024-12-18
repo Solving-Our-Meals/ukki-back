@@ -25,4 +25,9 @@ public class InquiryService {
     public List<InquiryCategoryDTO> findCategory() {
         return inquiryMapper.findCategory();
     }
+
+
+    public Integer lastInquiryNo() {
+        return inquiryMapper.lastInquiryNo();
+    }
 }
