@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.inquiry.model.dao.InquiryMapper">
+    <resultMap id="inquiry" type="com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO">
+        <id property="inquiryNo" column="INQ_NO"/>
+        <result property="inquiryTitle" column="INQ_TITLE"/>
+        <result property="inquiryContent" column="INQ_CONTENT"/>
+        <result property="inquiryDate" column="INQ_DATE"/>
+        <result property="categoryNo" column="CATEGORY_NO"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="answerTitle" column="ANS_TITLE"/>
+        <result property="answerContent" column="ANS_CONTENT"/>
+        <result property="answerDate" column="ANS_DATE"/>
+        <result property="state" column="STATE"/>
+        <result property="file" column="FILE"/>
+    </resultMap>
+    <resultMap id="category" type="com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO">
+        <id property="categoryNo" column="CATEGORY_NO"/>
+        <result property="categoryName" column="CATEGORY_NAME"/>
+    </resultMap>
+    <insert id="addInquiry" parameterType="com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO">
+        INSERT INTO TBL_INQUIRY VALUES
+        (
+            0,
+            #{inquiryTitle},
+            #{inquiryContent},
+            #{inquiryDate},
+            #{categoryNo},
+            #{userNo},
+            '처리중입니다.',
+            '처리중입니다.',
+            "2024-12-16",
+            #{state},
+            null
+        )
+    </insert>
+
+    <select id="findCategory" resultMap="category">
+        SELECT * FROM TBL_INQUIRY_CATEGORY
+    </select>
+</mapper>
