@@ -14,13 +14,6 @@
 > 2. "-"(하이픈)만 사용 <br>
 > 3. 명명규칙 예시 : feature/#1(이슈번호)-add-resource-files <br>
 > 4. 1기능 당 한개의 브랜치 생성 <br>
->> chore : 작은 수정 <br>
->> ci : ci 수정 <br>
->> docs : 문서 수정 <br>
->> style : 코드 스타일 수정 <br>
->> refactor : 코드 리팩토링 <br>
->> test : 테스트 <br>
->> perf : 성능 개선 <br>
 
 ### hotfix (긴급 문제수정용 브랜치)
 > 1. 영문 대문자 금지
