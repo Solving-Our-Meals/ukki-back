@@ -34,10 +34,8 @@ public class SignupController {
 
         String resultMessage = signupService.validatePassword(password);
         if (resultMessage.equals("비밀번호가 유효합니다.")) {
-            // 비밀번호가 유효한 경우 성공 메시지 처리
             return ResponseEntity.ok(Map.of("isValid", true, "message", resultMessage));
         } else {
-            // 유효하지 않은 경우 오류 메시지 반환
             return ResponseEntity.ok(Map.of("isValid", false, "message", resultMessage));
         }
     }
