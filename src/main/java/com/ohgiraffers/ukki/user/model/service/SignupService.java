@@ -20,9 +20,24 @@ public class SignupService {
         return count == 0;
     }
 
-    public boolean signupPwd(String password) {
-        // 비밀번호가 영문, 숫자, 특수문자 조합으로 8~20자 사이인지 확인하는 정규 표현식
-        String passwordRegex = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,20}$";
-        return password.matches(passwordRegex);
+    public String validatePassword(String password) {
+        // 비밀번호 길이가 8자 미만인 경우
+        if (password.length() < 8) {
+            return "ⓘ 비밀번호는 최소 8자 이상이어야 합니다.";
+        }
+
+        // 숫자가 포함되지 않은 경우
+        if (!password.matches(".*[0-9].*")) {
+            return "ⓘ 비밀번호에는 최소 하나의 숫자가 포함되어야 합니다.";
+        }
+
+        // 특수문자가 포함되지 않은 경우
+        if (!password.matches(".*[!@#$%^&*()_+\\-\\=\\[\\]{};':\"\\\\|,.<>\\/?]+.*")) {
+            return "ⓘ 비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.";
+        }
+
+        // 모든 조건을 만족하는 경우
+        return "ⓘ 비밀번호가 유효합니다.";
     }
+
 }

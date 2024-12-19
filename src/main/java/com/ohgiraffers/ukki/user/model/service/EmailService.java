@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.user.model.service;
 
+import com.ohgiraffers.ukki.user.model.dao.EmailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -7,6 +8,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -14,47 +16,59 @@ import java.util.concurrent.TimeUnit;
 public class EmailService {
 
     @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    private EmailMapper emailMapper;
 
-    @Value("${spring.mail.username}")
-    private String fromEmail;
-
-    // 이메일 인증 코드 생성 후 전송
-    public boolean sendCode(String email) {
-        String verificationCode = UUID.randomUUID().toString().substring(0, 6);
-
-        try {
-
-            redisTemplate.opsForValue().set(email, verificationCode, 5, TimeUnit.MINUTES);
-
-            sendEmail(email, verificationCode);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean isEmailDuplicate(String email) {
+        return emailMapper.countByEmail(email) > 0;
     }
 
-    private void sendEmail(String toEmail, String verificationCode) {
+    public boolean sendAuthCodeEmail(String email, String authCode) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
+            message.setTo(email);
             message.setSubject("이메일 인증 코드");
-            message.setText("여기에 인증 코드: " + verificationCode + " 를 입력하세요.");
+            message.setText("귀하의 인증 코드: " + authCode);
 
-            javaMailSender.send(message);
+            mailSender.send(message);  // 이메일 전송
+            return true;
         } catch (Exception e) {
-            throw new RuntimeException("이메일 전송에 실패했습니다: " + e.getMessage(), e);
+            return false;  // 이메일 전송 실패
         }
     }
 
-    public boolean verifyCode(String email, String code) {
-        String storedCode = redisTemplate.opsForValue().get(email);
+    // 코드 생성용
+    private String generateAuthCode() {
+        Random random = new Random();
+        StringBuilder authCode = new StringBuilder();
+        for (int i = 0; i < 6; i++) {  // 6자리 인증번호 생성
+            authCode.append(random.nextInt(10));  // 0~9까지 숫자 생성
+        }
+        return authCode.toString();
+    }
 
-        return storedCode != null && storedCode.equals(code);
+    // 인증코드 redis 저장용
+    private void saveAuthCodeToRedis(String email, String authCode) {
+        String redisKey = "authCode:" + email;
+        redisTemplate.opsForValue().set(redisKey, authCode, 30, TimeUnit.MINUTES); // 30분
+    }
+
+    // 이메일 인증 코드 생성 및 전송, Redis 저장
+    public boolean sendAuthCodeAndSave(String email) {
+        String authCode = generateAuthCode();  // 인증 코드 생성
+        saveAuthCodeToRedis(email, authCode);  // Redis에 저장
+        return sendAuthCodeEmail(email, authCode);  // 이메일 전송
+    }
+
+    public boolean verifyAuthCode(String email, String authCode) {
+        String redisKey = "authCode:" + email;
+        String storedCode = redisTemplate.opsForValue().get(redisKey);
+
+        return storedCode != null && storedCode.equals(authCode);
     }
 }
