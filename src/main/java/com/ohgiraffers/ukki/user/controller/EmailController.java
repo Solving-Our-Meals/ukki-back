@@ -59,4 +59,21 @@ public class EmailController {
         response.put("success", emailSent);
         return emailSent ? ResponseEntity.ok(response) : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
+    @PostMapping("/verifycode")
+    public ResponseEntity<Map<String, Object>> verifyCode(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String authCode = request.get("authCode");
+
+        boolean isValidCode = emailService.verifyAuthCode(email, authCode);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("isValid", isValidCode);
+
+        if (isValidCode) {
+            return ResponseEntity.ok(response);  // 인증 성공
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);  // 인증 실패
+        }
+    }
 }

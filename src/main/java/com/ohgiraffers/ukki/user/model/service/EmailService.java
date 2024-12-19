@@ -64,4 +64,11 @@ public class EmailService {
         saveAuthCodeToRedis(email, authCode);  // Redis에 저장
         return sendAuthCodeEmail(email, authCode);  // 이메일 전송
     }
+
+    public boolean verifyAuthCode(String email, String authCode) {
+        String redisKey = "authCode:" + email;
+        String storedCode = redisTemplate.opsForValue().get(redisKey);
+
+        return storedCode != null && storedCode.equals(authCode);
+    }
 }

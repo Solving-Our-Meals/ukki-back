@@ -33,7 +33,7 @@ public class SignupController {
         String password = request.get("userPass");
 
         String resultMessage = signupService.validatePassword(password);
-        if (resultMessage.equals("비밀번호가 유효합니다.")) {
+        if (resultMessage.equals("ⓘ 비밀번호가 유효합니다.")) {
             return ResponseEntity.ok(Map.of("isValid", true, "message", resultMessage));
         } else {
             return ResponseEntity.ok(Map.of("isValid", false, "message", resultMessage));
