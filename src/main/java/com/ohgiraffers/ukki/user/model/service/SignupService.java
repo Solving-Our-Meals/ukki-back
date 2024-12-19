@@ -40,4 +40,9 @@ public class SignupService {
         return "ⓘ 비밀번호가 유효합니다.";
     }
 
+
+    public boolean signupNickname(SignupUserDTO signupUserDTO) {
+        int count = signupMapper.signupNickname(signupUserDTO.getUserName());
+        return count == 0;
+    }
 }

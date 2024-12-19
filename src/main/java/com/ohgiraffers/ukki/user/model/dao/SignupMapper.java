@@ -6,4 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface SignupMapper {
 
     int signupId(String userId);
+
+    int signupNickname(String userId);
 }
