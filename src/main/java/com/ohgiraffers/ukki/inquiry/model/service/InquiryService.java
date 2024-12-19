@@ -30,4 +30,8 @@ public class InquiryService {
     public Integer lastInquiryNo() {
         return inquiryMapper.lastInquiryNo();
     }
+
+    public List<InquiryDTO> findInquiryList(int userNo) {
+        return inquiryMapper.findInquiryList(userNo);
+    }
 }

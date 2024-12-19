@@ -1,7 +1,9 @@
 package com.ohgiraffers.ukki.inquiry.controller;
 
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.ukki.inquiry.model.dto.InquiryListDTO;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -162,5 +164,22 @@ public class InquiryController {
         List<InquiryCategoryDTO> category = inquiryService.findCategory();
 
         return ResponseEntity.ok(category);
+    }
+
+    @GetMapping(value = "/inquirylist")
+    public  ResponseEntity<?> findInquiryList(){
+//        userNo 받아와야한다. auth쪽에서 해야할 듯 일단 num는 3번으로 진행하자
+        List<InquiryDTO> inquiryList = inquiryService.findInquiryList(3);
+        List<InquiryListDTO> necessaryInquiryList = new ArrayList<>();
+
+        for(int i=0; i<inquiryList.size(); i++){
+            InquiryListDTO temp = new InquiryListDTO();
+            temp.setInquiryTitle(inquiryList.get(i).getInquiryTitle());
+            temp.setInquiryDate(inquiryList.get(i).getInquiryDate());
+            temp.setState(inquiryList.get(i).getState().getInquiryState());
+            necessaryInquiryList.add(temp);
+        }
+
+        return ResponseEntity.ok(necessaryInquiryList);
     }
 }
