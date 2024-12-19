@@ -39,4 +39,12 @@ public class SignupController {
             return ResponseEntity.ok(Map.of("isValid", false, "message", resultMessage));
         }
     }
+
+    @PostMapping("/signupnickname")
+    public ResponseEntity<Map<String, Boolean>> signupNick(@RequestBody SignupUserDTO signupUserDTO) {
+        boolean isValid = signupService.signupNickname(signupUserDTO);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isValid", isValid);
+        return ResponseEntity.ok(response);
+    }
 }
