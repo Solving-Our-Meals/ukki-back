@@ -15,5 +15,5 @@ public interface StoreMapper {
 
     OperationDTO getOperation(StoreInfoDTO storeInfoDTO);
 
-    BannerDTO getBanner(StoreInfoDTO storeInfoDTO);
+    BannerDTO getBannerList(StoreInfoDTO storeInfoDTO);
 }

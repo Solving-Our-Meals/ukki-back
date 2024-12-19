@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,8 +83,8 @@ public class StoreController {
 
     @GetMapping("/storebanner/5")
     @ResponseBody
-    public List<String> getBanner(StoreInfoDTO storeInfoDTO) {
-        BannerDTO bannerDTO = storeService.getBanner(storeInfoDTO);
+    public List<String> getBannerList(StoreInfoDTO storeInfoDTO) {
+        BannerDTO bannerDTO = storeService.getBannerList(storeInfoDTO);
         List<String> bannerList = bannerDTO.getBannerList();
 
         List<String> fileUrls = new ArrayList<>();
@@ -94,7 +95,7 @@ public class StoreController {
     }
 
     @GetMapping("/api/files")
-    public ResponseEntity<Resource> getFile(@RequestParam("filename") String filename) {
+    public ResponseEntity<Resource> getBanner(@RequestParam("filename") String filename) {
         try {
             // Paths.get(SHARED_FOLDER)는 SHARED_FOLDER로 지정한 경로(여기서는 전역필드로 초기화) 문자열을 Path 객체로 변환
             // 이 Path 객체는 파일 시스템 경로를 추상화하여 처리할 수 있게 한다.
@@ -117,7 +118,6 @@ public class StoreController {
             // 이 UriResource 객체를 사용하여 파일을 읽거나 다른 작업을 수행할 수 있다.
             Resource resource = new UrlResource(file.toUri());
 
-
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
@@ -130,12 +130,35 @@ public class StoreController {
         }
     }
 
-//    @GetMapping(value = "/storeProfile/5")
-//    @RequestBody
-//    public ResponseEntity<Resource> getProfile(){
-//
-//    }
+    @GetMapping(value = "/storeProfile/5")
+    public ResponseEntity<String> getProfileName(StoreInfoDTO storeInfoDTO){
 
+        storeInfoDTO = storeService.getStoreInfo(storeInfoDTO);
+        String profileName = storeInfoDTO.getStoreProfile();
+        System.out.println(profileName);
+        return ResponseEntity.ok(profileName);
+    }
+
+    @GetMapping(value = "/api/profile")
+    public ResponseEntity<Resource> getProfile(@RequestParam("profileName") String profileName){
+
+        try {
+            Path file = Paths.get(SHARED_FOLDER).resolve(profileName + ".png");
+            // 디버깅 확인
+            System.out.println("프로필 파일 경로 : " + file);
+            Resource resource = new UrlResource(file.toUri());
+
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; profileName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 
 }
 

@@ -29,7 +29,7 @@ public class StoreService {
         return storeMapper.getOperation(storeInfoDTO);
     }
 
-    public BannerDTO getBanner(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getBanner(storeInfoDTO);
+    public BannerDTO getBannerList(StoreInfoDTO storeInfoDTO) {
+        return storeMapper.getBannerList(storeInfoDTO);
     }
 }
