@@ -15,4 +15,6 @@ public interface InquiryMapper {
     Integer lastInquiryNo();
 
     List<InquiryDTO> findInquiryList(int userNo);
+
+    InquiryDTO inquiryInfo(int inquiryNo);
 }

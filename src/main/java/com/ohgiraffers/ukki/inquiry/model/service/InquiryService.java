@@ -34,4 +34,8 @@ public class InquiryService {
     public List<InquiryDTO> findInquiryList(int userNo) {
         return inquiryMapper.findInquiryList(userNo);
     }
+
+    public InquiryDTO inquiryInfo(int inquiryNo) {
+        return inquiryMapper.inquiryInfo(inquiryNo);
+    }
 }

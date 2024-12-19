@@ -5,16 +5,36 @@ import com.ohgiraffers.ukki.common.InquiryState;
 import java.time.LocalDate;
 
 public class InquiryListDTO {
+    private String division;
+    private int inquiryNo;
     private String inquiryTitle;
     private LocalDate inquiryDate;
     private String state;
 
     public InquiryListDTO(){}
 
-    public InquiryListDTO(String inquiryTitle, LocalDate inquiryDate, String state) {
+    public InquiryListDTO(String division, int inquiryNo, String inquiryTitle, LocalDate inquiryDate, String state) {
+        this.division = division;
+        this.inquiryNo = inquiryNo;
         this.inquiryTitle = inquiryTitle;
         this.inquiryDate = inquiryDate;
         this.state = state;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
+    }
+
+    public int getInquiryNo() {
+        return inquiryNo;
+    }
+
+    public void setInquiryNo(int inquiryNo) {
+        this.inquiryNo = inquiryNo;
     }
 
     public String getInquiryTitle() {
@@ -44,7 +64,9 @@ public class InquiryListDTO {
     @Override
     public String toString() {
         return "InquiryListDTO{" +
-                "inquiryTitle='" + inquiryTitle + '\'' +
+                "division='" + division + '\'' +
+                ", inquiryNo=" + inquiryNo +
+                ", inquiryTitle='" + inquiryTitle + '\'' +
                 ", inquiryDate=" + inquiryDate +
                 ", state='" + state + '\'' +
                 '}';
