@@ -1,7 +1,9 @@
 package com.ohgiraffers.ukki.inquiry.controller;
 
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.ukki.inquiry.model.dto.InquiryListDTO;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -163,4 +165,32 @@ public class InquiryController {
 
         return ResponseEntity.ok(category);
     }
+
+    @GetMapping(value = "/list")
+    public ResponseEntity<?> findInquiryList(){
+//        생각해보니 리뷰신고도 같이 받아야한다. 다시 생각해보자 -> report를 따로 만들고 division을 통해 report와 inquiry구분 -> 관리자에서도 써야하기 때문에
+//        userNo 받아와야한다. auth쪽에서 해야할 듯 일단 num는 3번으로 진행하자
+        List<InquiryDTO> inquiryList = inquiryService.findInquiryList(3);
+        List<InquiryListDTO> necessaryInquiryList = new ArrayList<>();
+
+        for(int i=0; i<inquiryList.size(); i++){
+            InquiryListDTO temp = new InquiryListDTO();
+            temp.setDivision("inquiry");
+            temp.setInquiryNo(inquiryList.get(i).getInquiryNo());
+            temp.setInquiryTitle(inquiryList.get(i).getInquiryTitle());
+            temp.setInquiryDate(inquiryList.get(i).getInquiryDate());
+            temp.setState(inquiryList.get(i).getState().getInquiryState());
+            necessaryInquiryList.add(temp);
+        }
+
+        return ResponseEntity.ok(necessaryInquiryList);
+    }
+
+    @GetMapping(value = "/list/{inquiryNo}")
+    public ResponseEntity<?> inquiryInfo(@PathVariable int inquiryNo){
+        InquiryDTO inquiryDTO = inquiryService.inquiryInfo(inquiryNo);
+
+        return ResponseEntity.ok(inquiryDTO);
+    }
 }
+

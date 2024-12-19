@@ -44,4 +44,16 @@
     <select id="lastInquiryNo">
         SELECT MAX(INQ_NO) FROM TBL_INQUIRY
     </select>
+
+    <select id="findInquiryList" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE USER_NO = #{userNo}
+    </select>
+
+    <select id="inquiryInfo" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </select>
 </mapper>
