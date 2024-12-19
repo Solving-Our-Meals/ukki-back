@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.store.model.dao.StoreMapper">
+
+    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeDes" column="STORE_DES"/>
+        <result property="storeAddress" column="STORE_ADDRESS"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="longitude" column="LONGITUDE"/>
+        <result property="storeProfile" column="STORE_PROFILE"/>
+        <result property="storeMenu" column="STORE_MENU"/>
+        <result property="storeCategoryNo" column="STORE_CATEGORY_NO"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="posNumber" column="POS_NUMBER"/>
+    </resultMap>
+
+    <resultMap id="keywordResultMap" type="com.ohgiraffers.ukki.store.model.dto.KeywordDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="keyword1" column="KEYWORD1"/>
+        <result property="keyword2" column="KEYWORD2"/>
+        <result property="keyword3" column="KEYWORD3"/>
+        <result property="keyword4" column="KEYWORD4"/>
+        <result property="keyword5" column="KEYWORD5"/>
+        <result property="keyword6" column="KEYWORD6"/>
+    </resultMap>
+
+    <resultMap id="operationResultMap" type="com.ohgiraffers.ukki.store.model.dto.OperationDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="monday" column="MONDAY"/>
+        <result property="tuesday" column="TUESDAY"/>
+        <result property="wednesday" column="WEDNESDAY"/>
+        <result property="thursday" column="THURSDAY"/>
+        <result property="friday" column="FRIDAY"/>
+        <result property="saturday" column="SATURDAY"/>
+        <result property="sunday" column="SUNDAY"/>
+        <result property="breakTime" column="BREAK_TIME"/>
+    </resultMap>
+
+    <resultMap id="bannerResultMap" type="com.ohgiraffers.ukki.store.model.dto.BannerDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="banner1" column="IMAGE1"/>
+        <result property="banner2" column="IMAGE2"/>
+        <result property="banner3" column="IMAGE3"/>
+        <result property="banner4" column="IMAGE4"/>
+        <result property="banner5" column="IMAGE5"/>
+    </resultMap>
+
+    <!--  가게 정보  -->
+    <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+        SELECT
+        STORE_NO
+        , STORE_NAME
+        , STORE_DES
+        , STORE_ADDRESS
+        , LATITUDE
+        , LONGITUDE
+        , STORE_PROFILE
+        , STORE_MENU
+        , STORE_CATEGORY_NO
+        , USER_NO
+        , POS_NUMBER
+        FROM TBL_STORE
+        WHERE STORE_NO = 5
+        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
+    </select>
+
+    <!--  가게 키워드  -->
+    <select id="getKeyword" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="keywordResultMap">
+        SELECT
+        STORE_NO
+        , KEYWORD1
+        , KEYWORD2
+        , KEYWORD3
+        , KEYWORD4
+        , KEYWORD5
+        , KEYWORD6
+        FROM TBL_KEYWORD
+        WHERE STORE_NO = 5
+        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
+    </select>
+
+    <!--  운영 시간 불러오기  -->
+    <select id="getOperation" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="operationResultMap">
+        SELECT
+               *
+          FROM TBL_OPERATION
+         WHERE STORE_NO = 5
+        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
+    </select>
+
+    <!--  배너 불러오기  -->
+    <select id="getBanner" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
+        SELECT
+               *
+          FROM TBL_BANNER
+         WHERE STORE_NO = 5
+    </select>
+
+
+</mapper>
