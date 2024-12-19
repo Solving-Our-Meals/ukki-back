@@ -1,5 +1,8 @@
 package com.ohgiraffers.ukki.user.model.dto;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class EmailDTO {
     private String email;
     private String code;
@@ -25,6 +28,13 @@ public class EmailDTO {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public boolean isValidEmail() {
+        String emailConfirm = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        Pattern pattern = Pattern.compile(emailConfirm);
+        Matcher matcher = pattern.matcher(this.email);
+        return matcher.matches();
     }
 
     @Override

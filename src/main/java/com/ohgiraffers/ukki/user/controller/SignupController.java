@@ -22,13 +22,23 @@ public class SignupController {
         boolean isValid = signupService.signupId(signupUserDTO);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isValid", isValid);
+        // 나중에 sout 지울 예정
         System.out.println(signupUserDTO);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signuppwd")
     @ResponseBody
-    public boolean checkPassword(@RequestBody String password) {
-        return signupService.signupPwd(password);
+    public ResponseEntity<Map<String, Object>> checkPassword(@RequestBody Map<String, String> request) {
+        String password = request.get("userPass");
+
+        String resultMessage = signupService.validatePassword(password);
+        if (resultMessage.equals("비밀번호가 유효합니다.")) {
+            // 비밀번호가 유효한 경우 성공 메시지 처리
+            return ResponseEntity.ok(Map.of("isValid", true, "message", resultMessage));
+        } else {
+            // 유효하지 않은 경우 오류 메시지 반환
+            return ResponseEntity.ok(Map.of("isValid", false, "message", resultMessage));
+        }
     }
 }
