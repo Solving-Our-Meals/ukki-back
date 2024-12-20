@@ -31,13 +31,29 @@
             #{userNo},
             '처리중입니다.',
             '처리중입니다.',
-            "2024-12-16",
+            null,
             #{state},
-            null
+            #{file}
         )
     </insert>
 
     <select id="findCategory" resultMap="category">
         SELECT * FROM TBL_INQUIRY_CATEGORY
+    </select>
+
+    <select id="lastInquiryNo">
+        SELECT MAX(INQ_NO) FROM TBL_INQUIRY
+    </select>
+
+    <select id="findInquiryList" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE USER_NO = #{userNo}
+    </select>
+
+    <select id="inquiryInfo" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
     </select>
 </mapper>

@@ -9,4 +9,10 @@
     FROM TBL_USER
     WHERE USER_ID = #{ userId }
 </select>
+
+    <select id="signupNickname" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_USER
+        WHERE USER_ID = #{ userId }
+    </select>
 </mapper>

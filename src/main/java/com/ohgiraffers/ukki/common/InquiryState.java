@@ -13,4 +13,7 @@ public enum InquiryState {
         this.inquiryState=inquiryState;
     }
 
+    public String getInquiryState() {
+        return inquiryState;
+    }
 }
