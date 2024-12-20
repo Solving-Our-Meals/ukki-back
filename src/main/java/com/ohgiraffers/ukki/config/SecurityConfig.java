@@ -1,3 +1,4 @@
+/*
 package com.ohgiraffers.ukki.config;
 
 import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
@@ -23,13 +24,13 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // 비밀번호 암호화 기능
+    // 비밀번호 암호화 주입땜시 (이메일 서비스쪽에서 안됨)
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 정적 리소스 무시로 css, js, 이미지 보안적용 X (백엔드 static과 프론트 public 무시용도?)
+    // 정적 리소스 무시용도 -> css, js, 이미지 보안적용 X (백엔드 static과 프론트 public 무시용도?)
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
@@ -37,7 +38,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    // 권한 주기 !
+    // 권한 주기 ! // 피드백받았을 때 jwt에 맞게 변경필요함
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests( auth -> {
             auth.requestMatchers( "/auth/**", "/css/**", "/img/**", "/error/**", "/find/**").permitAll();
@@ -69,7 +70,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 새로 추가해야할 것
     // 로그아웃 시 토큰 만료
 
     // 로그아웃 했을 때 리프레시 토큰 블랙리스트 추가 -> 로그아웃 안하면 2주간은 자동으로 로그인되는 개념
 }
+*/
