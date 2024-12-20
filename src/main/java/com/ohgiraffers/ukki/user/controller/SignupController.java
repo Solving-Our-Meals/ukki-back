@@ -4,6 +4,7 @@ import com.ohgiraffers.ukki.user.model.dto.EmailDTO;
 import com.ohgiraffers.ukki.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.ukki.user.model.service.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,6 @@ public class SignupController {
         boolean isValid = signupService.signupId(signupUserDTO);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isValid", isValid);
-        // 나중에 sout 지울 예정
-        System.out.println(signupUserDTO);
         return ResponseEntity.ok(response);
     }
 
@@ -46,5 +45,16 @@ public class SignupController {
         Map<String, Boolean> response = new HashMap<>();
         response.put("isValid", isValid);
         return ResponseEntity.ok(response);
+    }
+
+    // 마지막 모든 걸 합친 회원가입
+    @PostMapping("/signup")
+    public ResponseEntity<String> realSignup(@RequestBody SignupUserDTO signupUserDTO) {
+        boolean isSignupSuccess = signupService.realSignup(signupUserDTO);
+        if (isSignupSuccess) {
+            return new ResponseEntity<>("회원가입이 완료되었습니다!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("회원가입에 실패했습니다.", HttpStatus.BAD_REQUEST);
+        }
     }
 }
