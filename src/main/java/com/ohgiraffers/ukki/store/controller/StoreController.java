@@ -139,6 +139,34 @@ public class StoreController {
     }
 
 //    매뉴 이미지 불러오기 로직 만들 예정
+    @GetMapping(value = "/storeMenu/5")
+    public ResponseEntity<String> getMenuName(StoreInfoDTO storeInfoDTO){
+
+        storeInfoDTO = storeService.getStoreInfo(storeInfoDTO);
+        String menuName = storeInfoDTO.getStoreMenu();
+
+        return ResponseEntity.ok(menuName);
+    }
+
+    @GetMapping(value = "/api/menu")
+    public ResponseEntity<Resource> getMenu(@RequestParam("menuName") String menuName ){
+
+        try {
+            Path file = Paths.get(SHARED_FOLDER).resolve(menuName + ".png");
+            System.out.println("menu : " + file );
+            Resource resource = new UrlResource(file.toUri());
+
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; menuName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 
 }
 
