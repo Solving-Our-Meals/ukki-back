@@ -4,18 +4,19 @@ import com.ohgiraffers.ukki.user.model.dao.SignupMapper;
 import com.ohgiraffers.ukki.user.model.dto.SignupUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SignupService {
 
     private final SignupMapper signupMapper;
-//    private final BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public SignupService(SignupMapper signupMapper) {
         this.signupMapper = signupMapper;
-//        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     public boolean signupId(SignupUserDTO signupUserDTO) {
@@ -50,9 +51,8 @@ public class SignupService {
 
     public boolean realSignup(SignupUserDTO signupUserDTO) {
         try {
-            // 시큐리티 구현되면 해제
-//            String hashedPassword = passwordEncoder.encode(signupUserDTO.getUserPass());
-//            signupUserDTO.setUserPass(hashedPassword);
+            String hashedPassword = passwordEncoder.encode(signupUserDTO.getUserPass());
+            signupUserDTO.setUserPass(hashedPassword);
 
             signupMapper.signup(signupUserDTO);
             return true;

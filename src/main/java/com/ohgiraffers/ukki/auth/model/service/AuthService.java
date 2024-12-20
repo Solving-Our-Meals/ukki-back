@@ -1,17 +1,27 @@
-/*
 package com.ohgiraffers.ukki.auth.model.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service
 public class AuthService {
+
+    private final UserDetail userDetail;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    public AuthService(UserDetail userDetail, BCryptPasswordEncoder passwordEncoder) {
+        this.userDetail = userDetail;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // 보안을 위해 application.yml의 jwt.secret을 받아서 사용
     @Value("${jwt.secret}")
@@ -92,5 +102,15 @@ public class AuthService {
             return false;
         }
     }
+
+    public boolean authenticateUser(String userId, String userPass) {
+        org.springframework.security.core.userdetails.UserDetails userDetails = userDetail.loadUserByUsername(userId);
+
+        if (userDetails == null) {
+            return false;
+        }
+
+        // 비밀번호 검증 (BCryptPasswordEncoder를 사용하여 비교)
+        return passwordEncoder.matches(userPass, userDetails.getPassword());
+    }
 }
- */

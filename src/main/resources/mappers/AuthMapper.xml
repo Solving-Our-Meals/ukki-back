@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.auth.model.dao.AuthMapper">
+    <select id="getUserByUserId" parameterType="String" resultType="com.ohgiraffers.ukki.auth.model.dto.AuthDTO">
+<!--   AS 사용해서 매칭 X     -->
+        SELECT
+        USER_ID AS userId,
+        USER_PASS AS userPass,
+        USER_ROLE
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+</mapper>
