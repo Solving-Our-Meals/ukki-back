@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.auth.model.service;
 
 import com.ohgiraffers.ukki.auth.model.dao.AuthMapper;
+import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -30,14 +31,17 @@ public class AuthService {
 
     // 사용자 인증
     public boolean authenticateUser(String userId, String userPass) {
-        org.springframework.security.core.userdetails.UserDetails userDetails = userDetail.loadUserByUsername(userId);
+        try {
+            AuthDTO user = authMapper.getUserByUserId(userId);
 
-        if (userDetails == null) {
-            return false;
+            if (user == null) {
+                return false;
+            }
+
+            return passwordEncoder.matches(userPass, user.getUserPass());
+        } catch (Exception e) {
+            throw new RuntimeException("비밀번호 인증 과정에서 오류가 발생했습니다.", e);
         }
-
-        // 비밀번호 검증
-        return passwordEncoder.matches(userPass, userDetails.getPassword());
     }
 
     // JWT 토큰 생성 (JwtService 사용)

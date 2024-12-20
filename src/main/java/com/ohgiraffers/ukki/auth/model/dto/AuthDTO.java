@@ -7,17 +7,18 @@ public class AuthDTO {
     private String userPass;
     private String email;
     private UserRole userRole;
-    private boolean isActive;
-
+    private boolean isActive = true;
+    private boolean noshow;
 
     public AuthDTO() {}
 
-    public AuthDTO(String userId, String userPass, String email, UserRole userRole, boolean isActive) {
+    public AuthDTO(String userId, String userPass, String email, UserRole userRole, boolean isActive, boolean noshow) {
         this.userId = userId;
         this.userPass = userPass;
         this.email = email;
         this.userRole = userRole;
         this.isActive = isActive;
+        this.noshow = noshow;
     }
 
     public String getUserId() {
@@ -60,6 +61,14 @@ public class AuthDTO {
         isActive = active;
     }
 
+    public boolean isNoshow() {
+        return noshow;
+    }
+
+    public void setNoshow(boolean noshow) {
+        this.noshow = noshow;
+    }
+
     @Override
     public String toString() {
         return "AuthDTO{" +
@@ -68,6 +77,7 @@ public class AuthDTO {
                 ", email='" + email + '\'' +
                 ", userRole=" + userRole +
                 ", isActive=" + isActive +
+                ", noshow=" + noshow +
                 '}';
     }
 }
