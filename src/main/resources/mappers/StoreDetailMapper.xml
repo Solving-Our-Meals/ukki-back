@@ -93,7 +93,7 @@
     </select>
 
     <!--  배너 불러오기  -->
-    <select id="getBanner" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
+    <select id="getBannerList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
         SELECT
                *
           FROM TBL_BANNER

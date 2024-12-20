@@ -1,6 +1,5 @@
 package com.ohgiraffers.ukki.user.controller;
 
-import com.ohgiraffers.ukki.user.model.dto.EmailDTO;
 import com.ohgiraffers.ukki.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.ukki.user.model.service.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
