@@ -1,4 +1,4 @@
-package com.ohgiraffers.ukki.auth.Filter;
+/* package com.ohgiraffers.ukki.auth.Filter;
 
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
 import jakarta.servlet.FilterChain;
@@ -45,3 +45,4 @@ public class JwtFilter extends OncePerRequestFilter {
     
     // 리프레시 토큰
 }
+ */
