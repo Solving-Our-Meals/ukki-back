@@ -2,6 +2,8 @@ package com.ohgiraffers.ukki.auth.controller;
 
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,28 +21,45 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
+    @PostMapping("/auth/login/step-one")
+    public ResponseEntity<?> checkUserId(@RequestBody AuthDTO authDTO) {
         try {
-            boolean isAuthenticated = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
-
-            if (isAuthenticated) {
-                // 인증 성공
-                String token = authService.createToken(authDTO.getUserId());
-
-                return ResponseEntity.ok().body(
-                        Map.of(
-                                "message", "로그인 성공!",
-                                "token", token
-                        )
-                );
+            int isUserIdValid = authService.isUserIdValid(authDTO.getUserId());
+            if (isUserIdValid == 0) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("isValid", false, "message", "아이디가 존재하지 않습니다."));
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "아이디 또는 비밀번호가 잘못되었습니다."));
+            return ResponseEntity.ok(Map.of("isValid", true, "message", "아이디 확인 완료"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("isValid", false, "message", "서버 오류가 발생했습니다."));
+        }
+    }
 
+    @PostMapping("/auth/login/step-two")
+    public ResponseEntity<?> authenticatePassword(@RequestBody AuthDTO authDTO, HttpServletResponse response) {
+        try {
+            boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
+            if (!isPasswordValid) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "비밀번호가 잘못되었습니다."));
+            }
+
+            String token = authService.createToken(authDTO.getUserId());
+
+            // 토큰 쿠키 저장용
+            Cookie cookie = new Cookie("authToken", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
+            response.addCookie(cookie);
+
+            return ResponseEntity.ok(Map.of("message", "로그인 성공!", "token", token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "서버 오류가 발생했습니다."));
         }
     }
+
 }

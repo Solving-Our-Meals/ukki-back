@@ -6,4 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AuthMapper {
     AuthDTO getUserByUserId(String userId);
+
+    int confirmUserId(String userId);
 }

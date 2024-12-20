@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.auth.model.service;
 
+import com.ohgiraffers.ukki.auth.model.dao.AuthMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,12 +18,14 @@ public class AuthService {
     private final UserDetail userDetail;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;  // JwtService 주입
+    private final AuthMapper authMapper;
 
     @Autowired
-    public AuthService(UserDetail userDetail, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserDetail userDetail, BCryptPasswordEncoder passwordEncoder, JwtService jwtService, AuthMapper authMapper) {
         this.userDetail = userDetail;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;  // JwtService 주입
+        this.authMapper = authMapper;
     }
 
     // 사용자 인증
@@ -50,5 +53,9 @@ public class AuthService {
     // 토큰에서 사용자 아이디 추출
     public String getUserIdFromToken(String token) {
         return jwtService.getUserIdFromToken(token);
+    }
+
+    public int isUserIdValid(String userId) {
+        return authMapper.confirmUserId(userId);
     }
 }
