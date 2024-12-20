@@ -59,28 +59,6 @@ public class StoreController {
         return storeInfoDTO;
     }
 
-//    @GetMapping("/storebanner/5")
-//    @ResponseBody
-//    public ResponseEntity<List<String>> getBanner(StoreInfoDTO storeInfoDTO) {
-//        System.out.println("banner 왔다.");
-//        BannerDTO bannerDTO = storeService.getBanner(storeInfoDTO);
-//
-//        System.out.println("list 담기 전: " + bannerDTO);
-//
-//        // DTO에 있는 각 필드의 값을 배열로 담음.
-//        List<String> bannerList = bannerDTO.getBannerList();
-//        System.out.println("list 담기 후: " + bannerList);
-//
-//        List<String> fileUrls = new ArrayList<>();
-//
-//        for (String bannerName : bannerList) {
-//            String fileUrl = SHARED_FOLDER + bannerName;
-//            fileUrls.add(fileUrl);
-//        }
-//
-//        return ResponseEntity.ok(fileUrls);
-//    }
-
     @GetMapping("/storebanner/5")
     @ResponseBody
     public List<String> getBannerList(StoreInfoDTO storeInfoDTO) {
@@ -159,6 +137,8 @@ public class StoreController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+//    매뉴 이미지 불러오기 로직 만들 예정
 
 }
 
