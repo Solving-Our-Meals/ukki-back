@@ -1,7 +1,6 @@
 package com.ohgiraffers.ukki.auth.controller;
 
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
-import com.ohgiraffers.ukki.auth.model.dto.JwtTokenDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,19 +21,26 @@ public class AuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
-        boolean isAuthenticated = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
+        try {
+            boolean isAuthenticated = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
 
-        if (isAuthenticated) {
-            // 인증 성공 시 JWT 토큰 생성
-            String token = authService.createToken(authDTO.getUserId());
+            if (isAuthenticated) {
+                // 인증 성공
+                String token = authService.createToken(authDTO.getUserId());
 
-            // LoginResponse DTO를 사용하여 응답
-            JwtTokenDTO response = new JwtTokenDTO("로그인 성공!", token);
-            return ResponseEntity.ok(response);
+                return ResponseEntity.ok().body(
+                        Map.of(
+                                "message", "로그인 성공!",
+                                "token", token
+                        )
+                );
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "아이디 또는 비밀번호가 잘못되었습니다."));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "서버 오류가 발생했습니다."));
         }
-
-        // 인증 실패
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("아이디 또는 비밀번호가 잘못되었습니다.");
     }
 }

@@ -7,9 +7,9 @@
 <!--   AS 사용해서 매칭 X     -->
         SELECT
         USER_ID AS userId,
-        USER_PASS AS userPass,
+        USER_PWD AS userPass,
         USER_ROLE
-        FROM users
+        FROM TBL_USER
         WHERE user_id = #{userId}
     </select>
 </mapper>
