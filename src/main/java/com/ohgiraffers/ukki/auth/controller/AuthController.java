@@ -55,11 +55,11 @@ public class AuthController {
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
             response.addCookie(cookie);
 
-            return ResponseEntity.ok(Map.of("message", "로그인 성공!", "token", token));
+            return ResponseEntity.ok(Map.of("success", true, "message", "로그인 성공 !", "token", token));
         } catch (Exception e) {
             e.printStackTrace(); // 에러가 뭔지 전혀 모르겠으면 사용 -> HS512가 512bit수준의 SECRET_KEY를 원하는데 내가 너무 짧게 설정해서 오류가난거임 -> 해결완료
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "서버 오류가 발생했습니다."));
+                    .body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
         }
     }
 
