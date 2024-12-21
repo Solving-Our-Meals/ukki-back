@@ -49,7 +49,7 @@ public class AuthController {
 
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
-            cookie.setHttpOnly(true);
+            cookie.setHttpOnly(false); // 이것도 배포 전에 false
             cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
