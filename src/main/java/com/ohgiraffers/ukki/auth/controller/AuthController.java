@@ -45,7 +45,7 @@ public class AuthController {
                         .body(Map.of("message", "비밀번호가 잘못되었습니다."));
             }
 
-            String token = authService.createToken(authDTO.getUserId());
+            String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole());
 
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);

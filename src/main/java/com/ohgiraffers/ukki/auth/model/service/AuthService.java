@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.auth.model.service;
 
 import com.ohgiraffers.ukki.auth.model.dao.AuthMapper;
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
+import com.ohgiraffers.ukki.common.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -45,8 +47,8 @@ public class AuthService {
     }
 
     // JWT 토큰 생성 (JwtService 사용)
-    public String createToken(String userId) {
-        return jwtService.createToken(userId);  // JwtService를 사용하여 토큰 생성
+    public String createToken(String userId, UserRole userRole) {
+        return jwtService.createToken(userId, userRole);  // JwtService를 사용하여 토큰 생성
     }
 
     // 토큰 유효성 검사
@@ -54,9 +56,9 @@ public class AuthService {
         return jwtService.validateToken(token);
     }
 
-    // 토큰에서 사용자 아이디 추출
-    public String getUserIdFromToken(String token) {
-        return jwtService.getUserIdFromToken(token);
+    // 토큰에서 사용자 아이디와 userRole 추출
+    public Map<String, Object> getUserInfoFromToken(String token) {
+        return jwtService.getUserInfoFromToken(token);
     }
 
     public int isUserIdValid(String userId) {

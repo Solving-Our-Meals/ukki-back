@@ -1,6 +1,5 @@
  package com.ohgiraffers.ukki.auth.Filter;
 
-import com.ohgiraffers.ukki.auth.model.service.AuthService;
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,8 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
-@Component
+ @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -30,10 +30,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰 유효성 검증
         if (token != null && jwtService.validateToken(token)) {
-            String userId = jwtService.getUserIdFromToken(token);
+            Map<String, Object> userInfo = jwtService.getUserInfoFromToken(token);
+
+            String userId = (String) userInfo.get("userId");  // userId 추출
+            String userRole = (String) userInfo.get("userRole");  // userRole 추출
+
 
             // 인증 객체 생성
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userId, null, null);  // 사용자 정보는 userId만 사용
+
+            // 인증 객체에 userRole 추가
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             // SecurityContext에 인증 정보 설정

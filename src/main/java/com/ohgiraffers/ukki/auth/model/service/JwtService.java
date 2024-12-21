@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.auth.model.service;
 
+import com.ohgiraffers.ukki.common.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class JwtService {
@@ -16,8 +19,9 @@ public class JwtService {
     private String SECRET_KEY;
 
     // JWT 토큰 생성용 (엑세스 토큰)
-    public String createToken(String userId) {
+    public String createToken(String userId, UserRole userRole) {
         Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("userRole", userRole);
         Date now = new Date();
         Date expired = new Date(now.getTime() + 3600000); // 1시간 설정
 
@@ -42,15 +46,23 @@ public class JwtService {
         }
     }
 
-    // 토큰에서 사용자 아이디 추출용도
-    public String getUserIdFromToken(String token) {
+    // 토큰에서 사용자 아이디와 userRole 추출용도
+    public Map<String, Object> getUserInfoFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY) // 비밀키로 검증한번하고
-                .build() // 마찬가지로 넣어야할거같아서 넣었는데 객체 생성을 위해서 쓴다고하는데 이걸 안쓰면 아래 검증이 안돼서 쓴다.
-                .parseClaimsJws(token) // jwt 파싱 및 서명 검증
-                .getBody(); // jwt 본문(payload) get
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-        return claims.getSubject(); // 본문에서 사용자 아이디 반환
+        String userId = claims.getSubject(); // 사용자 아이디
+        String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", userId);
+        userInfo.put("userRole", userRole);
+
+        return userInfo;
     }
+
     // 여기까지가 엑세스 토큰?
 }
