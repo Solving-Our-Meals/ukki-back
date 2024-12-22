@@ -4,6 +4,8 @@ import com.ohgiraffers.ukki.common.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +66,45 @@ public class JwtService {
         return userInfo;
     }
 
-    // 여기까지가 엑세스 토큰?
+    // 리프레시 토큰에 대한 부분이 없어 추가해야 한다.
+
+    // 리프토 생성
+    public String createRefreshToken(String userId) {
+        Claims claims = Jwts.claims().setSubject(userId);
+        Date now = new Date();
+        Date expired = new Date(now.getTime() + 604800000); // 7일 설정 (리프레시 토큰 유효 기간)
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expired)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
+
+    // 리프토 검증
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 리프토 중복 확인
+    public String getRefresh(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue(); // 원래 있던 리프토 반환해보기
+                }
+            }
+        }
+        return null;
+    }
 }

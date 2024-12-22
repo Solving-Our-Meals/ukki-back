@@ -3,16 +3,11 @@ package com.ohgiraffers.ukki.auth.model.service;
 import com.ohgiraffers.ukki.auth.model.dao.AuthMapper;
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
 import com.ohgiraffers.ukki.common.UserRole;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -45,10 +40,12 @@ public class AuthService {
             throw new RuntimeException("비밀번호 인증 과정에서 오류가 발생했습니다.", e);
         }
     }
+    
+    // 순환때문에 여기다가 한번더 돌리는 역할로 생성함
 
     // JWT 토큰 생성 (JwtService 사용)
     public String createToken(String userId, UserRole userRole) {
-        return jwtService.createToken(userId, userRole);  // JwtService를 사용하여 토큰 생성
+        return jwtService.createToken(userId, userRole);
     }
 
     // 토큰 유효성 검사
@@ -63,5 +60,19 @@ public class AuthService {
 
     public int isUserIdValid(String userId) {
         return authMapper.confirmUserId(userId);
+    }
+
+    // 리프토
+    public String createRefreshToken(String userId) {
+        return jwtService.createRefreshToken(userId);
+    }
+
+    // 리프토
+    public boolean validateRefreshToken(String refreshToken) {
+        return jwtService.validateRefreshToken(refreshToken);
+    }
+
+    public String getRefresh(HttpServletRequest request) {
+        return jwtService.getRefresh(request);
     }
 }

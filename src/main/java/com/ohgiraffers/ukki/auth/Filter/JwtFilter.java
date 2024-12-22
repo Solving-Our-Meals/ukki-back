@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Map;
 
- @Component
+@Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -59,6 +59,4 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         return null;
     }
-    
-    // 리프레시 토큰
 }
