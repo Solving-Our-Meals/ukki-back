@@ -56,4 +56,18 @@
         FROM TBL_INQUIRY
         WHERE INQ_NO = #{inquiryNo}
     </select>
+
+    <update id="inquiryUpdate" parameterType="com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO">
+        UPDATE TBL_INQUIRY
+        SET
+        INQ_TITLE = #{inquiryTitle},
+        INQ_CONTENT = #{inquiryContent},
+        FILE = #{file}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <delete id="inquiryDelete">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
 </mapper>

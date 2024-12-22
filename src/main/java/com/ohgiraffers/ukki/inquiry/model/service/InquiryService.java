@@ -38,4 +38,12 @@ public class InquiryService {
     public InquiryDTO inquiryInfo(int inquiryNo) {
         return inquiryMapper.inquiryInfo(inquiryNo);
     }
+
+    public int inquiryUpdate(InquiryDTO inquiryDTO) {
+        return inquiryMapper.inquiryUpdate(inquiryDTO);
+    }
+
+    public int inquiryDelete(int inquiryNo) {
+        return inquiryMapper.inquiryDelete(inquiryNo);
+    }
 }
