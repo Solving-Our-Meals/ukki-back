@@ -19,4 +19,16 @@ public class ReportService {
     public List<ReportDTO> findReportList(int userNo) {
         return reportMapper.findReportList(userNo);
     }
+
+    public ReportDTO reportInfo(int reportNo) {
+        return reportMapper.reportInfo(reportNo);
+    }
+
+    public int reportDelete(int reportNo) {
+        return reportMapper.reportDelete(reportNo);
+    }
+
+    public int reportUpdate(ReportDTO reportDTO) {
+        return reportMapper.reportUpdate(reportDTO);
+    }
 }

@@ -8,4 +8,10 @@ import java.util.List;
 @Mapper
 public interface ReportMapper {
     List<ReportDTO> findReportList(int userNo);
+
+    ReportDTO reportInfo(int reportNo);
+
+    int reportDelete(int reportNo);
+
+    int reportUpdate(ReportDTO reportDTO);
 }
