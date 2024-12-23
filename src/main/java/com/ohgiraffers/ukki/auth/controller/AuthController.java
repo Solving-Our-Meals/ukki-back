@@ -90,9 +90,10 @@ public class AuthController {
         if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
             Map<String, Object> userInfo = authService.getUserInfoFromToken(refreshToken);
             String userId = (String) userInfo.get("userId");
+            int userNo = (int) userInfo.get("userNo");
 
             // 지금 뉴 토큰이 map을 통해 아이디에 롤을 담고 있는데 아무래도 유저 번호가 추가되기 때문에 3개를 담아야해서 바꿔야할 듯 싶다.
-            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")), userNo.get("userNo"));
+            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")), userNo);
 
             Cookie newCookie = new Cookie("authToken", newToken);
             newCookie.setHttpOnly(false); // 배포하면 트루
