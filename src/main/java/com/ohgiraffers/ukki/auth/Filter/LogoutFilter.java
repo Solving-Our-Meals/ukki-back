@@ -15,7 +15,7 @@ public class LogoutFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("로그아웃 시작?이요~");
+        System.out.println("로그아웃 필터 시작?이요~");
     }
 
     @Override
