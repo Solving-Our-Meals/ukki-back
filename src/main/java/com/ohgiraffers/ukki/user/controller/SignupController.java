@@ -48,12 +48,18 @@ public class SignupController {
 
     // 마지막 모든 걸 합친 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<String> realSignup(@RequestBody SignupUserDTO signupUserDTO) {
+    public ResponseEntity<Map<String, Object>> realSignup(@RequestBody SignupUserDTO signupUserDTO) {
         boolean isSignupSuccess = signupService.realSignup(signupUserDTO);
+        Map<String, Object> response = new HashMap<>();
         if (isSignupSuccess) {
-            return new ResponseEntity<>("회원가입이 완료되었습니다!", HttpStatus.OK);
+            response.put("success", true);
+            response.put("message", "ⓘ 회원가입이 완료되었습니다!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("회원가입에 실패했습니다.", HttpStatus.BAD_REQUEST);
+            response.put("success", false);
+            response.put("message", "ⓘ 회원가입에 실패했습니다.");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
 }

@@ -49,7 +49,7 @@ public class AuthController {
                         .body(Map.of("message", "비밀번호가 잘못되었습니다."));
             }
 
-            String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole());
+            String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole(), authDTO.getUserNo());
 
             String existingRefreshToken = authService.getRefresh(request);
 
@@ -90,8 +90,9 @@ public class AuthController {
         if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
             Map<String, Object> userInfo = authService.getUserInfoFromToken(refreshToken);
             String userId = (String) userInfo.get("userId");
+            int userNo = (int) userInfo.get("userNo");
 
-            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")));
+            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")), userNo);
 
             Cookie newCookie = new Cookie("authToken", newToken);
             newCookie.setHttpOnly(false); // 배포하면 트루
