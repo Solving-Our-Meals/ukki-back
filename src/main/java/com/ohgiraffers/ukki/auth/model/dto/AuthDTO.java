@@ -3,7 +3,7 @@ package com.ohgiraffers.ukki.auth.model.dto;
 import com.ohgiraffers.ukki.common.UserRole;
 
 public class AuthDTO {
-    private String userNo;
+    private int userNo;
     private String userId;
     private String userPass;
     private String email;
@@ -13,11 +13,21 @@ public class AuthDTO {
 
     public AuthDTO() {}
 
-    public String getUserNo() {
+    public AuthDTO(int userNo, String userId, String userPass, String email, UserRole userRole, boolean isActive, boolean noshow) {
+        this.userNo = userNo;
+        this.userId = userId;
+        this.userPass = userPass;
+        this.email = email;
+        this.userRole = userRole;
+        this.isActive = isActive;
+        this.noshow = noshow;
+    }
+
+    public int getUserNo() {
         return userNo;
     }
 
-    public void setUserNo(String userNo) {
+    public void setUserNo(int userNo) {
         this.userNo = userNo;
     }
 
@@ -72,7 +82,7 @@ public class AuthDTO {
     @Override
     public String toString() {
         return "AuthDTO{" +
-                "userNo='" + userNo + '\'' +
+                "userNo=" + userNo +
                 ", userId='" + userId + '\'' +
                 ", userPass='" + userPass + '\'' +
                 ", email='" + email + '\'' +

@@ -21,9 +21,10 @@ public class JwtService {
     private String SECRET_KEY;
 
     // JWT 토큰 생성용 (엑세스 토큰)
-    public String createToken(String userId, UserRole userRole) {
+    public String createToken(String userId, UserRole userRole, int userNo) {
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("userRole", userRole);
+        claims.put("userNo", userNo);
         Date now = new Date();
         Date expired = new Date(now.getTime() + 3600000); // 1시간 설정
 
@@ -58,10 +59,12 @@ public class JwtService {
 
         String userId = claims.getSubject(); // 사용자 아이디
         String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
+        int userNo = (int) claims.get("userNo");
 
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("userId", userId);
         userInfo.put("userRole", userRole);
+        userInfo.put("userNo", userNo);
 
         return userInfo;
     }

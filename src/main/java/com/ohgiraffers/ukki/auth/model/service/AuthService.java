@@ -44,8 +44,8 @@ public class AuthService {
     // 순환때문에 여기다가 한번더 돌리는 역할로 생성함
 
     // JWT 토큰 생성 (JwtService 사용)
-    public String createToken(String userId, UserRole userRole) {
-        return jwtService.createToken(userId, userRole);
+    public String createToken(String userId, UserRole userRole, int userNo) {
+        return jwtService.createToken(userId, userRole, userNo);
     }
 
     // 토큰 유효성 검사
