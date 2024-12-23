@@ -220,9 +220,18 @@ public class InquiryController {
             }
         }
 
-//        int result = inquiryService.inquiryUpdate(inquiryDTO);
+        int result = inquiryService.inquiryUpdate(inquiryDTO);
+        String message = "";
+        if(result>0){
+            message="문의가 성공적으로 전달되었습니다.";
+        }else {
+            message="문의에 실패했습니다.";
+        }
 
-        return ResponseEntity.ok("hoi");
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("message", message);
+
+        return ResponseEntity.ok(responseMap);
     }
 
     @DeleteMapping(value = "/list/{inquiryNo}")

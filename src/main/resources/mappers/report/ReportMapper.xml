@@ -22,4 +22,22 @@
                             SELECT STORE_NO FROM TBL_STORE WHERE USER_NO = #{userNo}))
     </select>
 
+    <select id="reportInfo" resultMap="report">
+        SELECT *
+        FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </select>
+
+    <delete id="reportDelete">
+        DELETE FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </delete>
+
+    <update id="reportUpdate" parameterType="com.ohgiraffers.ukki.report.model.dto.ReportDTO">
+        UPDATE TBL_REVIEW_REPORT
+        SET
+        REPORT_TITLE = #{reportTitle},
+        REPORT_CONTENT = #{reportContent},
+        WHERE REPORT_NO = #{reportNo}
+    </update>
 </mapper>

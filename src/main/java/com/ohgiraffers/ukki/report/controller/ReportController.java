@@ -5,15 +5,15 @@ import com.ohgiraffers.ukki.report.model.dto.ReportListDTO;
 import com.ohgiraffers.ukki.report.model.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/report")
+@RequestMapping(value = "/reports")
 public class ReportController {
 
     private final ReportService reportService;
@@ -43,4 +43,48 @@ public class ReportController {
         return ResponseEntity.ok(necessaryReportList);
     }
 
+    @GetMapping("/list/{reportNo}")
+    public ResponseEntity<?> reportInfo(@PathVariable int reportNo){
+        ReportDTO reportDTO = reportService.reportInfo(reportNo);
+
+        return ResponseEntity.ok(reportDTO);
+    }
+
+    @DeleteMapping("list/{reportNo}")
+    public ResponseEntity<?> reportDelete(@PathVariable int reportNo){
+        int result = reportService.reportDelete(reportNo);
+        String message = "";
+        if(result>0){
+            message="문의가 성공적으로 전달되었습니다.";
+        }else {
+            message="문의에 실패했습니다.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("message", message);
+
+        return ResponseEntity.ok(responseMap);
+    }
+    @PutMapping(value = "/list/{reportNo}")
+    public ResponseEntity<?> reportUpdate(@PathVariable int reportNo,
+                                           @RequestPart(value = "data") ReportDTO reportDTO){
+
+        System.out.println("왔당");
+        System.out.println(reportDTO);
+        reportDTO.setReportNo(reportNo);
+
+        int result = reportService.reportUpdate(reportDTO);
+
+        String message = "";
+        if(result>0){
+            message="문의가 성공적으로 전달되었습니다.";
+        }else {
+            message="문의에 실패했습니다.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("message", message);
+
+        return ResponseEntity.ok(responseMap);
+    }
 }
