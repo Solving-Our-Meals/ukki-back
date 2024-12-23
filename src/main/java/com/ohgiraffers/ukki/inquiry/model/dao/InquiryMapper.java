@@ -17,4 +17,8 @@ public interface InquiryMapper {
     List<InquiryDTO> findInquiryList(int userNo);
 
     InquiryDTO inquiryInfo(int inquiryNo);
+
+    int inquiryUpdate(InquiryDTO inquiryDTO);
+
+    int inquiryDelete(int inquiryNo);
 }
