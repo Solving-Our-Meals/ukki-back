@@ -99,7 +99,11 @@ public class QrController {
 //        QR코드 확인 페이지에서 get요청 오게 되면 예약에 저장되어 있는 가게번호와 예약번호를 반환한다.
         QrConfirmDTO qrConfirmDTO = qrService.qrConfirmation(QR);
 
-        return ResponseEntity.ok(qrConfirmDTO);
+        if(qrConfirmDTO!=null) {
+            return ResponseEntity.ok(qrConfirmDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"none\"}");
+        }
     }
 
     @PutMapping("/qr/{QR}/confirm")

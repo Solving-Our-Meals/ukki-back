@@ -18,7 +18,8 @@
 
     <update id="qrConfirmSuccess">
         UPDATE TBL_RESERVATION
-        SET QR_CONFIRM = true
+        SET QR_CONFIRM = true,
+            QR = 'clear'
         WHERE QR = #{qr}
     </update>
 </mapper>
