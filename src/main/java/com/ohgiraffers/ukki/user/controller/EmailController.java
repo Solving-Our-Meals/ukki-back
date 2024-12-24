@@ -49,7 +49,7 @@ public class EmailController {
         String email = request.get("email");
 
         if (!isValidEmail(email)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "유효하지 않은 이메일입니다."));
+            return ResponseEntity.badRequest().body(Map.of("message", "ⓘ 유효하지 않은 이메일입니다."));
         }
 
         // 이메일과 인증 번호를 서비스로 보내서 처리

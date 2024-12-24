@@ -31,12 +31,12 @@ public class AuthController {
             int isUserIdValid = authService.isUserIdValid(authDTO.getUserId());
             if (isUserIdValid == 0) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("isValid", false, "message", "아이디가 존재하지 않습니다."));
+                        .body(Map.of("isValid", false, "message", "ⓘ 아이디가 존재하지 않습니다."));
             }
-            return ResponseEntity.ok(Map.of("isValid", true, "message", "아이디 확인 완료"));
+            return ResponseEntity.ok(Map.of("isValid", true, "message", "ⓘ 아이디 확인 완료"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("isValid", false, "message", "서버 오류가 발생했습니다."));
+                    .body(Map.of("isValid", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
 
@@ -46,7 +46,7 @@ public class AuthController {
             boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "비밀번호가 잘못되었습니다."));
+                        .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));
             }
 
             String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole(), authDTO.getUserNo());
@@ -76,11 +76,11 @@ public class AuthController {
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "로그인 성공 !", "token", token));
+            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
         } catch (Exception e) {
             e.printStackTrace(); // 에러가 뭔지 전혀 모르겠으면 사용 -> 사용해보고 에러 보니까 HS512가 512bit수준의 SECRET_KEY를 원하는데 내가 너무 짧게 설정해서 오류가난거임 -> yml에서 해결완료
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
+                    .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
 
@@ -104,7 +104,7 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("token", newToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "리프레시 토큰이 유효하지 않습니다."));
+                    .body(Map.of("message", "ⓘ 리프레시 토큰이 유효하지 않습니다."));
         }
     }
 
@@ -115,10 +115,10 @@ public class AuthController {
             deleteCookie(request, response, "authToken");
             deleteCookie(request, response, "refreshToken");
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "로그아웃 성공"));
+            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
+                    .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
 

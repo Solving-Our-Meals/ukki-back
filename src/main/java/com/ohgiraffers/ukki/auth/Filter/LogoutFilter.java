@@ -42,7 +42,7 @@ public class LogoutFilter implements Filter {
 
             response.addCookie(authTokenCookie); // 쿠키 삭제
 
-            System.out.println("리프토 & 엑토 제거 완료");
+            System.out.println("ⓘ 리프토 & 엑토 제거 완료");
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
@@ -51,6 +51,6 @@ public class LogoutFilter implements Filter {
     @Override
     public void destroy() {
         // 리소스 생길거 있으면 종료 넣으면 될듯한데 잘 모르겠네
-        System.out.println("로그아웃 필터 끝이요");
+        System.out.println("ⓘ 로그아웃 필터 끝이요");
     }
 }
