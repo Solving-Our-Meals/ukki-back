@@ -1,5 +1,7 @@
 package com.ohgiraffers.ukki.qr.model.service;
 
+import com.ohgiraffers.ukki.qr.model.dao.QrMapper;
+import com.ohgiraffers.ukki.qr.model.dto.QrConfirmDTO;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +23,22 @@ public class QrService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
+    private QrMapper qrMapper;
+
     public QrService(@Qualifier("redisTemplate") RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    public boolean qrSend(String email,String qrName, byte[] qrCodeByteArray) {
-        saveQrCodeToRedis(email, qrName);
+    public boolean qrSend(String email,String qrName, byte[] qrCodeByteArray, long keepTime) {
+        saveQrCodeToRedis(email, qrName, keepTime);
         return sendQrCodeEmail(email, qrCodeByteArray);
     }
 
     // 인증코드 redis 저장용
-    private void saveQrCodeToRedis(String email, String qrName) {
-//        코드의 만료기간은 해당 예약의 예약시간 + 5분 ->
-//                redisTemplate에서 set 어떻게 정할지 생각하자. -> 예약 시간도 받아야겠네
-//        예약시간을 Date로 전환시키고 그 Date빼기 현재시간 + 5분
+    private void saveQrCodeToRedis(String email, String qrName, long keepTime) {
         String redisKey = "qrCode:" + email;
-        redisTemplate.opsForValue().set(redisKey, qrName, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(redisKey, qrName, keepTime, TimeUnit.MINUTES);
     }
 
     public boolean sendQrCodeEmail(String email, byte[] qrCodeByteArray) {
@@ -55,4 +57,11 @@ public class QrService {
         }
     }
 
+    public QrConfirmDTO qrConfirmation(String qr) {
+        return qrMapper.qrConfirmation(qr);
+    }
+
+    public int qrConfirmSuccess(String qr) {
+        return qrMapper.qrConfirmSuccess(qr);
+    }
 }
