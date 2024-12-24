@@ -25,4 +25,25 @@ public class InquiryService {
     public List<InquiryCategoryDTO> findCategory() {
         return inquiryMapper.findCategory();
     }
+
+
+    public Integer lastInquiryNo() {
+        return inquiryMapper.lastInquiryNo();
+    }
+
+    public List<InquiryDTO> findInquiryList(int userNo) {
+        return inquiryMapper.findInquiryList(userNo);
+    }
+
+    public InquiryDTO inquiryInfo(int inquiryNo) {
+        return inquiryMapper.inquiryInfo(inquiryNo);
+    }
+
+    public int inquiryUpdate(InquiryDTO inquiryDTO) {
+        return inquiryMapper.inquiryUpdate(inquiryDTO);
+    }
+
+    public int inquiryDelete(int inquiryNo) {
+        return inquiryMapper.inquiryDelete(inquiryNo);
+    }
 }

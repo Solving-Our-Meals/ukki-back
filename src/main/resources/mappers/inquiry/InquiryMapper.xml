@@ -31,13 +31,43 @@
             #{userNo},
             '처리중입니다.',
             '처리중입니다.',
-            "2024-12-16",
+            null,
             #{state},
-            null
+            #{file}
         )
     </insert>
 
     <select id="findCategory" resultMap="category">
         SELECT * FROM TBL_INQUIRY_CATEGORY
     </select>
+
+    <select id="lastInquiryNo">
+        SELECT MAX(INQ_NO) FROM TBL_INQUIRY
+    </select>
+
+    <select id="findInquiryList" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE USER_NO = #{userNo}
+    </select>
+
+    <select id="inquiryInfo" resultMap="inquiry">
+        SELECT *
+        FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </select>
+
+    <update id="inquiryUpdate" parameterType="com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO">
+        UPDATE TBL_INQUIRY
+        SET
+        INQ_TITLE = #{inquiryTitle},
+        INQ_CONTENT = #{inquiryContent},
+        FILE = #{file}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <delete id="inquiryDelete">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
 </mapper>

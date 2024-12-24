@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.report.model.dao.ReportMapper">
+    <resultMap id="report" type="com.ohgiraffers.ukki.report.model.dto.ReportDTO">
+        <id property="reportNo" column="REPORT_NO"/>
+        <result property="reportTitle" column="REPORT_TITLE"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="reportDate" column="REPORT_DATE"/>
+        <result property="reviewNo" column="REVIEW_NO"/>
+        <result property="answerTitle" column="ANS_TITLE"/>
+        <result property="answerContent" column="ANS_CONTENT"/>
+        <result property="answerDate" column="ANS_DATE"/>
+        <result property="state" column="STATE"/>
+    </resultMap>
+
+    <select id="findReportList" resultMap="report">
+        SELECT *
+        FROM TBL_REVIEW_REPORT
+        WHERE REVIEW_NO IN (SELECT REVIEW_NO FROM TBL_REVIEW WHERE STORE_NO = (
+                            SELECT STORE_NO FROM TBL_STORE WHERE USER_NO = #{userNo}))
+    </select>
+
+    <select id="reportInfo" resultMap="report">
+        SELECT *
+        FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </select>
+
+    <delete id="reportDelete">
+        DELETE FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </delete>
+
+    <update id="reportUpdate" parameterType="com.ohgiraffers.ukki.report.model.dto.ReportDTO">
+        UPDATE TBL_REVIEW_REPORT
+        SET
+        REPORT_TITLE = #{reportTitle},
+        REPORT_CONTENT = #{reportContent},
+        WHERE REPORT_NO = #{reportNo}
+    </update>
+</mapper>
