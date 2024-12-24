@@ -37,7 +37,7 @@ public class AuthService {
 
             return passwordEncoder.matches(userPass, user.getUserPass());
         } catch (Exception e) {
-            throw new RuntimeException("비밀번호 인증 과정에서 오류가 발생했습니다.", e);
+            throw new RuntimeException("ⓘ 비밀번호 인증 과정에서 오류가 발생했습니다.", e);
         }
     }
     
