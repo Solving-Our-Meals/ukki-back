@@ -6,14 +6,16 @@ public class SignupUserDTO {
     private String userPass;
     private String email;
     private String userName;
+    private int noShow;
 
     public SignupUserDTO() {}
 
-    public SignupUserDTO(String userId, String userPass, String email, String userName) {
+    public SignupUserDTO(String userId, String userPass, String email, String userName, int noShow) {
         this.userId = userId;
         this.userPass = userPass;
         this.email = email;
         this.userName = userName;
+        this.noShow = noShow;
     }
 
     public String getUserId() {
@@ -48,6 +50,14 @@ public class SignupUserDTO {
         this.userName = userName;
     }
 
+    public int getNoShow() {
+        return noShow;
+    }
+
+    public void setNoShow(int noShow) {
+        this.noShow = noShow;
+    }
+
     @Override
     public String toString() {
         return "SignupUserDTO{" +
@@ -55,6 +65,7 @@ public class SignupUserDTO {
                 ", userPass='" + userPass + '\'' +
                 ", email='" + email + '\'' +
                 ", userName='" + userName + '\'' +
+                ", noShow=" + noShow +
                 '}';
     }
 }
