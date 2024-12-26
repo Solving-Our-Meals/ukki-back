@@ -34,4 +34,17 @@
         #{noshow}
         )
     </insert>
+
+    <select id="getNoshowCountByEmail" resultType="int" parameterType="String">
+        SELECT
+        IFNULL(SUM(NOSHOW), 0)
+        FROM TBL_NOSHOW
+        WHERE EMAIL = #{ email }
+    </select>
+
+    <delete id="removeEmailFromNoshow" parameterType="String">
+        DELETE
+        FROM TBL_NOSHOW
+        WHERE EMAIL = #{ email }
+    </delete>
 </mapper>
