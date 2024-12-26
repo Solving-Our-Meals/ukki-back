@@ -5,8 +5,14 @@
 
 <mapper namespace="com.ohgiraffers.ukki.user.model.dao.EmailMapper">
     <select id="countByEmail" parameterType="String" resultType="int">
-    SELECT COUNT(*)
-    FROM TBL_USER
-    WHERE Email = #{ email }
+        SELECT IFNULL(COUNT(*), 0)
+        FROM TBL_USER
+        WHERE EMAIL = #{ email }
+    </select>
+
+    <select id="getNoshowCountByEmail" parameterType="String" resultType="int">
+        SELECT IFNULL(SUM(NOSHOW), 0)
+        FROM TBL_NOSHOW
+        WHERE EMAIL = #{ email }
     </select>
 </mapper>

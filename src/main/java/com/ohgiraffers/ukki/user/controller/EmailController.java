@@ -32,16 +32,27 @@ public class EmailController {
     public ResponseEntity<Map<String, Object>> checkEmail(@RequestBody Map<String, String> request) {
         String email = request.get("email");
 
-        boolean isDuplicate = emailService.isEmailDuplicate(email);
+        boolean isDuplicate = emailService.isEmailDuplicate(email); // 중복
+        boolean isNoshowLimitExceeded = emailService.isNoshowLimitExceeded(email); // 노쇼
 
         Map<String, Object> response = new HashMap<>();
         response.put("isDuplicate", isDuplicate);
+        response.put("isNoshowLimitExceeded", isNoshowLimitExceeded);
 
+        // 이메일
         if (isDuplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);  // 이메일이 중복된 경우
-        } else {
-            return ResponseEntity.ok(response);
+            response.put("message", "이 이메일은 이미 사용 중입니다."); // 중복
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
         }
+
+        // 노쇼
+        if (isNoshowLimitExceeded) {
+            response.put("message", "이 이메일의 노쇼 횟수가 3회 이상입니다. 가입이 불가합니다."); // 노쇼
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response); // 403 Forbidden
+        }
+
+        // 정상
+        return ResponseEntity.ok(response); // 200 OK
     }
 
     @PostMapping("/sendemail")

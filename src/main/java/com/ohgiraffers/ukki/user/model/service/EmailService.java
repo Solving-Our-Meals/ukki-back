@@ -71,4 +71,9 @@ public class EmailService {
 
         return storedCode != null && storedCode.equals(authCode);
     }
+
+    public boolean isNoshowLimitExceeded(String email) {
+        int noshowCount = emailMapper.getNoshowCountByEmail(email);
+        return noshowCount >= 3;
+    }
 }

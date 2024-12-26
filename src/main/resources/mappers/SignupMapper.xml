@@ -22,14 +22,16 @@
         USER_ID,
         USER_PWD,
         EMAIL,
-        USER_NAME
+        USER_NAME,
+        NOSHOW
         )
         VALUES
         (
         #{userId},
         #{userPass},
         #{email},
-        #{userName}
+        #{userName},
+        #{noshow}
         )
     </insert>
 </mapper>
