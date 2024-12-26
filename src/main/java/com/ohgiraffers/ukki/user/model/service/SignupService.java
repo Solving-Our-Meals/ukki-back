@@ -55,7 +55,7 @@ public class SignupService {
             signupUserDTO.setUserPass(hashedPassword);
 
             int noshowCount = signupMapper.getNoshowCountByEmail(signupUserDTO.getEmail()); // DTO에서 이메일 가져와서 그 이메일의 NOSHOW 횟수를 가져오라
-//            System.out.println(noshowCount); 여기까지 반환 잘됨
+//            System.out.println(noshowCount); // 여기까지 반환 잘됨
             if (noshowCount > 0) {
                 signupUserDTO.setNoshow(noshowCount); // 만약 반환된 값이 0보다 크면 값을 DTO의 noshow 횟수로 설정혀라
                 signupMapper.signup(signupUserDTO); // 회원가입 시키기
