@@ -11,4 +11,10 @@ public interface SignupMapper {
     int signupNickname(String userName);
 
     void signup(SignupUserDTO signupUserDTO);
+
+    // 노쇼에 대한 로직
+
+    int getNoshowCountByEmail(String email);
+
+    void removeEmailFromNoshow(String email);
 }

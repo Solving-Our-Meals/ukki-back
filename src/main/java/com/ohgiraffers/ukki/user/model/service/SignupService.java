@@ -54,7 +54,19 @@ public class SignupService {
             String hashedPassword = passwordEncoder.encode(signupUserDTO.getUserPass());
             signupUserDTO.setUserPass(hashedPassword);
 
-            signupMapper.signup(signupUserDTO);
+            int noshowCount = signupMapper.getNoshowCountByEmail(signupUserDTO.getEmail()); // DTO에서 이메일 가져와서 그 이메일의 NOSHOW 횟수를 가져오라
+//            System.out.println(noshowCount); 여기까지 반환 잘됨
+            if (noshowCount > 0) {
+                signupUserDTO.setNoshow(noshowCount); // 만약 반환된 값이 0보다 크면 값을 DTO의 noshow 횟수로 설정혀라
+                signupMapper.signup(signupUserDTO); // 회원가입 시키기
+                // 이제 업데이트는 쿼리문이 아닌 여기서 해준 상태라고 볼 수 있고
+                // 값을 가져왔으니 기존 노쇼에선 제거해줄것
+                signupMapper.removeEmailFromNoshow(signupUserDTO.getEmail()); // DTO에서 이메일 가져와서 그 이메일 삭제혀라
+
+            } else {
+                signupUserDTO.setNoshow(0);
+                signupMapper.signup(signupUserDTO);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
