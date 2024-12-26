@@ -41,13 +41,11 @@ public class EmailController {
 
         // 이메일
         if (isDuplicate) {
-            response.put("message", "이 이메일은 이미 사용 중입니다."); // 중복
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
         }
 
         // 노쇼
         if (isNoshowLimitExceeded) {
-            response.put("message", "이 이메일의 노쇼 횟수가 3회 이상입니다. 가입이 불가합니다."); // 노쇼
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response); // 403 Forbidden
         }
 
