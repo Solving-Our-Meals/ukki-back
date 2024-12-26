@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.admin.reservation.model.dao.AdminReservationMapper">
+    <resultMap id="reservation" type="com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationDTO">
+    </resultMap>
+    <resultMap id="week" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO">
+        <result property="mon" column="mon"/>
+        <result property="tue" column="tue"/>
+        <result property="wed" column="wed"/>
+        <result property="thu" column="thu"/>
+        <result property="fri" column="fri"/>
+        <result property="sat" column="sat"/>
+        <result property="sun" column="sun"/>
+    </resultMap>
+
+    <resultMap id="noShow" type="com.ohgiraffers.ukki.admin.reservation.model.dto.MonthlyNoShowDTO">
+        <result property="monthlyReservation" column="MONTH"/>
+        <result property="monthlyNoShow" column="NOSHOW"/>
+    </resultMap>
+
+    <select id="weeklyReservation" resultMap="week">
+
+        SELECT
+        SUM(CASE WHEN DATE(res_date) = this_week_monday THEN 1 ELSE 0 END) AS mon,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS tue,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 2 DAY) THEN 1 ELSE 0 END) AS wed,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS thu,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 4 DAY) THEN 1 ELSE 0 END) AS fri,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 5 DAY) THEN 1 ELSE 0 END) AS sat,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 6 DAY) THEN 1 ELSE 0 END) AS sun
+        FROM
+        tbl_end_res,
+        (SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday) AS week_start
+        WHERE
+        DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
+
+    </select>
+
+    <select id="todayReservation">
+        SELECT
+        COUNT(*)
+        FROM TBL_RESERVATION
+        WHERE RES_DATE = DATE_FORMAT(NOW(), '%Y-%m-%d');
+    </select>
+
+    <select id="monthlyNoShowReservation" resultMap="noShow">
+        select
+        count(*) AS 'MONTH',
+        sum(case when QR_CONFIRM = 0 then 1 else 0 end) AS 'NOSHOW'
+        from tbl_end_res
+        where date_format(res_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m');
+    </select>
+</mapper>
