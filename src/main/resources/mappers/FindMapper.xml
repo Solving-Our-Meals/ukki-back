@@ -9,4 +9,11 @@
         FROM TBL_USER
         WHERE email = #{ email }
     </select>
+
+    <update id="changePwd" parameterType="com.ohgiraffers.ukki.auth.model.dto.FindDTO">
+        UPDATE
+        TBL_USER
+        SET USER_PWD = #{ userPass }
+        WHERE email = #{ email }
+    </update>
 </mapper>
