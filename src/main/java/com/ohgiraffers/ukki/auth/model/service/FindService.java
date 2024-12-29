@@ -15,4 +15,13 @@ public class FindService {
         this.findMapper = findMapper;
         this.passwordEncoder = passwordEncoder;
     }
+
+    public String findUserIdByEmail(String email) {
+        return findMapper.findUserIdByEmail(email);
+    }
+
+    public boolean changePassword(String email, String userPass) {
+        String encryptedPassword = passwordEncoder.encode(userPass);
+        return findMapper.changePwd(email, encryptedPassword);
+    }
 }

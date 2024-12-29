@@ -19,9 +19,28 @@ public class FindController {
         this.findService = findService;
     }
 
-    @PostMapping("/find")
-    public ResponseEntity<?> find() {
-        return null;
+    @PostMapping("/finds1")
+    public ResponseEntity<?> findUserId(@RequestBody FindDTO findDTO) {
+        String userId = findService.findUserIdByEmail(findDTO.getEmail());
+
+        if (userId != null) {
+            FindResponseDTO responseDTO = new FindResponseDTO(userId, true);
+            System.out.println("Server Response: " + responseDTO);
+            return ResponseEntity.ok(responseDTO);
+        } else {
+            return ResponseEntity.status(404).body(new FindResponseDTO(null, false));
+        }
+    }
+
+    @PostMapping("/finds2")
+    public ResponseEntity<?> changePassword(@RequestBody FindDTO findDTO) {
+        boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getUserPass());
+
+        if (passwordChanged) {
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } else {
+            return ResponseEntity.status(400).body("ⓘ 비밀번호 변경에 실패했습니다.");
+        }
     }
 
     }
