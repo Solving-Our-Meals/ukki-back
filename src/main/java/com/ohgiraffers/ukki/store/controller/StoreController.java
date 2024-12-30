@@ -1,9 +1,6 @@
 package com.ohgiraffers.ukki.store.controller;
 
-import com.ohgiraffers.ukki.store.model.dto.BannerDTO;
-import com.ohgiraffers.ukki.store.model.dto.KeywordDTO;
-import com.ohgiraffers.ukki.store.model.dto.OperationDTO;
-import com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO;
+import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -13,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,18 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/")
+@RequestMapping(value="/store")
 public class StoreController {
 
     private final StoreService storeService;
     private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public StoreController(StoreService storeService){
         this.storeService = storeService;
     }
 
     // 검색 페이지 만들어지면 pathvariable로 변경하기
-    @GetMapping(value="/store/test", produces = "application/json; charset=UTF-8")
+    @GetMapping(value="/test", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public StoreInfoDTO getStoreInfo(ModelAndView mv, @ModelAttribute StoreInfoDTO storeInfoDTO){
 
@@ -59,6 +56,7 @@ public class StoreController {
         return storeInfoDTO;
     }
 
+    // 가게 배너 리스트로 담기
     @GetMapping("/storebanner/5")
     @ResponseBody
     public List<String> getBannerList(StoreInfoDTO storeInfoDTO) {
@@ -72,6 +70,7 @@ public class StoreController {
         return fileUrls;
     }
 
+    // 가게 배너 파일 서버에서 로컬 접근 및 불러오기
     @GetMapping("/api/files")
     public ResponseEntity<Resource> getBanner(@RequestParam("filename") String filename) {
         try {
@@ -85,6 +84,7 @@ public class StoreController {
 
             // 디버깅 확인
             System.out.println("file 경로 : " + file.toString());
+
 
             // 자바에서 Path 객체로부터 Resource 객체를 생성하는 부분
             // file.toUri() :
@@ -108,6 +108,7 @@ public class StoreController {
         }
     }
 
+    // 가게 프로필 DTO에 담기
     @GetMapping(value = "/storeProfile/5")
     public ResponseEntity<String> getProfileName(StoreInfoDTO storeInfoDTO){
 
@@ -117,6 +118,7 @@ public class StoreController {
         return ResponseEntity.ok(profileName);
     }
 
+    // 가게 프로필 파일 서버에서 로컬 접근 및 불러오기
     @GetMapping(value = "/api/profile")
     public ResponseEntity<Resource> getProfile(@RequestParam("profileName") String profileName){
 
@@ -138,7 +140,7 @@ public class StoreController {
         }
     }
 
-//    매뉴 이미지 불러오기 로직 만들 예정
+    // 메뉴 이미지 DB에서 불러오기 및 DTO에 담기
     @GetMapping(value = "/storeMenu/5")
     public ResponseEntity<String> getMenuName(StoreInfoDTO storeInfoDTO){
 
@@ -148,6 +150,7 @@ public class StoreController {
         return ResponseEntity.ok(menuName);
     }
 
+    // 메뉴 이미지 서버에서 로컬 접근 및 불러오기
     @GetMapping(value = "/api/menu")
     public ResponseEntity<Resource> getMenu(@RequestParam("menuName") String menuName ){
 
@@ -167,6 +170,68 @@ public class StoreController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    // 리뷰 정보 DB에서 가져오기
+    @GetMapping(value = "/review", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ReviewDTO getReviewInfo(ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
+
+        System.out.println("리뷰 매퍼 옴.");
+        reviewDTO = storeService.getReviewList(storeInfoDTO);
+        System.out.println("reviewDTO : " + reviewDTO);
+
+        mv.addObject("review 정보", reviewDTO);
+
+        return reviewDTO;
+    }
+
+    // 서버에서 로컬에 있는 리뷰 사진 불러오기
+    @GetMapping("/api/reviewImg")
+    @ResponseBody
+    public ResponseEntity<Resource> getReviewImg(@RequestParam("reviewImgName") String reviewImgName ){
+
+        System.out.println("리뷰 이미지 api");
+        try {
+            Path file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".png");
+            System.out.println("reviewImg : " + file );
+            Resource resource = new UrlResource(file.toUri());
+
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; reviewImgName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // 서버에서 로컬에 있는 사용자 프로필 이미지 불러오기
+    @GetMapping("/api/userProfile")
+    @ResponseBody
+    public ResponseEntity<Resource> getUserProfile(@RequestParam("userProfileName") String userProfileName ){
+
+        System.out.println("사용자 프로필 이미지 api");
+        try {
+            Path file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".png");
+            System.out.println("유저 프로필 : " + file );
+            Resource resource = new UrlResource(file.toUri());
+
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; userProfileName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
 
 }
 

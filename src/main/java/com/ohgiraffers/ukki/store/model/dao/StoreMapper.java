@@ -1,10 +1,9 @@
 package com.ohgiraffers.ukki.store.model.dao;
 
-import com.ohgiraffers.ukki.store.model.dto.BannerDTO;
-import com.ohgiraffers.ukki.store.model.dto.KeywordDTO;
-import com.ohgiraffers.ukki.store.model.dto.OperationDTO;
-import com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO;
+import com.ohgiraffers.ukki.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface StoreMapper {
@@ -16,4 +15,10 @@ public interface StoreMapper {
     OperationDTO getOperation(StoreInfoDTO storeInfoDTO);
 
     BannerDTO getBannerList(StoreInfoDTO storeInfoDTO);
+
+    ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO);
+
+//    List<ReviewContentDTO> getReviewList(StoreInfoDTO storeInfoDTO);
+//
+//    long getReviewCount(StoreInfoDTO storeInfoDTO);
 }

@@ -49,37 +49,54 @@
         <result property="banner5" column="IMAGE5"/>
     </resultMap>
 
+    <resultMap id="getReviewInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <collection property="reviewList" resultMap="reviewListResultMap"/>
+    </resultMap>
+
+    <resultMap id="reviewListResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        <id property="reviewNo" column="REVIEW_NO"/>
+        <result property="reviewContent" column="REVIEW_CONTENT"/>
+        <result property="reviewImage" column="REVIEW_IMG"/>
+        <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="reportCount" column="REPORT_COUNT"/>
+    </resultMap>
+
     <!--  가게 정보  -->
     <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
         SELECT
-        STORE_NO
-        , STORE_NAME
-        , STORE_DES
-        , STORE_ADDRESS
-        , LATITUDE
-        , LONGITUDE
-        , STORE_PROFILE
-        , STORE_MENU
-        , STORE_CATEGORY_NO
-        , USER_NO
-        , POS_NUMBER
-        FROM TBL_STORE
-        WHERE STORE_NO = 5
+               STORE_NO
+             , STORE_NAME
+             , STORE_DES
+             , STORE_ADDRESS
+             , LATITUDE
+             , LONGITUDE
+             , STORE_PROFILE
+             , STORE_MENU
+             , STORE_CATEGORY_NO
+             , USER_NO
+             , POS_NUMBER
+          FROM TBL_STORE
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
     <!--  가게 키워드  -->
     <select id="getKeyword" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="keywordResultMap">
         SELECT
-        STORE_NO
-        , KEYWORD1
-        , KEYWORD2
-        , KEYWORD3
-        , KEYWORD4
-        , KEYWORD5
-        , KEYWORD6
-        FROM TBL_KEYWORD
-        WHERE STORE_NO = 5
+               STORE_NO
+             , KEYWORD1
+             , KEYWORD2
+             , KEYWORD3
+             , KEYWORD4
+             , KEYWORD5
+             , KEYWORD6
+          FROM TBL_KEYWORD
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
@@ -100,5 +117,26 @@
          WHERE STORE_NO = 5
     </select>
 
+    <!-- 리뷰 정보 가져오기 -->
+    <select id="getReviewList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+        SELECT
+               A.STORE_NO
+             , (SELECT
+                       COUNT(*)
+                  FROM TBL_REVIEW
+                 WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = 5
+         ORDER BY REVIEW_NO DESC;
+    </select>
 
 </mapper>
