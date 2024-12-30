@@ -19,7 +19,7 @@ public class FindController {
         this.findService = findService;
     }
 
-    @PostMapping("/finds1")
+    @PostMapping("/find/id")
     public ResponseEntity<?> findUserId(@RequestBody FindDTO findDTO) {
         String userId = findService.findUserIdByEmail(findDTO.getEmail());
 
@@ -31,7 +31,7 @@ public class FindController {
         }
     }
 
-    @PostMapping("/finds2")
+    @PostMapping("/find/pwd")
     public ResponseEntity<?> changePassword(@RequestBody FindDTO findDTO) {
         // 단계를 나눠서 비밀번호 확인절차에서는 필요없을 것 같아 배제
 //        String passwordValidationError = findService.validatePassword(findDTO.getNewPassword());
