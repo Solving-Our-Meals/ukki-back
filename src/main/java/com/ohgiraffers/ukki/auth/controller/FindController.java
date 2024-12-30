@@ -25,7 +25,6 @@ public class FindController {
 
         if (userId != null) {
             FindResponseDTO responseDTO = new FindResponseDTO(userId, true);
-            System.out.println("Server Response: " + responseDTO);
             return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.status(404).body(new FindResponseDTO(null, false));
@@ -34,7 +33,7 @@ public class FindController {
 
     @PostMapping("/finds2")
     public ResponseEntity<?> changePassword(@RequestBody FindDTO findDTO) {
-        boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getUserPass());
+        boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getNewPassword());
 
         if (passwordChanged) {
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
