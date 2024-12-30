@@ -33,8 +33,13 @@ public class FindController {
 
     @PostMapping("/finds2")
     public ResponseEntity<?> changePassword(@RequestBody FindDTO findDTO) {
-        boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getNewPassword());
+        // 단계를 나눠서 비밀번호 확인절차에서는 필요없을 것 같아 배제
+//        String passwordValidationError = findService.validatePassword(findDTO.getNewPassword());
+//        if (passwordValidationError != null) {
+//            return ResponseEntity.status(400).body(new FindResponseDTO(false, passwordValidationError));
+//        }
 
+        boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getNewPassword());
         if (passwordChanged) {
             FindResponseDTO responseDTO = new FindResponseDTO(true, "비밀번호 변경 완료 !");
             return ResponseEntity.ok(responseDTO);
