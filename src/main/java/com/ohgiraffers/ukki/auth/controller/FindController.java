@@ -36,9 +36,10 @@ public class FindController {
         boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getNewPassword());
 
         if (passwordChanged) {
-            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+            FindResponseDTO responseDTO = new FindResponseDTO(true, "비밀번호 변경 완료 !");
+            return ResponseEntity.ok(responseDTO);
         } else {
-            return ResponseEntity.status(400).body("ⓘ 비밀번호 변경에 실패했습니다.");
+            return ResponseEntity.status(400).body(false);
         }
     }
 
