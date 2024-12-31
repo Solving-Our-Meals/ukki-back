@@ -40,8 +40,8 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject("ukki(우리들의 끼니해결) 인증메일");
             helper.setText("<html><body>" +
-                    "<p style='font-weight: bold; font-size: 20px;'>귀하의 인증 코드: " + authCode + "</p>" +
-                    "<img src='cid:logoImage' alt='Logo' />" +
+                    "<p style='font-weight: bold; font-size: 40px; width:auto;'>우끼 인증번호 : " + authCode + "</p>" +
+                    "<img src='cid:logoImage' style='width: 400px; height: auto;' alt='Logo' />" +
                     "</body></html>", true);
 
             // 랜덤 이미지 정하려고 넣었다. - 이미지 경로 문제있으면 메일 안가니까 조심 -> 이메일 보내기 실패 뜨면 여기부터 확인
@@ -53,7 +53,7 @@ public class EmailService {
             ClassPathResource resource = new ClassPathResource(selectedImage);
             helper.addInline("logoImage", resource);
 
-            mailSender.send(message); // 마지막 이메일 전송하는 구간
+            mailSender.send(message);
 
             return true;
         } catch (Exception e) {
