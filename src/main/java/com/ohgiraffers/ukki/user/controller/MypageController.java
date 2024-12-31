@@ -1,10 +1,22 @@
 package com.ohgiraffers.ukki.user.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
+import com.ohgiraffers.ukki.user.model.service.MypageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 public class MypageController {
+
+    @Autowired
+    private MypageService mypageService;
+
+    @GetMapping("/{userNo}")
+    public MypageDTO getUserInfo(@PathVariable Long userNo, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+
+        return mypageService.getUserInfoFromToken(jwtToken, userNo);
+    }
 
 }
