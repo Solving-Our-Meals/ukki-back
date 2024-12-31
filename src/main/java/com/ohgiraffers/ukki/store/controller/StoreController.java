@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -13,16 +14,19 @@ import org.springframework.web.servlet.ModelAndView;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value="/store")
 public class StoreController {
 
     private final StoreService storeService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public StoreController(StoreService storeService){
         this.storeService = storeService;
@@ -229,6 +233,40 @@ public class StoreController {
         } catch (MalformedURLException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    // 리뷰 등록하기
+    @PostMapping(value="/5/review", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public void createReview(ModelAndView mv, @RequestBody Map<String, String> params, ReviewContentDTO reviewContentDTO, ReviewDTO reviewDTO){
+
+        System.out.println("리뷰 등록하러 왔다.");
+
+        StringBuilder sb = new StringBuilder();
+
+        params.entrySet().forEach(entry -> {
+            sb.append(entry.getKey() + " = " + entry.getValue() + "\n");
+            switch (entry.getKey()) {
+                case "reviewDate":
+                    reviewContentDTO.setReviewDate(entry.getValue());
+                    break;
+                case "reviewContent":
+                    reviewContentDTO.setReviewContent(entry.getValue());
+                    break;
+                case "reviewImage":
+                    reviewContentDTO.setReviewImage(entry.getValue());
+                    break;
+                case "userNo":
+                    reviewContentDTO.setUserNo(Long.parseLong(entry.getValue()));
+                    break;
+                case "storeNo":
+                    reviewDTO.setStoreNo(Long.parseLong(entry.getValue()));
+                    break;
+            }
+        });
+
+        System.out.println("11111" + reviewDTO);
+        System.out.println("2222" + reviewContentDTO);
     }
 
 
