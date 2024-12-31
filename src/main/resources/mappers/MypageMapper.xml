@@ -5,12 +5,12 @@
 <mapper namespace="com.ohgiraffers.ukki.user.model.dao.MypageMapper">
     <select id="findUserInfoByUserNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDTO">
         SELECT
-        user_no AS userNo,
-        nickname,
-        profile_image AS profileImage,
-        reservation_count AS reservationCount,
-        review_count AS reviewCount
-        FROM tbl_user
-        WHERE user_no = #{userNo}
+        USER_NO AS userNo,
+        USER_NAME,
+        USER_PROFILE AS profileImage,
+<!--        RESERVATION_COUNT AS reservationCount,-->
+<!--        REVIEW_COUNT AS reviewCount-->
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo}
     </select>
 </mapper>

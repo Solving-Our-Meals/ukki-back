@@ -20,15 +20,15 @@ public class MypageService {
         this.mypageMapper = mypageMapper;
     }
 
-    public MypageDTO getUserInfoFromToken(String jwtToken, Long userNo) {
+    public MypageDTO getUserInfoFromToken(String jwtToken, int userNo) {
         if (!jwtService.validateToken(jwtToken)) {
             throw new IllegalArgumentException("Invalid JWT token");
         }
 
         Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
-        Long extractedUserNo = (Long) userInfo.get("userNo");
+        int extractedUserNo = (int) userInfo.get("userNo");
 
-        if (!extractedUserNo.equals(userNo)) {
+        if (extractedUserNo != userNo) {
             throw new IllegalArgumentException("User ID mismatch");
         }
 
