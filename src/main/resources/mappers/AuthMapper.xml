@@ -15,7 +15,7 @@
         USER_NO AS userNo,
         USER_ID AS userId,
         USER_PWD AS userPass,
-        USER_ROLE
+        USER_ROLE AS userRole
         FROM TBL_USER
         WHERE user_id = #{userId}
     </select>

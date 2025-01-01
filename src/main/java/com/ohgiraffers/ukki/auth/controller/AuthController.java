@@ -44,6 +44,13 @@ public class AuthController {
     public ResponseEntity<?> authenticatePassword(@RequestBody AuthDTO authDTO, HttpServletResponse response, HttpServletRequest request) {
         try {
             boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
+
+            System.out.println(authDTO.getUserId());
+            System.out.println(authDTO.getUserRole());
+            System.out.println(authDTO.getUserId());
+            System.out.println(authDTO.getUserPass());
+            // 유저 검증이 아닌 정보를 담는 jwtUserDTO 생성해서 token 쪽 DTO로 사용하면 될 듯?
+
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));

@@ -46,7 +46,7 @@ public class JwtService {
             Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY) // 비밀키 bearer뒤에 올 키에 대한 값 확인용인듯? 내가 application.yml에 저장한 값이 있는지 검증하는 것으로 보임 - 서명 검증 키
                     .build() // 새로운 버전에서는 parerbuilder()를 사용하면서 build()가 추가된듯
-                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조되 경우 예외 발생
+                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조돼 경우 예외 발생
             return true;
         } catch (Exception e) {
             return false; // 서명 검즘이 안되면 false 반환하겠다.
