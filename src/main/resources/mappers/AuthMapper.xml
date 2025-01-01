@@ -19,4 +19,13 @@
         FROM TBL_USER
         WHERE user_id = #{userId}
     </select>
+
+    <select id="findUserRoleAndUserNoById" parameterType="String" resultType="com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO">
+        <!--   AS 사용해서 매칭 X     -->
+        SELECT
+        USER_NO AS userNo,
+        USER_ROLE AS userRole
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
 </mapper>

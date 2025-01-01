@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.auth.controller;
 
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
+import com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
 import com.ohgiraffers.ukki.common.UserRole;
 import jakarta.servlet.http.Cookie;
@@ -42,14 +43,11 @@ public class AuthController {
 
     @PostMapping("/login/step-two")
     public ResponseEntity<?> authenticatePassword(@RequestBody AuthDTO authDTO, HttpServletResponse response, HttpServletRequest request) {
+        ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(authDTO.getUserId());
+        System.out.println(forJwtDTO.getUserRole());
+        System.out.println(forJwtDTO.getUserNo());
         try {
             boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
-
-            System.out.println(authDTO.getUserId());
-            System.out.println(authDTO.getUserRole());
-            System.out.println(authDTO.getUserId());
-            System.out.println(authDTO.getUserPass());
-            // 유저 검증이 아닌 정보를 담는 jwtUserDTO 생성해서 token 쪽 DTO로 사용하면 될 듯?
 
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
