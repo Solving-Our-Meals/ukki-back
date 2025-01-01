@@ -2,26 +2,28 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value="/store")
+@CrossOrigin(origins = "http://localhost:3000/store")
 public class StoreController {
 
     private final StoreService storeService;
@@ -180,7 +182,7 @@ public class StoreController {
     @ResponseBody
     public ReviewDTO getReviewInfo(ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
 
-        System.out.println("리뷰 매퍼 옴.");
+        System.out.println("리뷰 조회 매퍼 옴.");
         reviewDTO = storeService.getReviewList(storeInfoDTO);
         System.out.println("reviewDTO : " + reviewDTO);
 
@@ -236,40 +238,217 @@ public class StoreController {
     }
 
     // 리뷰 등록하기
-    @PostMapping(value="/5/review", produces = "application/json; charset=UTF-8")
+    @PostMapping(value="/5/review", consumes = "multipart/form-data", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public void createReview(ModelAndView mv, @RequestBody Map<String, String> params, ReviewContentDTO reviewContentDTO, ReviewDTO reviewDTO){
+    public void createReview(Model model, @RequestPart("params") String params, @RequestPart("reviewImage") MultipartFile singleFile, ReviewContentDTO reviewContentDTO) {
 
         System.out.println("리뷰 등록하러 왔다.");
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> paramMap;
+
+        System.out.println("Params: " + params);
+        System.out.println("File: " + singleFile);
+
+        try {
+            paramMap = objectMapper.readValue(params, Map.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        Date nowDate = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String today = simpleDateFormat.format(nowDate);
+
+        long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
+        System.out.println("리뷰 이미지 갯수 " + reviewImageCount);
+
         StringBuilder sb = new StringBuilder();
 
-        params.entrySet().forEach(entry -> {
-            sb.append(entry.getKey() + " = " + entry.getValue() + "\n");
-            switch (entry.getKey()) {
+        paramMap.forEach((key, value) -> {
+            switch (key) {
                 case "reviewDate":
-                    reviewContentDTO.setReviewDate(entry.getValue());
+                    reviewContentDTO.setReviewDate(value);
                     break;
                 case "reviewContent":
-                    reviewContentDTO.setReviewContent(entry.getValue());
+                    reviewContentDTO.setReviewContent(value);
                     break;
                 case "reviewImage":
-                    reviewContentDTO.setReviewImage(entry.getValue());
+                    reviewContentDTO.setReviewImage(value + reviewImageCount);
                     break;
                 case "userNo":
-                    reviewContentDTO.setUserNo(Long.parseLong(entry.getValue()));
+                    reviewContentDTO.setUserNo(Long.parseLong(value));
                     break;
                 case "storeNo":
-                    reviewDTO.setStoreNo(Long.parseLong(entry.getValue()));
+                    reviewContentDTO.setStoreNo(Long.parseLong(value));
                     break;
             }
         });
 
-        System.out.println("11111" + reviewDTO);
         System.out.println("2222" + reviewContentDTO);
+
+        storeService.createReview(reviewContentDTO);
+
+        // 파일 업로드하기
+        // 서버로 전달 된 File을 서버에서 설정하는 경로에 저장한다.
+//        String filePath = SHARED_FOLDER;
+//        File dir = new File(filePath);
+//        System.out.println("파일 경로인건가...? : " + dir.getAbsolutePath());
+//
+//        if(!dir.exists()){
+//            /* mkdirs() : 해당 경로에 디렉토리가 없을 경우 생성해주는 메소드이다. */
+//            dir.mkdirs();
+//        }
+//
+//        // 파일명 변경 처리
+//        String originFileName = singleFile.getOriginalFilename();
+//        String ext = originFileName.substring(originFileName.lastIndexOf("."));
+//        System.out.println("ext = " + ext);
+//
+//        // UUID : 식별 가능한 고유의 아이디값을 생성해주는 유틸성 클래스
+//        String savedName = UUID.randomUUID() + ext;
+//        System.out.println("savedName = " + savedName);
+//
+//        // 파일 저장
+//        try {
+//            singleFile.transferTo(new File(filePath + "/" + savedName));
+//            model.addAttribute("message", "파일 업로드 성공");
+//        } catch (IOException e) {
+//            model.addAttribute("message", "파일 업로드 실패");
+//        }
+
     }
 
 
+
+
+//    @PostMapping(value="/5/review", consumes = "multipart/form-data")
+//    @ResponseBody
+//    public void createReview(@RequestPart("params") Map<String, String> params, @RequestPart("reviewImage") MultipartFile singleFile, ReviewContentDTO reviewContentDTO) {
+//
+//        Date nowDate = new Date();
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String today = simpleDateFormat.format(nowDate);
+//
+//        long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
+//        System.out.println("리뷰 이미지 갯수 " + reviewImageCount);
+//
+//        StringBuilder sb = new StringBuilder();
+//
+//        params.entrySet().forEach(entry -> {
+//            sb.append(entry.getKey() + " = " + entry.getValue() + "\n");
+//            switch (entry.getKey()) {
+//                case "reviewDate":
+//                    reviewContentDTO.setReviewDate(entry.getValue());
+//                    break;
+//                case "reviewContent":
+//                    reviewContentDTO.setReviewContent(entry.getValue());
+//                    break;
+//                case "reviewImage":
+//                    reviewContentDTO.setReviewImage(entry.getValue() + reviewImageCount);
+//                    break;
+//                case "userNo":
+//                    reviewContentDTO.setUserNo(Long.parseLong(entry.getValue()));
+//                    break;
+//                case "storeNo":
+//                    reviewContentDTO.setStoreNo(Long.parseLong(entry.getValue()));
+//                    break;
+//            }
+//        });
+//
+//        storeService.createReview(reviewContentDTO);
+//
+//        String filePath = SHARED_FOLDER;
+//        File dir = new File(filePath);
+//        System.out.println("파일 경로인건가...? : " + dir.getAbsolutePath());
+//
+//        if (!dir.exists()) {
+//            dir.mkdirs();
+//        }
+//
+//        String originFileName = singleFile.getOriginalFilename();
+//        String ext = originFileName.substring(originFileName.lastIndexOf("."));
+//        System.out.println("ext = " + ext);
+//
+//        String savedName = UUID.randomUUID() + ext;
+//        System.out.println("savedName = " + savedName);
+//
+//
+//        try {
+//            singleFile.transferTo(new File(filePath + "/" + savedName));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
+
+
+
+//    @PostMapping(value = "/5/review", consumes = "multipart/form-data")
+//    @ResponseBody
+//    public void createReview(@RequestPart("params") String params, @RequestPart("reviewImage") MultipartFile singleFile, ReviewContentDTO reviewContentDTO) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        Map<String, String> paramMap;
+//
+//        try {
+//            paramMap = objectMapper.readValue(params, Map.class);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        Date nowDate = new Date();
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String today = simpleDateFormat.format(nowDate);
+//
+//        long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
+//        System.out.println("리뷰 이미지 갯수 " + reviewImageCount);
+//
+//        paramMap.forEach((key, value) -> {
+//            switch (key) {
+//                case "reviewDate":
+//                    reviewContentDTO.setReviewDate(value);
+//                    break;
+//                case "reviewContent":
+//                    reviewContentDTO.setReviewContent(value);
+//                    break;
+//                case "reviewImage":
+//                    reviewContentDTO.setReviewImage(value + reviewImageCount);
+//                    break;
+//                case "userNo":
+//                    reviewContentDTO.setUserNo(Long.parseLong(value));
+//                    break;
+//                case "storeNo":
+//                    reviewContentDTO.setStoreNo(Long.parseLong(value));
+//                    break;
+//            }
+//        });
+//
+//        storeService.createReview(reviewContentDTO);
+//
+//        String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+//        String filePath = SHARED_FOLDER;
+//        File dir = new File(filePath);
+//        System.out.println("파일 경로인건가...? : " + dir.getAbsolutePath());
+//
+//        if (!dir.exists()) {
+//            dir.mkdirs();
+//        }
+//
+//        String originFileName = singleFile.getOriginalFilename();
+//        String ext = originFileName.substring(originFileName.lastIndexOf("."));
+//        System.out.println("ext = " + ext);
+//
+//        String savedName = UUID.randomUUID() + ext;
+//        System.out.println("savedName = " + savedName);
+//
+//        try {
+//            singleFile.transferTo(new File(filePath + "/" + savedName));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }
 
