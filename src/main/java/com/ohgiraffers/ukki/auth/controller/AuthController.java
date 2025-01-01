@@ -46,6 +46,7 @@ public class AuthController {
         ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(authDTO.getUserId());
         System.out.println(forJwtDTO.getUserRole());
         System.out.println(forJwtDTO.getUserNo());
+        UserRole userRole = UserRole.valueOf(forJwtDTO.getUserRole()); // 자료형이 ENUM이어서 String으로 변경해줘야 컴파일 에러가 안남
         try {
             boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
 
@@ -54,7 +55,7 @@ public class AuthController {
                         .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));
             }
 
-            String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole(), authDTO.getUserNo());
+            String token = authService.createToken(authDTO.getUserId(), userRole, forJwtDTO.getUserNo());
 
             String existingRefreshToken = authService.getRefresh(request);
 
