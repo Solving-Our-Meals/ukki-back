@@ -36,13 +36,14 @@ public class StoreService {
         return storeMapper.getReviewList(storeInfoDTO);
     }
 
-//    public List<ReviewContentDTO> getReviewList(StoreInfoDTO storeInfoDTO) {
-//        return storeMapper.getReviewList(storeInfoDTO);
-//    }
-//
-//    public long getReviewCount(StoreInfoDTO storeInfoDTO) {
-//        return storeMapper.getReviewCount(storeInfoDTO);
-//    }
+    public String getReviewCount(String today) {
+        return storeMapper.getReviewCount(today);
+    }
+
+    public void createReview(ReviewContentDTO reviewContentDTO) {
+        storeMapper.createReview(reviewContentDTO);
+    }
+
 
 
 }

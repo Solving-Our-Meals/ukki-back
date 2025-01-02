@@ -6,6 +6,7 @@ public class ReviewContentDTO {
     private String reviewContent;
     private String reviewImage;
     private String reviewDate;
+    private long storeNo;
     private long userNo;
     private String userName;
     private String userProfile;
@@ -13,11 +14,12 @@ public class ReviewContentDTO {
 
     public ReviewContentDTO(){}
 
-    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, long userNo, String userName, String userProfile, long reportCount) {
+    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, long storeNo, long userNo, String userName, String userProfile, long reportCount) {
         this.reviewNo = reviewNo;
         this.reviewContent = reviewContent;
         this.reviewImage = reviewImage;
         this.reviewDate = reviewDate;
+        this.storeNo = storeNo;
         this.userNo = userNo;
         this.userName = userName;
         this.userProfile = userProfile;
@@ -54,6 +56,14 @@ public class ReviewContentDTO {
 
     public void setReviewDate(String reviewDate) {
         this.reviewDate = reviewDate;
+    }
+
+    public long getStoreNo() {
+        return storeNo;
+    }
+
+    public void setStoreNo(long storeNo) {
+        this.storeNo = storeNo;
     }
 
     public long getUserNo() {
@@ -95,6 +105,7 @@ public class ReviewContentDTO {
                 ", reviewContent='" + reviewContent + '\'' +
                 ", reviewImage='" + reviewImage + '\'' +
                 ", reviewDate='" + reviewDate + '\'' +
+                ", storeNo=" + storeNo +
                 ", userNo=" + userNo +
                 ", userName='" + userName + '\'' +
                 ", userProfile='" + userProfile + '\'' +

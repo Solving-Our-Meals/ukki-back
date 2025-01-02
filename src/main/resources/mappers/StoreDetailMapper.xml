@@ -139,4 +139,32 @@
          ORDER BY REVIEW_NO DESC;
     </select>
 
+    <!-- 리뷰 이미지 순서 정하기 위한 리뷰이미지 갯수 가져오기 -->
+    <select id="getReviewCount" parameterType="String">
+        SELECT
+               COUNT(REVIEW_IMG)
+          FROM TBL_REVIEW
+         WHERE REVIEW_DATE = #{today}
+    </select>
+
+    <!-- 리뷰 등록하기 -->
+    <insert id="createReview" parameterType="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        INSERT INTO TBL_REVIEW
+        (
+            REVIEW_CONTENT
+          , REVIEW_IMG
+          , REVIEW_DATE
+          , STORE_NO
+          , USER_NO
+        )
+        VALUES
+        (
+            #{ reviewContent }
+          , #{ reviewImage }
+          , #{ reviewDate }
+          , #{ storeNo }
+          , #{ userNo }
+        )
+    </insert>
+
 </mapper>

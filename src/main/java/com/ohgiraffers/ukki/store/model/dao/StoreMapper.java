@@ -18,7 +18,8 @@ public interface StoreMapper {
 
     ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO);
 
-//    List<ReviewContentDTO> getReviewList(StoreInfoDTO storeInfoDTO);
-//
-//    long getReviewCount(StoreInfoDTO storeInfoDTO);
+    String getReviewCount(String today);
+
+    void createReview(ReviewContentDTO reviewContentDTO);
+
 }
