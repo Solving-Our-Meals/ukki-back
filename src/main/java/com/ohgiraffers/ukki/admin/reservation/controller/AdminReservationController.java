@@ -28,6 +28,16 @@ public class AdminReservationController {
     public ResponseEntity<?> weeklyReservation() {
         try {
             ThisWeekReservationDTO thisWeek = adminReservationService.weeklyReservation();
+            if(thisWeek==null){
+                thisWeek = new ThisWeekReservationDTO();
+                thisWeek.setMon(0);
+                thisWeek.setTue(0);
+                thisWeek.setWed(0);
+                thisWeek.setThu(0);
+                thisWeek.setFri(0);
+                thisWeek.setSat(0);
+                thisWeek.setSun(0);
+            }
             System.out.println(thisWeek);
             return ResponseEntity.ok(thisWeek);
         } catch (Exception e) {
@@ -60,6 +70,7 @@ public class AdminReservationController {
     public ResponseEntity<?> monthlyNoShowReservation() {
         try {
             MonthlyNoShowDTO noShow = adminReservationService.monthlyNoShowReservation();
+
 
             System.out.println(noShow);
 
