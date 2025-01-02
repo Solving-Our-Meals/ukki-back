@@ -3,13 +3,13 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.user.model.dao.MypageMapper">
-    <select id="findUserInfoByUserNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDTO">
+    <select id="findUserInfoByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDTO">
         SELECT
         USER_NO AS userNo,
-        USER_NAME,
+        USER_NAME AS nickname,
         USER_PROFILE AS profileImage
         FROM TBL_USER
-        WHERE USER_NO = #{userNo}
+        WHERE USER_ID = #{userId}
     </select>
 
     <!--        RESERVATION_COUNT AS reservationCount(DTO),-->
