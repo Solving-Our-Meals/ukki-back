@@ -1,6 +1,5 @@
 package com.ohgiraffers.ukki.admin.user.controller;
 
-import com.ohgiraffers.ukki.admin.reservation.controller.AdminReservationController;
 import com.ohgiraffers.ukki.admin.reservation.model.service.AdminReservationService;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserActInfoDTO;
@@ -82,7 +81,7 @@ public class AdminUserController {
         return ResponseEntity.ok("hi");
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> searchAllUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
         try {
             List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
