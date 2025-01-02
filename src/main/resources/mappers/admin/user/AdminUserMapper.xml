@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.admin.user.model.dao.AdminUserMapper">
+    <resultMap id="user" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="userRole" column="USER_ROLE"/>
+        <result property="noShow" column="NOSHOW"/>
+    </resultMap>
+
+    <insert id="insertActInfo">
+        INSERT INTO TBL_USER_ACT_INFO VALUES
+        <foreach collection="actInfoList" item="actInfo" separator="," close=";">
+            (#{actInfo.userNo}, #{actInfo.resCount}, #{actInfo.reviewCount}, #{actInfo.randomCount})
+        </foreach>
+    </insert>
+
+        <select id="searchBy" parameterType="map" resultMap="user">
+            SELECT
+            *
+            FROM TBL_USER
+            <where>
+                <if test="category != null and word != null">
+                    ${category} LIKE CONCAT('%', #{word}, '%')
+                </if>
+                <if test="category == null and word != null">
+                    CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
+                </if>
+            </where>
+        </select>
+
+    <select id="searchAllUsers" resultMap="user">
+        SELECT * FROM TBL_USER WHERE USER_ROLE != 'ADMIN'
+    </select>
+</mapper>

@@ -20,6 +20,12 @@
         <result property="monthlyNoShow" column="NOSHOW"/>
     </resultMap>
 
+    <resultMap id="userActRes" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserResDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="totalRes" column="TOTAL_RES"/>
+        <result property="totalRandomRes" column="TOTAL_RANDOM"/>
+    </resultMap>
+
     <select id="weeklyReservation" resultMap="week">
 
         SELECT
@@ -51,5 +57,15 @@
         sum(case when QR_CONFIRM = 0 then 1 else 0 end) AS 'NOSHOW'
         from tbl_end_res
         where date_format(res_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m');
+    </select>
+
+    <select id="userResList" resultMap="userActRes">
+        SELECT
+        USER_NO,
+        SUM(CASE WHEN QR_CONFIRM = 1 THEN 1 ELSE 0 END) AS 'TOTAL_RES',
+        SUM(CASE WHEN IS_RANDOM = 1 THEN 1 ELSE 0 END) AS 'TOTAL_RANDOM'
+        FROM TBL_END_RES
+        GROUP BY USER_NO
+        ORDER BY USER_NO;
     </select>
 </mapper>
