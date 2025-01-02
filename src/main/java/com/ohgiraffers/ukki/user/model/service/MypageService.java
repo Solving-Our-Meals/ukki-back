@@ -20,24 +20,23 @@ public class MypageService {
         this.mypageMapper = mypageMapper;
     }
 
-    public MypageDTO getUserInfoFromToken(String jwtToken, int userNo) {
+    public MypageDTO getUserInfoFromToken(String jwtToken, String userId) {
         if (!jwtService.validateToken(jwtToken)) {
-            throw new IllegalArgumentException("Invalid JWT token");
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
         }
 
         Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
-        int extractedUserNo = (int) userInfo.get("userNo");
+        String extractedUserId = (String) userInfo.get("userId");
 
-        if (extractedUserNo != userNo) {
-            throw new IllegalArgumentException("User ID mismatch");
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
         }
 
-        MypageDTO mypageDTO = mypageMapper.findUserInfoByUserNo(userNo);
+        MypageDTO mypageDTO = mypageMapper.findUserInfoByUserId(userId);
 
         if (mypageDTO == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new IllegalArgumentException("사용자 찾을 수 없음");
         }
-
         return mypageDTO;
     }
 }

@@ -2,9 +2,11 @@ package com.ohgiraffers.ukki.auth.model.service;
 
 import com.ohgiraffers.ukki.auth.model.dao.AuthMapper;
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
+import com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO;
 import com.ohgiraffers.ukki.common.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -74,5 +76,9 @@ public class AuthService {
 
     public String getRefresh(HttpServletRequest request) {
         return jwtService.getRefresh(request);
+    }
+
+    public ForJwtDTO findUserRoleAndUserNoById(String userId) {
+        return authMapper.findUserRoleAndUserNoById(userId);
     }
 }

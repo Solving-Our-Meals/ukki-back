@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,9 +23,6 @@ public class JwtService {
 
     // JWT 토큰 생성용 (엑세스 토큰)
     public String createToken(String userId, UserRole userRole, int userNo) {
-        System.out.println("userId: " + userId);  // 정상
-        System.out.println("userRole: " + userRole);  // null
-        System.out.println("userNo: " + userNo);  // 0
 
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("userRole", userRole);
@@ -46,7 +44,7 @@ public class JwtService {
             Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY) // 비밀키 bearer뒤에 올 키에 대한 값 확인용인듯? 내가 application.yml에 저장한 값이 있는지 검증하는 것으로 보임 - 서명 검증 키
                     .build() // 새로운 버전에서는 parerbuilder()를 사용하면서 build()가 추가된듯
-                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조되 경우 예외 발생
+                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조돼 경우 예외 발생
             return true;
         } catch (Exception e) {
             return false; // 서명 검즘이 안되면 false 반환하겠다.
@@ -62,16 +60,13 @@ public class JwtService {
                 .getBody();
 
         String userId = claims.getSubject(); // 사용자 아이디
-        String userRoleString = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
-        UserRole userRole = UserRole.valueOf(userRoleString);
+        String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
         int userNo = (int) claims.get("userNo");
 
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("userId", userId);
         userInfo.put("userRole", userRole);
         userInfo.put("userNo", userNo);
-
-        System.out.println("Decoded JWT: " + userInfo);
 
         return userInfo;
     }
@@ -117,4 +112,5 @@ public class JwtService {
         }
         return null;
     }
+
 }

@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.auth.controller;
 
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
+import com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
 import com.ohgiraffers.ukki.common.UserRole;
 import jakarta.servlet.http.Cookie;
@@ -42,14 +43,17 @@ public class AuthController {
 
     @PostMapping("/login/step-two")
     public ResponseEntity<?> authenticatePassword(@RequestBody AuthDTO authDTO, HttpServletResponse response, HttpServletRequest request) {
+        ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(authDTO.getUserId());
+        UserRole userRole = UserRole.valueOf(forJwtDTO.getUserRole()); // 자료형이 ENUM이어서 String으로 변경해줘야 컴파일 에러가 안남
         try {
             boolean isPasswordValid = authService.authenticateUser(authDTO.getUserId(), authDTO.getUserPass());
+
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));
             }
 
-            String token = authService.createToken(authDTO.getUserId(), authDTO.getUserRole(), authDTO.getUserNo());
+            String token = authService.createToken(authDTO.getUserId(), userRole, forJwtDTO.getUserNo());
 
             String existingRefreshToken = authService.getRefresh(request);
 

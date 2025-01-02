@@ -2,18 +2,37 @@ package com.ohgiraffers.ukki.user.model.dto;
 
 public class MypageDTO {
 
-    private Long userNo;
+    private String userId;
+    private int userNo;
     private String nickname;
     private String profileImage;
-    private Long reservationCount;
-    private Long reviewCount;
+    private int reservationCount;
+    private int reviewCount;
 
-    // Getters and Setters
-    public Long getUserNo() {
+    public MypageDTO() {}
+
+    public MypageDTO(String userId, int userNo, String nickname, String profileImage, int reservationCount, int reviewCount) {
+        this.userId = userId;
+        this.userNo = userNo;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.reservationCount = reservationCount;
+        this.reviewCount = reviewCount;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getUserNo() {
         return userNo;
     }
 
-    public void setUserNo(Long userNo) {
+    public void setUserNo(int userNo) {
         this.userNo = userNo;
     }
 
@@ -33,19 +52,31 @@ public class MypageDTO {
         this.profileImage = profileImage;
     }
 
-    public Long getReservationCount() {
+    public int getReservationCount() {
         return reservationCount;
     }
 
-    public void setReservationCount(Long reservationCount) {
+    public void setReservationCount(int reservationCount) {
         this.reservationCount = reservationCount;
     }
 
-    public Long getReviewCount() {
+    public int getReviewCount() {
         return reviewCount;
     }
 
-    public void setReviewCount(Long reviewCount) {
+    public void setReviewCount(int reviewCount) {
         this.reviewCount = reviewCount;
+    }
+
+    @Override
+    public String toString() {
+        return "MypageDTO{" +
+                "userId='" + userId + '\'' +
+                ", userNo=" + userNo +
+                ", nickname='" + nickname + '\'' +
+                ", profileImage='" + profileImage + '\'' +
+                ", reservationCount=" + reservationCount +
+                ", reviewCount=" + reviewCount +
+                '}';
     }
 }

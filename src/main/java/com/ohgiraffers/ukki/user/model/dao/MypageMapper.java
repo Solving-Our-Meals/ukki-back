@@ -5,5 +5,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface MypageMapper {
-    MypageDTO findUserInfoByUserNo(int userNo);
+    MypageDTO findUserInfoByUserId(String userId);
 }
