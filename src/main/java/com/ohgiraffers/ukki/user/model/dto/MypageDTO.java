@@ -8,16 +8,18 @@ public class MypageDTO {
     private String profileImage;
     private int reservationCount;
     private int reviewCount;
+    private int randomCount;
 
     public MypageDTO() {}
 
-    public MypageDTO(String userId, int userNo, String nickname, String profileImage, int reservationCount, int reviewCount) {
+    public MypageDTO(String userId, int userNo, String nickname, String profileImage, int reservationCount, int reviewCount, int randomCount) {
         this.userId = userId;
         this.userNo = userNo;
         this.nickname = nickname;
         this.profileImage = profileImage;
         this.reservationCount = reservationCount;
         this.reviewCount = reviewCount;
+        this.randomCount = randomCount;
     }
 
     public String getUserId() {
@@ -68,6 +70,14 @@ public class MypageDTO {
         this.reviewCount = reviewCount;
     }
 
+    public int getRandomCount() {
+        return randomCount;
+    }
+
+    public void setRandomCount(int randomCount) {
+        this.randomCount = randomCount;
+    }
+
     @Override
     public String toString() {
         return "MypageDTO{" +
@@ -77,6 +87,7 @@ public class MypageDTO {
                 ", profileImage='" + profileImage + '\'' +
                 ", reservationCount=" + reservationCount +
                 ", reviewCount=" + reviewCount +
+                ", randomCount=" + randomCount +
                 '}';
     }
 }

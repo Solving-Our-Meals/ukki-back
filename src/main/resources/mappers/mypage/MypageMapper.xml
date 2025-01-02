@@ -6,11 +6,16 @@
 <!--    닉네임 가져오기     -->
     <select id="findUserInfoByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDTO">
         SELECT
-        USER_NO AS userNo,
-        USER_NAME AS nickname,
-        USER_PROFILE AS profileImage
-        FROM TBL_USER
-        WHERE USER_ID = #{userId}
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        u.USER_NAME AS nickname,
+        u.USER_PROFILE AS profileImage,
+        r.RES_COUNT AS reservationCount,
+        r.REVIEW_COUNT AS reviewCount,
+        r.RANDOM_COUNT AS randomCount
+        FROM TBL_USER u
+        LEFT JOIN TBL_USER_ACT_INFO r ON u.USER_NO = r.USER_NO
+        WHERE u.USER_ID = #{userId}
     </select>
 
 <!--  도전 현황 가져오기  -->
