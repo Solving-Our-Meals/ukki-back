@@ -15,8 +15,6 @@ public class MypageController {
     @GetMapping("/{userNo}")
     public MypageDTO getUserInfo(@PathVariable int userNo, @RequestHeader("Authorization") String token) {
         String jwtToken = token.replace("Bearer ", "");
-
-        System.out.println("Received JWT Token: " + jwtToken);
         return mypageService.getUserInfoFromToken(jwtToken, userNo);
     }
 

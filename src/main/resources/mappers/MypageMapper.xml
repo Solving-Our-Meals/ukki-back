@@ -7,10 +7,11 @@
         SELECT
         USER_NO AS userNo,
         USER_NAME,
-        USER_PROFILE AS profileImage,
-<!--        RESERVATION_COUNT AS reservationCount,-->
-<!--        REVIEW_COUNT AS reviewCount-->
+        USER_PROFILE AS profileImage
         FROM TBL_USER
         WHERE USER_NO = #{userNo}
     </select>
+
+    <!--        RESERVATION_COUNT AS reservationCount(DTO),-->
+    <!--        REVIEW_COUNT AS reviewCount(DTO)-->
 </mapper>

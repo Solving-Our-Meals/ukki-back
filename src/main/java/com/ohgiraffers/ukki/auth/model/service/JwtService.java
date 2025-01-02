@@ -23,9 +23,6 @@ public class JwtService {
 
     // JWT 토큰 생성용 (엑세스 토큰)
     public String createToken(String userId, UserRole userRole, int userNo) {
-        System.out.println("userId: " + userId);  // 정상
-        System.out.println("userRole: " + userRole);  // null
-        System.out.println("userNo: " + userNo);  // 0
 
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("userRole", userRole);
@@ -63,16 +60,13 @@ public class JwtService {
                 .getBody();
 
         String userId = claims.getSubject(); // 사용자 아이디
-        String userRoleString = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
-        UserRole userRole = UserRole.valueOf(userRoleString);
+        String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
         int userNo = (int) claims.get("userNo");
 
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("userId", userId);
         userInfo.put("userRole", userRole);
         userInfo.put("userNo", userNo);
-
-        System.out.println("Decoded JWT: " + userInfo);
 
         return userInfo;
     }
