@@ -29,6 +29,7 @@ public class MypageController {
     }*/
 
     // 쿠키로만 보냈을 땐 이 방법을 사용해야하고 우리는 쿠키로 검증하는 방식을 사용할겁니다. 쿠키서비스에 getJWTCookie 메소드를 통해 검증하시고 사용하시면 됩니다 !
+    // 마이페이지 프로필의 닉네임을 불러오는 컨트롤러
     @GetMapping("/{userId}")
     public MypageDTO getUserInfo(@PathVariable String userId, HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
