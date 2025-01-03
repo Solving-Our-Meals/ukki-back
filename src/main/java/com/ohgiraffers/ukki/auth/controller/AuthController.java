@@ -97,13 +97,11 @@ public class AuthController {
             for (Cookie cookie : cookies) {
                 if ("refreshToken".equals(cookie.getName())) {
                     refreshToken = cookie.getValue();
-                    System.out.println(cookie.getValue());
                 }
             }
         }
 
         if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
-            System.out.println(authService.validateRefreshToken(refreshToken));
             /* 결론 : 엑세스 토큰에는 유저 아이디, 역할, 번호가 담기는 상황 -> getUserInfofromToken에서도 마찬가지로 그렇게 로직이 짜임
             리프레시 토큰에서는 유저 아이디만 갖고 있음 -> 이유 : 갱신용이기 때문에 정보가 많이 담길 필요가 없다.
             그러나 리프레시 토큰에서 엑세스 토큰의 3가지 정보를 담는 getUserInfoFormToken을 사용하면서 null이 발생해 문제가 발생했고 토큰이 일치하지 않는다는
@@ -121,19 +119,11 @@ public class AuthController {
             ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(userId);
             UserRole userRole = UserRole.valueOf(forJwtDTO.getUserRole());
 
-            String token = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
-            System.out.println(token);
-            System.out.println(userId);
-
-            System.out.println(userRole);
-
-            System.out.println(forJwtDTO.getUserNo());
-
             String newToken = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
 
             Cookie newCookie = new Cookie("authToken", newToken);
-            newCookie.setHttpOnly(true);
-            newCookie.setSecure(true);
+            newCookie.setHttpOnly(false);
+            newCookie.setSecure(false);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
