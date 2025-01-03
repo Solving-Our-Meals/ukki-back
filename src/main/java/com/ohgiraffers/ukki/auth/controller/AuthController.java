@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.auth.controller;
 
+import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
 import com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
@@ -9,10 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -21,9 +19,11 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtFilter jwtFilter;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtFilter jwtFilter) {
         this.authService = authService;
+        this.jwtFilter = jwtFilter;
     }
 
     @PostMapping("/login/step-one")
@@ -66,7 +66,7 @@ public class AuthController {
 
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
-            cookie.setHttpOnly(false); // 이것도 배포 전에 false
+            cookie.setHttpOnly(true); // 이것도 배포 전에 false
             cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
@@ -74,7 +74,7 @@ public class AuthController {
 
             // 리프토 부분
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-            refreshCookie.setHttpOnly(false); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
+            refreshCookie.setHttpOnly(true); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
             refreshCookie.setSecure(false); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
@@ -89,26 +89,48 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
-        String refreshToken = requestBody.get("refreshToken");
-        if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
-            Map<String, Object> userInfo = authService.getUserInfoFromToken(refreshToken);
-            String userId = (String) userInfo.get("userId");
-            int userNo = (int) userInfo.get("userNo");
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = null;
 
-            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")), userNo);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
+            }
+        }
+
+        if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
+            /* 결론 : 엑세스 토큰에는 유저 아이디, 역할, 번호가 담기는 상황 -> getUserInfofromToken에서도 마찬가지로 그렇게 로직이 짜임
+            리프레시 토큰에서는 유저 아이디만 갖고 있음 -> 이유 : 갱신용이기 때문에 정보가 많이 담길 필요가 없다.
+            그러나 리프레시 토큰에서 엑세스 토큰의 3가지 정보를 담는 getUserInfoFormToken을 사용하면서 null이 발생해 문제가 발생했고 토큰이 일치하지 않는다는
+            문제가 발생했다. 그래서 리프레시 토큰 전용인 getUserInfoFromRefreshToken 메소드를 만들어서 userId만 담아서 가져오니 정상 작동한다.
+            sout가 작동하지 않는게 아니라 위에서 문제가 발생해서 sout까지는 가지도 않는 문제였고 만약 하나의 메소드에서 쓸 경우에는 if 문으로 나눠서할 수 있을 것
+            같은데(접근 토큰과 리프레시 토큰의 구분이 가능하다면?) 굳이 그렇게 할 필요없이 이렇게 나누면 될 것 같다.
+            개고생했는데 이게 문제였다. 엑세스 토큰의 getUserInfoToken을 그대로 사용할 경우 userRole과 userId를 가져오다보니 null값이 나온다고
+            문제가 생겼는데 userId만 넣는게 맞는 것 같다. 로직을 공통으로 쓰기 힘들어지고 로직이 많아진다. 토큰에 담아서 DB에서 찾아다가 쓰는게 맞다.
+            팀원의 요청으로 No까지 넣었지만 개인적으로는 하나만 쓰는게 맞지 않나 싶다. -> DB에서 찾아오는 식으로
+            다만, 여기서 생기는 의문은 느려질 수 있지 않냐는건데 이건 좀 더 공부해야 될 것 같다.
+            */
+            Map<String, Object> userInfo = authService.getUserInfoFromRefreshToken(refreshToken);
+            String userId = (String) userInfo.get("userId");
+
+            ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(userId);
+            UserRole userRole = UserRole.valueOf(forJwtDTO.getUserRole());
+
+            String newToken = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
 
             Cookie newCookie = new Cookie("authToken", newToken);
-            newCookie.setHttpOnly(false); // 배포하면 트루
-            newCookie.setSecure(false); // 배포하면 트루
+            newCookie.setHttpOnly(true);
+            newCookie.setSecure(false);
             newCookie.setPath("/");
-            newCookie.setMaxAge(60 * 60);
+            newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
-
-            return ResponseEntity.ok(Map.of("token", newToken));
+            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "ⓘ 리프레시 토큰이 유효하지 않습니다."));
+                    .body(Map.of("success", false, "message", "ⓘ 유효하지 않은 리프레시 토큰 !"));
         }
     }
 
@@ -137,6 +159,26 @@ public class AuthController {
                 }
             }
         }
+    }
+
+    @GetMapping("/check-auth")
+    public ResponseEntity<?> checkAuth(HttpServletRequest request) {
+        // 쿠키에서 authToken을 찾아서 인증 상태를 확인
+        String token = jwtFilter.getTokenFromCookies(request);
+
+        if (token == null || !authService.validateToken(token)) {
+            return ResponseEntity.status(401).body("Unauthorized");  // 인증 실패
+        }
+
+        // 토큰이 유효하다면, 사용자 정보를 추출
+        Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
+        String userId = (String) userInfo.get("userId");
+
+        if (userId != null) {
+            return ResponseEntity.ok("Authenticated");  // 인증됨
+        }
+
+        return ResponseEntity.status(401).body("Unauthorized");
     }
 
 }
