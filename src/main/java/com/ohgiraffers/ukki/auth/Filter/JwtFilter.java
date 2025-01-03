@@ -27,7 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 요청 헤더에서 JWT 토큰 추출
-        String token = getTokenFromCookie(request);
+        String token = getTokenFromCookies(request);
 
         // 토큰 유효성 검증
         if (token != null && jwtService.validateToken(token)) {
@@ -54,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     // HTTP 요청에서 Authorization 헤더를 통해 토큰 추출
-    private String getTokenFromCookie(HttpServletRequest request) {
+    public String getTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

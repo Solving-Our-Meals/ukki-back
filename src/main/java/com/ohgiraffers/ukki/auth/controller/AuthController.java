@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.auth.controller;
 
+import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
 import com.ohgiraffers.ukki.auth.model.dto.AuthDTO;
 import com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO;
 import com.ohgiraffers.ukki.auth.model.service.AuthService;
@@ -9,10 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -21,9 +19,11 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtFilter jwtFilter;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtFilter jwtFilter) {
         this.authService = authService;
+        this.jwtFilter = jwtFilter;
     }
 
     @PostMapping("/login/step-one")
@@ -67,7 +67,7 @@ public class AuthController {
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
             cookie.setHttpOnly(true); // 이것도 배포 전에 false
-            cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
+            cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
             response.addCookie(cookie);
@@ -75,7 +75,7 @@ public class AuthController {
             // 리프토 부분
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
             refreshCookie.setHttpOnly(true); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
-            refreshCookie.setSecure(true); // 배포하면 트루
+            refreshCookie.setSecure(false); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
@@ -123,7 +123,7 @@ public class AuthController {
 
             Cookie newCookie = new Cookie("authToken", newToken);
             newCookie.setHttpOnly(true);
-            newCookie.setSecure(true);
+            newCookie.setSecure(false);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
@@ -159,6 +159,26 @@ public class AuthController {
                 }
             }
         }
+    }
+
+    @GetMapping("/check-auth")
+    public ResponseEntity<?> checkAuth(HttpServletRequest request) {
+        // 쿠키에서 authToken을 찾아서 인증 상태를 확인
+        String token = jwtFilter.getTokenFromCookies(request);
+
+        if (token == null || !authService.validateToken(token)) {
+            return ResponseEntity.status(401).body("Unauthorized");  // 인증 실패
+        }
+
+        // 토큰이 유효하다면, 사용자 정보를 추출
+        Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
+        String userId = (String) userInfo.get("userId");
+
+        if (userId != null) {
+            return ResponseEntity.ok("Authenticated");  // 인증됨
+        }
+
+        return ResponseEntity.status(401).body("Unauthorized");
     }
 
 }
