@@ -105,7 +105,17 @@ public class AuthController {
         }
 
         if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
-
+            // 결론 : 엑세스 토큰에는 유저 아이디, 역할, 번호가 담기는 상황 -> getUserInfofromToken에서도 마찬가지로 그렇게 로직이 짜임
+            // 리프레시 토큰에서는 유저 아이디만 갖고 있음 -> 이유 : 갱신용이기 때문에 정보가 많이 담길 필요가 없다.
+            // 그러나 리프레시 토큰에서 엑세스 토큰의 3가지 정보를 담는 getUserInfoFormToken을 사용하면서 null이 발생해 문제가 발생했고 토큰이 일치하지 않는다는
+            // 문제가 발생했다. 그래서 리프레시 토큰 전용인 getUserInfoFromRefreshToken 메소드를 만들어서 userId만 담아서 가져오니 정상 작동한다.
+            // sout가 작동하지 않는게 아니라 위에서 문제가 발생해서 sout까지는 가지도 않는 문제였고 만약 하나의 메소드에서 쓸 경우에는 if 문으로 나눠서할 수 있을 것
+            // 같은데(접근 토큰과 리프레시 토큰의 구분이 가능하다면?) 굳이 그렇게 할 필요없이 이렇게 나누면 될 것 같다.
+            /* 개고생했는데 이게 문제였다. 엑세스 토큰의 getUserInfoToken을 그대로 사용할 경우 userRole과 userId를 가져오다보니 null값이 나온다고
+            문제가 생겼는데 userId만 넣는게 맞는 것 같다. 로직을 공통으로 쓰기 힘들어지고 로직이 많아진다. 토큰에 담아서 DB에서 찾아다가 쓰는게 맞다.
+            팀원의 요청으로 No까지 넣었지만 개인적으로는 하나만 쓰는게 맞지 않나 싶다. -> DB에서 찾아오는 식으로
+            다만, 여기서 생기는 의문은 느려질 수 있지 않냐는건데 이건 좀 더 공부해야 될 것 같다.
+            */
             Map<String, Object> userInfo = authService.getUserInfoFromRefreshToken(refreshToken);
             String userId = (String) userInfo.get("userId");  // userId 추출
 
