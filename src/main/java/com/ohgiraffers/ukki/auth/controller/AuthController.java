@@ -66,16 +66,16 @@ public class AuthController {
 
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
-            cookie.setHttpOnly(false); // 이것도 배포 전에 false
-            cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
+            cookie.setHttpOnly(true); // 이것도 배포 전에 false
+            cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
             response.addCookie(cookie);
 
             // 리프토 부분
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-            refreshCookie.setHttpOnly(false); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
-            refreshCookie.setSecure(false); // 배포하면 트루
+            refreshCookie.setHttpOnly(true); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
+            refreshCookie.setSecure(true); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
@@ -122,20 +122,17 @@ public class AuthController {
             String newToken = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
 
             Cookie newCookie = new Cookie("authToken", newToken);
-            newCookie.setHttpOnly(false);
-            newCookie.setSecure(false);
+            newCookie.setHttpOnly(true);
+            newCookie.setSecure(true);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
-
-            return ResponseEntity.ok(Map.of("token", newToken));
+            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "ⓘ 리프레시 토큰이 유효하지 않습니다."));
+                    .body(Map.of("success", false, "message", "ⓘ 유효하지 않은 리프레시 토큰 !"));
         }
     }
-
-
 
     // 로그아웃 관련
     @PostMapping("/logout")
