@@ -129,4 +129,22 @@ public class JwtService {
         return null;
     }
 
+    public String getUserInfoFromTokenId(String jwtToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String userId = claims.getSubject(); // 사용자 아이디
+        String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
+        int userNo = (int) claims.get("userNo");
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", userId);
+        userInfo.put("userRole", userRole);
+        userInfo.put("userNo", userNo);
+
+        return userId;
+    }
 }

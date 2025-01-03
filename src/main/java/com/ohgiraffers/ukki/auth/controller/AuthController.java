@@ -161,6 +161,7 @@ public class AuthController {
         }
     }
 
+    // 검증만을 위한 로직
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
         // 쿠키에서 엑세스 토큰 찾아서 유효한지 확인하는 과정입니다.
@@ -180,5 +181,4 @@ public class AuthController {
 
         return ResponseEntity.status(401).body("Unauthorized"); // 401 인증실패 (권한없음)
     }
-
 }
