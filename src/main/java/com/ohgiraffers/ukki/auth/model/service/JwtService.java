@@ -51,7 +51,7 @@ public class JwtService {
         }
     }
 
-    // 토큰에서 사용자 아이디와 userRole 추출용도
+    // 토큰에서 사용자 아이디와 userRole 추출용도 -> 고생한 부분 -> 리프레시 토큰은 아이디만 담겨있으므로 새로 만들어야함
     public Map<String, Object> getUserInfoFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
@@ -72,6 +72,22 @@ public class JwtService {
     }
 
     // 리프레시 토큰에 대한 부분이 없어 추가해야 한다.
+
+    // 리프레시 토큰에서 사용자 아이디만 추출
+    public Map<String, Object> getUserInfoFromRefreshToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        String userId = claims.getSubject(); // 사용자 아이디
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", userId);
+
+        return userInfo;
+    }
 
     // 리프토 생성
     public String createRefreshToken(String userId) {

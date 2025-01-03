@@ -89,20 +89,46 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
-        String refreshToken = requestBody.get("refreshToken");
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("작동은함?");
+        String refreshToken = null;
+
+        // 쿠키에서 refreshToken을 읽어오기
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    System.out.println(cookie.getValue());
+                }
+            }
+        }
+
         if (refreshToken != null && authService.validateRefreshToken(refreshToken)) {
-            Map<String, Object> userInfo = authService.getUserInfoFromToken(refreshToken);
-            String userId = (String) userInfo.get("userId");
-            int userNo = (int) userInfo.get("userNo");
 
-            String newToken = authService.createToken(userId, UserRole.valueOf((String) userInfo.get("userRole")), userNo);
+            Map<String, Object> userInfo = authService.getUserInfoFromRefreshToken(refreshToken);
+            String userId = (String) userInfo.get("userId");  // userId 추출
 
+            ForJwtDTO forJwtDTO = authService.findUserRoleAndUserNoById(userId);
+            UserRole userRole = UserRole.valueOf(forJwtDTO.getUserRole());
+
+            String token = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
+            System.out.println(token);
+            System.out.println(userId);
+
+            System.out.println(userRole);
+
+            System.out.println(forJwtDTO.getUserNo());
+
+            // 새로운 accessToken 생성
+            String newToken = authService.createToken(userId, userRole, forJwtDTO.getUserNo());
+
+            // 새로운 토큰을 쿠키에 저장
             Cookie newCookie = new Cookie("authToken", newToken);
-            newCookie.setHttpOnly(false); // 배포하면 트루
-            newCookie.setSecure(false); // 배포하면 트루
+            newCookie.setHttpOnly(true); // 보안을 위해 true로 설정
+            newCookie.setSecure(true); // 배포 시 true로 설정 (HTTPS)
             newCookie.setPath("/");
-            newCookie.setMaxAge(60 * 60);
+            newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
 
             return ResponseEntity.ok(Map.of("token", newToken));
@@ -111,6 +137,8 @@ public class AuthController {
                     .body(Map.of("message", "ⓘ 리프레시 토큰이 유효하지 않습니다."));
         }
     }
+
+
 
     // 로그아웃 관련
     @PostMapping("/logout")

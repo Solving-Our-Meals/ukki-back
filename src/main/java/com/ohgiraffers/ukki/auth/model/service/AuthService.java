@@ -81,4 +81,9 @@ public class AuthService {
     public ForJwtDTO findUserRoleAndUserNoById(String userId) {
         return authMapper.findUserRoleAndUserNoById(userId);
     }
+
+
+    public Map<String, Object> getUserInfoFromRefreshToken(String refreshToken) {
+        return jwtService.getUserInfoFromRefreshToken(refreshToken);
+    }
 }
