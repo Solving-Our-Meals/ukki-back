@@ -163,22 +163,22 @@ public class AuthController {
 
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
-        // 쿠키에서 authToken을 찾아서 인증 상태를 확인
+        // 쿠키에서 엑세스 토큰 찾아서 유효한지 확인하는 과정입니다.
         String token = jwtFilter.getTokenFromCookies(request);
 
         if (token == null || !authService.validateToken(token)) {
             return ResponseEntity.status(401).body("Unauthorized");  // 인증 실패
         }
 
-        // 토큰이 유효하다면, 사용자 정보를 추출
+        // 토큰이 유효하면 사용자 정보를 추출하는 과정입니다.(Sub으로 지정한 ID가 추출)
         Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
         String userId = (String) userInfo.get("userId");
 
         if (userId != null) {
-            return ResponseEntity.ok("Authenticated");  // 인증됨
+            return ResponseEntity.ok("Authenticated");  // 200 인증완료 (권한있음)
         }
 
-        return ResponseEntity.status(401).body("Unauthorized");
+        return ResponseEntity.status(401).body("Unauthorized"); // 401 인증실패 (권한없음)
     }
 
 }
