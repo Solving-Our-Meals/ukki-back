@@ -81,7 +81,7 @@
              , USER_NO
              , POS_NUMBER
           FROM TBL_STORE
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
@@ -96,7 +96,7 @@
              , KEYWORD5
              , KEYWORD6
           FROM TBL_KEYWORD
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
@@ -105,16 +105,21 @@
         SELECT
                *
           FROM TBL_OPERATION
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
     <!--  배너 불러오기  -->
     <select id="getBannerList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
         SELECT
-               *
+               STORE_NO
+             , BANNER1
+             , BANNER2
+             , BANNER3
+             , BANNER4
+             , BANNER5
           FROM TBL_BANNER
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
     </select>
 
     <!-- 리뷰 정보 가져오기 -->
@@ -135,7 +140,7 @@
              , A.REPORT_COUNT
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 5
+         WHERE A.STORE_NO = 6
          ORDER BY REVIEW_NO DESC;
     </select>
 

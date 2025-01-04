@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public StoreController(StoreService storeService){
         this.storeService = storeService;
