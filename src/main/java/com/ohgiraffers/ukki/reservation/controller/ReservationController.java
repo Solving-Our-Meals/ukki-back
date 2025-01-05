@@ -8,10 +8,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -30,10 +27,9 @@ public class ReservationController {
     }
 
     // 대표 사진
-    @GetMapping(value = "/5/repPhoto")
-    public ResponseEntity<String> getRepPhotoName(){
+    @GetMapping(value = "/{storeNo}/repPhoto")
+    public ResponseEntity<String> getRepPhotoName(@PathVariable("storeNo") long storeNo){
 
-        long storeNo = 5;
         StoreBannerDTO storeBannerDTO = reservationService.getRepPhotoName(storeNo);
         String bannerName = storeBannerDTO.getRepPhoto();
         System.out.println(storeBannerDTO);
@@ -63,9 +59,10 @@ public class ReservationController {
     }
 
     // 프로필 사진
-    @GetMapping ResponseEntity<String> getProfileName(ReservationStoreDTO reservationStoreDTO){
+    @GetMapping (value = "/{storeNo}/profile")
+    ResponseEntity<String> getProfileName(@PathVariable("storeNo") long storeNo, ReservationStoreDTO reservationStoreDTO){
 
-        long storeNo = 5;
+//        long storeNo = 5;
         reservationStoreDTO = reservationService.getReservationedStoreInfo(storeNo);
         String profileName = reservationStoreDTO.getStoreProfile();
 
