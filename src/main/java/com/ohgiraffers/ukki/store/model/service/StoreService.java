@@ -44,6 +44,8 @@ public class StoreService {
         storeMapper.createReview(reviewContentDTO);
     }
 
+    public List<StoreInfoDTO> getStoresLocation(int category) { return storeMapper.getStoresLocation(category); }
+
 
 
 }
