@@ -10,7 +10,7 @@ public class StoreInfoDTO {
     private float longitude; //가게 경도
     private String storeProfile;
     private String storeMenu;
-    private long storeCategoryNo;
+    private int storeCategoryNo;
     private long userNo;
     private int posNumber; // 예약 가능 인원
     private KeywordDTO storeKeyword;
@@ -18,7 +18,7 @@ public class StoreInfoDTO {
 
     public StoreInfoDTO() {}
 
-    public StoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, long storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword, OperationDTO operationTime) {
+    public StoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword, OperationDTO operationTime) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
@@ -98,11 +98,11 @@ public class StoreInfoDTO {
         this.storeMenu = storeMenu;
     }
 
-    public long getStoreCategoryNo() {
+    public int getStoreCategoryNo() {
         return storeCategoryNo;
     }
 
-    public void setStoreCategoryNo(long storeCategoryNo) {
+    public void setStoreCategoryNo(int storeCategoryNo) {
         this.storeCategoryNo = storeCategoryNo;
     }
 

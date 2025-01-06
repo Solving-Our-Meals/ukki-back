@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ohgiraffers.ukki.store.model.dao.StoreMapper">
+    <select id="getStoresLocation" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+        SELECT
+        STORE_NO
+        , STORE_NAME
+        , STORE_DES
+        , STORE_ADDRESS
+        , LATITUDE
+        , LONGITUDE
+        , STORE_PROFILE
+        , STORE_CATEGORY_NO
+        FROM TBL_STORE
+        WHERE STORE_CATEGORY_NO = #{ category }
+    </select>
+</mapper>
