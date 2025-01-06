@@ -13,6 +13,19 @@
         <result property="noShow" column="NOSHOW"/>
     </resultMap>
 
+    <resultMap id="userInfo" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserInfoDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="userRole" column="USER_ROLE"/>
+        <result property="noShow" column="NOSHOW"/>
+        <result property="resCount" column="RES_COUNT"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <result property="randomCount" column="RANDOM_COUNT"/>
+    </resultMap>
+
     <insert id="insertActInfo">
         INSERT INTO TBL_USER_ACT_INFO VALUES
         <foreach collection="actInfoList" item="actInfo" separator="," close=";">
@@ -31,10 +44,29 @@
                 <if test="category == null and word != null">
                     CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
                 </if>
+                AND USER_ROLE != 'ADMIN'
             </where>
         </select>
 
     <select id="searchAllUsers" resultMap="user">
         SELECT * FROM TBL_USER WHERE USER_ROLE != 'ADMIN'
     </select>
+
+    <select id="searchUserInfo" resultMap="userInfo">
+        SELECT
+        a.USER_NO,
+        a.USER_ID,
+        a.EMAIL,
+        a.USER_NAME,
+        a.USER_PROFILE,
+        a.USER_ROLE,
+        a.NOSHOW,
+        b.RES_COUNT,
+        b.REVIEW_COUNT,
+        b.RANDOM_COUNT
+        FROM TBL_USER a
+        LEFT JOIN TBL_USER_ACT_INFO b ON a.USER_NO = b.USER_NO
+        WHERE a.USER_NO = ${userNo};
+    </select>
+
 </mapper>

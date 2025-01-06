@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.admin.user.model.service;
 import com.ohgiraffers.ukki.admin.user.model.dao.AdminUserMapper;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserActInfoDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserDTO;
+import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserInfoDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,7 +26,6 @@ public class AdminUserService {
 
     public List<AdminUserDTO> searchUsers(String category, String word) {
         if (category != null || word != null) {
-            System.out.println(category + " " + word + "나야나");
             Map<String, String> params = new HashMap<String, String>();
             params.put("category", category);
             params.put("word", word);
@@ -33,5 +33,9 @@ public class AdminUserService {
         } else {
             return adminUserMapper.searchAllUsers();
         }
+    }
+
+    public AdminUserInfoDTO searchUserInfo(int userNo) {
+        return adminUserMapper.searchUserInfo(userNo);
     }
 }
