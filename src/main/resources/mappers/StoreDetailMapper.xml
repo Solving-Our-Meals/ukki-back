@@ -42,11 +42,11 @@
 
     <resultMap id="bannerResultMap" type="com.ohgiraffers.ukki.store.model.dto.BannerDTO">
         <id property="storeNo" column="STORE_NO"/>
-        <result property="banner1" column="IMAGE1"/>
-        <result property="banner2" column="IMAGE2"/>
-        <result property="banner3" column="IMAGE3"/>
-        <result property="banner4" column="IMAGE4"/>
-        <result property="banner5" column="IMAGE5"/>
+        <result property="banner1" column="BANNER1"/>
+        <result property="banner2" column="BANNER2"/>
+        <result property="banner3" column="BANNER3"/>
+        <result property="banner4" column="BANNER4"/>
+        <result property="banner5" column="BANNER5"/>
     </resultMap>
 
     <resultMap id="getReviewInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewDTO">
