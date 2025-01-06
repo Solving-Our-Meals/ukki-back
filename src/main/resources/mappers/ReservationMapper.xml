@@ -17,6 +17,17 @@
         <result property="longitude" column="LONGITUDE"/>
     </resultMap>
 
+    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
+        <id property="resNo" column="RES_NO"/>
+        <result property="resDate" column="RES_DATE"/>
+        <result property="resTime" column="RES_TIME"/>
+        <result property="isRandom" column="IS_RANDOM"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="qrConfirm" column="QU_CONFIRM"/>
+        <result property="qr" column="QR"/>
+    </resultMap>
+
     <select id="getRepPhotoName" parameterType="long" resultMap="bannerResultMap">
         SELECT
                STORE_NO
@@ -34,6 +45,37 @@
              , LONGITUDE
           FROM TBL_STORE
          WHERE STORE_NO = 5
+    </select>
+
+    <insert id="insertReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
+        INSERT INTO TBL_RESERVATION
+        (
+               RES_DATE
+             , RES_TIME
+             , IS_RANDOM
+             , USER_NO
+             , STORE_NO
+             , QR_CONFIRM
+             , QR
+        )
+        VALUES
+        (
+               #{ resDate }
+             , #{ resTime }
+             , 0
+             , #{ userNo }
+             , #{ storeNo }
+             , 0
+             , "5sdf"
+        )
+    </insert>
+
+    <!-- 유저 이메일 받아오기 -->
+    <select id="getEmail" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO" resultType="String">
+        SELECT
+               EMAIL
+          FROM TBL_USER
+         WHERE USER_NO = #{ userNo }
     </select>
 
 </mapper>
