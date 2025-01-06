@@ -112,7 +112,12 @@
     <!--  배너 불러오기  -->
     <select id="getBannerList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
         SELECT
-               *
+               STORE_NO
+             , BANNER1
+             , BANNER2
+             , BANNER3
+             , BANNER4
+             , BANNER5
           FROM TBL_BANNER
          WHERE STORE_NO = 5
     </select>

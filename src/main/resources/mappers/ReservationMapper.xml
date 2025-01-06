@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.reservation.model.dao.ReservationMapper">
+
+    <resultMap id="bannerResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.StoreBannerDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="repPhoto" column="REP_PHOTO"/>
+    </resultMap>
+
+    <resultMap id="reservationedStoreInfoResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.ReservationStoreDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeProfile" column="STORE_PROFILE"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="longitude" column="LONGITUDE"/>
+    </resultMap>
+
+    <select id="getRepPhotoName" parameterType="long" resultMap="bannerResultMap">
+        SELECT
+               STORE_NO
+             , REP_PHOTO
+          FROM TBL_BANNER
+         WHERE STORE_NO = 5
+    </select>
+
+    <select id="getReservationedStoreInfo" parameterType="long" resultMap="reservationedStoreInfoResultMap">
+        SELECT
+               STORE_NO
+             , STORE_NAME
+             , STORE_PROFILE
+             , LATITUDE
+             , LONGITUDE
+          FROM TBL_STORE
+         WHERE STORE_NO = 5
+    </select>
+
+</mapper>
