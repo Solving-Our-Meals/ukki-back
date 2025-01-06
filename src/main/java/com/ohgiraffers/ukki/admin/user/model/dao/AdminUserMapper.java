@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.admin.user.model.dao;
 
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserActInfoDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserDTO;
+import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,4 +19,6 @@ public interface AdminUserMapper {
     List<AdminUserDTO> searchBy(Map<String, String> params);
 
     List<AdminUserDTO> searchByWord(@Param("word") String word);
+
+    AdminUserInfoDTO searchUserInfo(int userNo);
 }

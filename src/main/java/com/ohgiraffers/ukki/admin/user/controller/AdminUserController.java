@@ -2,18 +2,13 @@ package com.ohgiraffers.ukki.admin.user.controller;
 
 import com.ohgiraffers.ukki.admin.reservation.model.service.AdminReservationService;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
-import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserActInfoDTO;
-import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserDTO;
-import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserResDTO;
-import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserReviewDTO;
+import com.ohgiraffers.ukki.admin.user.model.dto.*;
 import com.ohgiraffers.ukki.admin.user.model.service.AdminUserService;
+import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +76,18 @@ public class AdminUserController {
         return ResponseEntity.ok("hi");
     }
 
-    @GetMapping("")
+    @GetMapping("/list/")
+    public ResponseEntity<?> searchUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
+        try {
+            List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
+            return ResponseEntity.ok(userList);
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while retrieving users: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @GetMapping("/list")
     public ResponseEntity<?> searchAllUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
         try {
             List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
@@ -90,5 +96,12 @@ public class AdminUserController {
             String errorMessage = "Error occurred while retrieving users: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
+    }
+
+    @GetMapping("/info/{userNo}")
+    public ResponseEntity<?> searchUserInfo(@PathVariable int userNo){
+        AdminUserInfoDTO userInfoDTO = adminUserService.searchUserInfo(userNo);
+
+        return ResponseEntity.ok(userInfoDTO);
     }
 }
