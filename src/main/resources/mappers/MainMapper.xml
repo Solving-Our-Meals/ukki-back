@@ -10,11 +10,9 @@
         , STORE_NAME
         , STORE_DES
         , STORE_ADDRESS
-        , LATITUDE
-        , LONGITUDE
         , STORE_PROFILE
         , STORE_CATEGORY_NO
         FROM TBL_STORE
-        WHERE STORE_CATEGORY_NO = #{ category }
+
     </select>
 </mapper>
