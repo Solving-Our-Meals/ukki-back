@@ -66,7 +66,26 @@
         b.RANDOM_COUNT
         FROM TBL_USER a
         LEFT JOIN TBL_USER_ACT_INFO b ON a.USER_NO = b.USER_NO
-        WHERE a.USER_NO = ${userNo};
+        WHERE a.USER_NO = #{userNo};
     </select>
 
+    <select id="searchSaneName">
+        SELECT
+        USER_NAME
+        FROM TBL_USER
+        WHERE USER_NAME LIKE CONCAT('건전한우끼', '%')
+        ORDER BY USER_NAME DESC
+        LIMIT 1;
+    </select>
+
+    <update id="updateUserName" parameterType="map">
+        UPDATE TBL_USER
+        SET USER_NAME = #{newSaneName}
+        WHERE USER_NO = #{userNo};
+    </update>
+
+    <delete id="deleteUserInfo">
+        DELETE FROM TBL_USER
+        WHERE USER_NO = #{userNo}
+    </delete>
 </mapper>

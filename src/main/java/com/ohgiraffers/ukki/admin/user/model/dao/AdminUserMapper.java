@@ -21,4 +21,10 @@ public interface AdminUserMapper {
     List<AdminUserDTO> searchByWord(@Param("word") String word);
 
     AdminUserInfoDTO searchUserInfo(int userNo);
+
+    String searchSaneName();
+
+    int updateUserName(Map<String, String> params);
+
+    int deleteUserInfo(int userNo);
 }
