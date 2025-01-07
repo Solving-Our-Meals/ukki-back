@@ -23,4 +23,5 @@ public class MainController {
     public List<StoreInfoDTO> getStoresLocation(@RequestParam("category") int category) {
         return storeService.getStoresLocation(category);
     }
+
 }
