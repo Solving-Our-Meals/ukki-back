@@ -77,7 +77,7 @@ public class AdminUserController {
     }
     
     @GetMapping("/list")
-    public ResponseEntity<?> searchAllUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
+    public ResponseEntity<?> searchUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
         try {
             List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
             return ResponseEntity.ok(userList);
