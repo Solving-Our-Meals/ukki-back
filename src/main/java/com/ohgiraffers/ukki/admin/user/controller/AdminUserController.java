@@ -75,18 +75,7 @@ public class AdminUserController {
 
         return ResponseEntity.ok("hi");
     }
-
-    @GetMapping("/list/")
-    public ResponseEntity<?> searchUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
-        try {
-            List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
-            return ResponseEntity.ok(userList);
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while retrieving users: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-        }
-    }
-
+    
     @GetMapping("/list")
     public ResponseEntity<?> searchAllUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
         try {
