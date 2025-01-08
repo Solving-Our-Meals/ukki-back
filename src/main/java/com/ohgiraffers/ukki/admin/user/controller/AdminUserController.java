@@ -104,4 +104,42 @@ public class AdminUserController {
 
         return ResponseEntity.ok(userInfoDTO);
     }
+
+    @PutMapping("/info/{userNo}")
+    public ResponseEntity<?> updateUserName(@PathVariable int userNo){
+        String lastSaneName = adminUserService.searchSaneName();
+        if(lastSaneName == null){
+            lastSaneName = "건전한우끼0";
+        }
+        String saneNoPart = lastSaneName.substring(5);
+
+        int saneNo = Integer.parseInt(saneNoPart)+1;
+
+        String newSaneName = "건전한우끼"+saneNo;
+
+        System.out.println(saneNo);
+
+        int result = adminUserService.updateUserName(userNo, newSaneName);
+        Map<String, Object> responseMap = new HashMap<>();
+        if (result > 0) {
+            responseMap.put("message", "닉네임 변경에 성공했습니다.");
+            responseMap.put("success", true);
+        } else {
+            responseMap.put("message", "닉네임 변경에 실패했습니다.");
+            responseMap.put("success", false);
+        } return ResponseEntity.ok(responseMap);
+    }
+
+    @DeleteMapping("/info/{userNo}")
+    public ResponseEntity<?> deleteUserInfo(@PathVariable int userNo){
+        int result = adminUserService.deleteUserInfo(userNo);
+        Map<String, Object> responseMap = new HashMap<>();
+        if (result > 0) {
+            responseMap.put("message", "회원 삭제에 성공했습니다.");
+            responseMap.put("success", true);
+        } else {
+            responseMap.put("message", "회원 삭제에 실패했습니다.");
+            responseMap.put("success", false);
+        } return ResponseEntity.ok(responseMap);
+    }
 }

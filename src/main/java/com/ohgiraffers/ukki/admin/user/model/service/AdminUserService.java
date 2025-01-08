@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class AdminUserService {
@@ -37,5 +38,20 @@ public class AdminUserService {
 
     public AdminUserInfoDTO searchUserInfo(int userNo) {
         return adminUserMapper.searchUserInfo(userNo);
+    }
+
+    public String searchSaneName() { return adminUserMapper.searchSaneName();
+    }
+
+    public int updateUserName(int userNo, String newSaneName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("userNo", ""+userNo);
+        params.put("newSaneName", newSaneName);
+
+        return adminUserMapper.updateUserName(params);
+    }
+
+    public int deleteUserInfo(int userNo) {
+        return adminUserMapper.deleteUserInfo(userNo);
     }
 }
