@@ -19,8 +19,9 @@ public class MainController {
         this.storeService = storeService;
     }
 
-    @GetMapping("/api/stores")
+    @GetMapping("/category")
     public List<StoreInfoDTO> getStoresLocation(@RequestParam("category") int category) {
         return storeService.getStoresLocation(category);
     }
+
 }
