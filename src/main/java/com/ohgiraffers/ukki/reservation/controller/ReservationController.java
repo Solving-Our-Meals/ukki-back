@@ -25,9 +25,9 @@ import java.nio.file.Paths;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final QrService qrService;
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public ReservationController(ReservationService reservationService, QrService qrService){
         this.reservationService = reservationService;

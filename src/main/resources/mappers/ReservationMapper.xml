@@ -62,11 +62,11 @@
         (
                #{ resDate }
              , #{ resTime }
-             , 0
+             , N
              , #{ userNo }
              , #{ storeNo }
-             , 0
-             , "5sdf"
+             , N
+             , #{ qr }
         )
     </insert>
 
