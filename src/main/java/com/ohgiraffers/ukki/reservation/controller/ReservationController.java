@@ -25,9 +25,9 @@ import java.nio.file.Paths;
 public class ReservationController {
 
     private final ReservationService reservationService;
-//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final QrService qrService;
-    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public ReservationController(ReservationService reservationService, QrService qrService){
         this.reservationService = reservationService;
@@ -40,7 +40,7 @@ public class ReservationController {
 
         StoreBannerDTO storeBannerDTO = reservationService.getRepPhotoName(storeNo);
         String bannerName = storeBannerDTO.getRepPhoto();
-        System.out.println(storeBannerDTO);
+//        System.out.println(storeBannerDTO);
 
         return ResponseEntity.ok(bannerName);
     }
@@ -51,7 +51,7 @@ public class ReservationController {
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(repPhotoName + ".png");
             //디버깅 확인
-            System.out.println("배너 파일 경로" + file);
+//            System.out.println("배너 파일 경로" + file);
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -102,22 +102,22 @@ public class ReservationController {
     @ResponseBody
     public void insertReservation(@RequestBody ReservationInfoDTO reservationInfoDTO) throws WriterException {
 
-        System.out.println("예약 DB 드가자");
+//        System.out.println("예약 DB 드가자");
 
         // QR코드를 생성하기 위한 필수 파라미터인 이메일 DB에서 받아오기
         String userEmail = reservationService.getEmail(reservationInfoDTO);
-        System.out.println("userEmail = " + userEmail);
+//        System.out.println("userEmail = " + userEmail);
 
         // QR코드 만드는 함수 호출
         QrController qrController = new QrController(qrService);
-        System.out.println("여긴 왔니...?");
+//        System.out.println("여긴 왔니...?");
         String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
-        System.out.println("어디까지 왔니1");
+//        System.out.println("어디까지 왔니1");
         // QR코드 reservationInfoDTO에 넣기
         reservationInfoDTO.setQr(qrCode);
-        System.out.println("어디까지 왔니2");
-        System.out.println("reservationInfo : " + reservationInfoDTO);
-        System.out.println("어디까지 왔니3");
+//        System.out.println("어디까지 왔니2");
+//        System.out.println("reservationInfo : " + reservationInfoDTO);
+//        System.out.println("어디까지 왔니3");
 
         reservationService.insertReservation(reservationInfoDTO);
     }

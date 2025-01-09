@@ -49,5 +49,11 @@ public class StoreService {
     }
 
 
+    public ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO) {
+        return storeMapper.getReviewListByScope(storeInfoDTO);
+    }
 
+    public List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
+        return storeMapper.getUserReviewList(userId, storeNo);
+    }
 }

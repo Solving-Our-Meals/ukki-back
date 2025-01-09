@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public StoreController(StoreService storeService){
         this.storeService = storeService;
@@ -41,11 +41,11 @@ public class StoreController {
     public StoreInfoDTO getStoreInfo(ModelAndView mv, @ModelAttribute StoreInfoDTO storeInfoDTO){
 
         // storeDB 연결
-        System.out.println("getStoreInfo 넘어옴");
+//        System.out.println("getStoreInfo 넘어옴");
         storeInfoDTO = storeService.getStoreInfo(storeInfoDTO);
 
 
-        System.out.println("keyword 연결 전" + storeInfoDTO);
+//        System.out.println("keyword 연결 전" + storeInfoDTO);
 
         // keywordDB 연결
         KeywordDTO keywordDTO = storeService.getKeyword(storeInfoDTO);
@@ -57,8 +57,8 @@ public class StoreController {
 
         mv.addObject("getStoreInfo", storeInfoDTO);
 
-        System.out.println(keywordDTO);
-        System.out.println("keyword연결 이후" + storeInfoDTO);
+//        System.out.println(keywordDTO);
+//        System.out.println("keyword연결 이후" + storeInfoDTO);
 
         return storeInfoDTO;
     }
@@ -90,7 +90,7 @@ public class StoreController {
             Path file = Paths.get(SHARED_FOLDER).resolve(filename + ".png");
 
             // 디버깅 확인
-            System.out.println("file 경로 : " + file.toString());
+//            System.out.println("file 경로 : " + file.toString());
 
 
             // 자바에서 Path 객체로부터 Resource 객체를 생성하는 부분
@@ -121,7 +121,7 @@ public class StoreController {
 
         storeInfoDTO = storeService.getStoreInfo(storeInfoDTO);
         String profileName = storeInfoDTO.getStoreProfile();
-        System.out.println(profileName);
+//        System.out.println(profileName);
         return ResponseEntity.ok(profileName);
     }
 
@@ -132,7 +132,7 @@ public class StoreController {
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(profileName + ".png");
             // 디버깅 확인
-            System.out.println("프로필 파일 경로 : " + file);
+//            System.out.println("프로필 파일 경로 : " + file);
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -163,7 +163,7 @@ public class StoreController {
 
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(menuName + ".png");
-            System.out.println("menu : " + file );
+//            System.out.println("menu : " + file );
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -183,8 +183,21 @@ public class StoreController {
     @ResponseBody
     public ReviewDTO getReviewInfo(ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
 
-        System.out.println("리뷰 조회 매퍼 옴.");
+//        System.out.println("리뷰 조회 매퍼 옴.");
         reviewDTO = storeService.getReviewList(storeInfoDTO);
+        System.out.println("reviewDTO : " + reviewDTO);
+
+        mv.addObject("review 정보", reviewDTO);
+
+        return reviewDTO;
+    }
+
+    @GetMapping(value = "/reviewscope", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ReviewDTO getReviewInfoByScope(ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
+
+//        System.out.println("리뷰 조회 매퍼 옴.");
+        reviewDTO = storeService.getReviewListByScope(storeInfoDTO);
         System.out.println("reviewDTO : " + reviewDTO);
 
         mv.addObject("review 정보", reviewDTO);
@@ -197,10 +210,10 @@ public class StoreController {
     @ResponseBody
     public ResponseEntity<Resource> getReviewImg(@RequestParam("reviewImgName") String reviewImgName ){
 
-        System.out.println("리뷰 이미지 api");
+//        System.out.println("리뷰 이미지 api");
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".png");
-            System.out.println("reviewImg : " + file );
+//            System.out.println("reviewImg : " + file );
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -220,10 +233,10 @@ public class StoreController {
     @ResponseBody
     public ResponseEntity<Resource> getUserProfile(@RequestParam("userProfileName") String userProfileName ){
 
-        System.out.println("사용자 프로필 이미지 api");
+//        System.out.println("사용자 프로필 이미지 api");
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".png");
-            System.out.println("유저 프로필 : " + file );
+//            System.out.println("유저 프로필 : " + file );
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -243,7 +256,7 @@ public class StoreController {
     @ResponseBody
     public void createReview(@RequestParam("params") String params, @RequestPart("reviewImage") MultipartFile singleFile) {
 
-        System.out.println("리뷰 등록하러 왔다.");
+//        System.out.println("리뷰 등록하러 왔다.");
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> paramMap;
@@ -282,16 +295,16 @@ public class StoreController {
 
         // reviewImage 필드 값 설정
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyMMdd");
-        System.out.println("simpleDateFormat2 = " + simpleDateFormat2);
+//        System.out.println("simpleDateFormat2 = " + simpleDateFormat2);
 
         String reviewDate = simpleDateFormat2.format(nowDate).toString();
-        System.out.println("reviewDate = " + reviewDate);
+//        System.out.println("reviewDate = " + reviewDate);
 
         String reviewImageValue = "REVIEW" + reviewDate;
-        System.out.println("reviewImageValue = " + reviewImageValue);
+//        System.out.println("reviewImageValue = " + reviewImageValue);
 
         reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
-        System.out.println("reviewContentDTO : " + reviewContentDTO);
+//        System.out.println("reviewContentDTO : " + reviewContentDTO);
 
         storeService.createReview(reviewContentDTO);
 
@@ -307,12 +320,12 @@ public class StoreController {
         String ext = originFileName.substring(originFileName.lastIndexOf('.'));
         String savedName = reviewContentDTO.getReviewImage() + ext;
         String fullPath = filePath + "/" + savedName;
-        System.out.println("리뷰 이미지 file 경로 : " + fullPath);
+//        System.out.println("리뷰 이미지 file 경로 : " + fullPath);
 
         try {
             //파일 저장
             singleFile.transferTo(new File(fullPath));
-            System.out.println("파일 저장 완료");
+//            System.out.println("파일 저장 완료");
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -321,5 +334,19 @@ public class StoreController {
 
     }
 
+
+    // 리뷰 버튼 활성화를 위한 리뷰 작성 권환 확인용
+    @GetMapping(value = "/getreviewlist")
+    public ResponseEntity<List<ReservationInfoDTO>> getUserReviewList(@RequestParam("userId") String userId, @RequestParam("storeNo") long storeNo, Model model, @ModelAttribute List<ReservationInfoDTO> reservationList){
+        System.out.println("리뷰 권한 넘어옴");
+        System.out.println("userId : " + userId + " , storeNo : " + storeNo);
+
+        reservationList = storeService.getUserReviewList(userId, storeNo);
+
+        System.out.println("reservationList = " + reservationList);
+
+        return ResponseEntity.ok(reservationList);
+
+    }
 }
 
