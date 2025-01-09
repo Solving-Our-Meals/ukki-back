@@ -28,12 +28,14 @@
         FROM
         TBL_RESERVATION r
         LEFT JOIN
-        TBL_USER u ON r.USER_NO = u.USER_ID
+        TBL_USER u ON r.USER_NO = u.USER_NO  -- USER_NO와 USER_NO를 비교
         LEFT JOIN
         TBL_STORE s ON r.STORE_NO = s.STORE_NO
         WHERE
         u.USER_ID = #{userId}
+
         UNION
+
         SELECT
         u.USER_ID,
         s.STORE_NAME,
@@ -43,12 +45,13 @@
         FROM
         TBL_END_RES er
         LEFT JOIN
-        TBL_USER u ON er.USER_NO = u.USER_ID
+        TBL_USER u ON er.USER_NO = u.USER_NO  -- USER_NO와 USER_NO를 비교
         LEFT JOIN
         TBL_STORE s ON er.STORE_NO = s.STORE_NO
         WHERE
         u.USER_ID = #{userId}
     </select>
+
 
 
 

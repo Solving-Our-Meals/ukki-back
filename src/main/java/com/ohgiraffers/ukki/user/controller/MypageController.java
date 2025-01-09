@@ -8,7 +8,10 @@ import com.ohgiraffers.ukki.user.model.service.MypageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -63,8 +66,8 @@ public class MypageController {
         return mypageService.getUserInfoFromToken(jwtToken, userId);
     }
 
-    @GetMapping("/reservation")
-    public MypageReservationDTO getUserReservation(HttpServletRequest request) {
+    @GetMapping
+    public ResponseEntity<List<MypageReservationDTO>> getUserReservation(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
@@ -77,7 +80,13 @@ public class MypageController {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        return mypageService.getUserReservationFromToken(jwtToken, userId);
+        List<MypageReservationDTO> reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+
+        if (reservations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(reservations);
     }
 
 }

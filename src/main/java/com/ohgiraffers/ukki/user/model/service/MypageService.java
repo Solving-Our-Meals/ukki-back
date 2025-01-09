@@ -7,6 +7,7 @@ import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -41,7 +42,7 @@ public class MypageService {
         return mypageDTO;
     }
 
-    public MypageReservationDTO getUserReservationFromToken(String jwtToken, String userId) {
+    public List<MypageReservationDTO> getUserReservationFromToken(String jwtToken, String userId) {
         if (!jwtService.validateToken(jwtToken)) {
             throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
         }
@@ -53,11 +54,14 @@ public class MypageService {
             throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
         }
 
-        MypageReservationDTO mypageReservationDTO = mypageMapper.findUserReservationByUserId(userId);
 
-        if (mypageReservationDTO == null) {
-            throw new IllegalArgumentException("사용자 찾을 수 없음");
+        List<MypageReservationDTO> reservations = mypageMapper.findUserReservationByUserId(userId);
+
+        if (reservations == null || reservations.isEmpty()) {
+            throw new IllegalArgumentException("예약 정보를 찾을 수 없음");
         }
-        return mypageReservationDTO;
+
+        return reservations;
     }
+
 }
