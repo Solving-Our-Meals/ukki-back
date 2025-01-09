@@ -66,7 +66,7 @@ public class MypageController {
         return mypageService.getUserInfoFromToken(jwtToken, userId);
     }
 
-    @GetMapping
+    @GetMapping("/reservation")
     public ResponseEntity<List<MypageReservationDTO>> getUserReservation(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
 
