@@ -3,7 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.admin.store.model.dao.AdminStoreMapper">
-    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreDTO">
+    <resultMap id="storeListResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreListDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeCategory" column="CATEGORY_NAME"/>
+        <result property="storeAddress" column="STORE_ADDRESS"/>
+        <result property="storeRegistDate" column="STORE_REGIST_DATE"/>
+    </resultMap>
+
+    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreInfoDTO">
         <id property="storeNo" column="STORE_NO"/>
         <result property="storeName" column="STORE_NAME"/>
         <result property="storeDes" column="STORE_DES"/>
@@ -42,5 +50,32 @@
         SELECT
         COUNT(*)
         FROM TBL_STORE;
+    </select>
+
+    <select id="searchBy" resultMap="storeListResultMap" parameterType="map">
+        SELECT
+        a.STORE_NO,
+        a.STORE_NAME,
+        b.CATEGORY_NAME,
+        a.STORE_ADDRESS,
+        a.STORE_REGIST_DATE
+        FROM TBL_STORE a
+        LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
+        <where>
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "CATEGORY_NAME"'>
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                CONCAT(a.STORE_NO, ' ', a.STORE_NAME, ' ', b.CATEGORY_NAME, ' ', a.STORE_ADDRESS, ' ', a.STORE_REGIST_DATE) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+        ORDER BY a.STORE_REGIST_DATE;
     </select>
 </mapper>
