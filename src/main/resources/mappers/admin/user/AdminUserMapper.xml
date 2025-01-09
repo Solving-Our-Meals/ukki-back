@@ -33,25 +33,17 @@
         </foreach>
     </insert>
 
-        <select id="searchBy" parameterType="map" resultMap="user">
-            SELECT
-            *
-            FROM TBL_USER
-            <where>
-                <if test="category != null and word != null">
-                    ${category} LIKE CONCAT('%', #{word}, '%')
-                </if>
-                <if test="category == null and word != null">
-                    CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
-                </if>
-                AND USER_ROLE != 'ADMIN'
-            </where>
-        </select>
-
-    <select id="searchAllUsers" resultMap="user">
-        SELECT * FROM TBL_USER WHERE USER_ROLE != 'ADMIN'
+    <select id="searchBy" parameterType="map" resultMap="user">
+        SELECT * FROM TBL_USER
+        WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
+        <if test="category != null and word != null">
+            AND ${category} LIKE CONCAT('%', #{word}, '%')
+        </if>
+        <if test="category == null and word != null">
+            AND CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
+        </if>
     </select>
-
+    
     <select id="searchUserInfo" resultMap="userInfo">
         SELECT
         a.USER_NO,

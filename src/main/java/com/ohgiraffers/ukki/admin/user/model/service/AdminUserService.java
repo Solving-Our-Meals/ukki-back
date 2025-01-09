@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class AdminUserService {
@@ -26,14 +25,10 @@ public class AdminUserService {
     }
 
     public List<AdminUserDTO> searchUsers(String category, String word) {
-        if (category != null || word != null) {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put("category", category);
             params.put("word", word);
             return adminUserMapper.searchBy(params);
-        } else {
-            return adminUserMapper.searchAllUsers();
-        }
     }
 
     public AdminUserInfoDTO searchUserInfo(int userNo) {
