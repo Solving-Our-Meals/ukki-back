@@ -1,7 +1,6 @@
 package com.ohgiraffers.ukki.admin.store.model.dao;
 
-import com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreListDTO;
-import com.ohgiraffers.ukki.admin.store.model.dto.MonthlyRegistStoreDTO;
+import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -14,4 +13,10 @@ public interface AdminStoreMapper {
     int totalRegistStore();
 
     List<AdminStoreListDTO> searchBy(Map<String, String> params);
+
+    AdminStoreInfoDTO searchStoreInfo(int storeNo);
+
+    KeywordDTO getKeyword(long storeNo);
+
+    OperationDTO getOperation(long storeNo);
 }

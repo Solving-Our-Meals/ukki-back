@@ -1,8 +1,7 @@
 package com.ohgiraffers.ukki.admin.store.model.service;
 
 import com.ohgiraffers.ukki.admin.store.model.dao.AdminStoreMapper;
-import com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreListDTO;
-import com.ohgiraffers.ukki.admin.store.model.dto.MonthlyRegistStoreDTO;
+import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +31,17 @@ public class AdminStoreService {
         params.put("category", category);
         params.put("word", word);
         return adminStoreMapper.searchBy(params);
+    }
+
+    public AdminStoreInfoDTO searchStoreInfo(int storeNo) {
+        return adminStoreMapper.searchStoreInfo(storeNo);
+    }
+
+    public KeywordDTO getKeyword(long storeNo) {
+        return adminStoreMapper.getKeyword(storeNo);
+    }
+
+    public OperationDTO getOperation(long storeNo) {
+        return adminStoreMapper.getOperation(storeNo);
     }
 }
