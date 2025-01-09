@@ -18,7 +18,37 @@
         WHERE u.USER_ID = #{userId}
     </select>
 
-<!--  도전 현황 가져오기  -->
+    <select id="findUserReservationByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
+        SELECT
+        u.USER_ID,
+        s.STORE_NAME,
+        r.RES_DATE AS date,
+        r.RES_TIME AS time,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        LEFT JOIN
+        TBL_USER u ON r.USER_NO = u.USER_ID
+        LEFT JOIN
+        TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+        UNION
+        SELECT
+        u.USER_ID,
+        s.STORE_NAME,
+        er.RES_DATE AS date,
+        er.RES_TIME AS time,
+        er.QR
+        FROM
+        TBL_END_RES er
+        LEFT JOIN
+        TBL_USER u ON er.USER_NO = u.USER_ID
+        LEFT JOIN
+        TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+    </select>
 
 
 
