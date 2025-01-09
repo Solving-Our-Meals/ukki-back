@@ -25,4 +25,7 @@ public interface StoreMapper {
 
     List<StoreInfoDTO> getStoresLocation(@Param("category") int category);
 
+    ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO);
+
+    List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo);
 }

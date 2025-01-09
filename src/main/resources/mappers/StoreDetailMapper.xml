@@ -60,10 +60,22 @@
         <result property="reviewContent" column="REVIEW_CONTENT"/>
         <result property="reviewImage" column="REVIEW_IMG"/>
         <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="reviewScope" column="REVIEW_SCOPE"/>
         <result property="userNo" column="USER_NO"/>
         <result property="userName" column="USER_NAME"/>
         <result property="userProfile" column="USER_PROFILE"/>
         <result property="reportCount" column="REPORT_COUNT"/>
+    </resultMap>
+
+    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+        <id property="resNo" column="RES_NO"/>
+        <result property="resDate" column="RES_DATE"/>
+        <result property="resTime" column="RES_TIME"/>
+        <result property="isRandom" column="IS_RANDOM"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="qrConfirm" column="QR_CONFIRM"/>
+        <result property="qr" column="QR"/>
     </resultMap>
 
     <!--  가게 정보  -->
@@ -122,7 +134,7 @@
          WHERE STORE_NO = 5
     </select>
 
-    <!-- 리뷰 정보 가져오기 -->
+    <!-- 리뷰 정보 가져오기 / 최신순 -->
     <select id="getReviewList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
         SELECT
                A.STORE_NO
@@ -134,6 +146,7 @@
              , A.REVIEW_CONTENT
              , A.REVIEW_IMG
              , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
              , A.USER_NO
              , B.USER_NAME
              , B.USER_PROFILE
@@ -143,6 +156,30 @@
          WHERE A.STORE_NO = 5
          ORDER BY REVIEW_NO DESC;
     </select>
+
+    <!-- 리뷰 정보 가져오기 / 별점순 -->
+    <select id="getReviewListByScope" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+        SELECT
+                A.STORE_NO
+              , (SELECT
+                        COUNT(*)
+                   FROM TBL_REVIEW
+                  WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = 5
+        ORDER BY REVIEW_SCOPE DESC;
+    </select>
+
 
     <!-- 리뷰 이미지 순서 정하기 위한 리뷰이미지 갯수 가져오기 -->
     <select id="getReviewCount" parameterType="String">
@@ -171,5 +208,26 @@
           , #{ userNo }
         )
     </insert>
+
+    <!-- 리뷰 작성 권한을 위한 리뷰 내역 조회 -->
+    <select id="getUserReviewList" parameterType="map" resultMap="reservationInfoDTOResultMap">
+        SELECT
+               A.RES_NO
+             , A.RES_DATE
+             , A.RES_TIME
+             , A.IS_RANDOM
+             , A.USER_NO
+             , A.STORE_NO
+             , A.QR_CONFIRM
+             , A.QR
+          FROM TBL_RESERVATION A
+         WHERE A.USER_NO = (SELECT
+                                   USER_NO
+                              FROM TBL_USER
+                             WHERE USER_ID = #{ userId })
+               AND
+<!--               A.STORE_NO = #{ storeNO }-->
+              A.STORE_NO = 1;
+    </select>
 
 </mapper>
