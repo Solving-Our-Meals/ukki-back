@@ -10,15 +10,16 @@ public class AdminStoreInfoDTO {
     private float longitude; //가게 경도
     private String storeProfile;
     private String storeMenu;
-    private int storeCategoryNo;
+    private String storeCategory;
     private long userNo;
     private int posNumber; // 예약 가능 인원
     private KeywordDTO storeKeyword;
     private OperationDTO operationTime;
+    private String storeRegistDate;
 
     public AdminStoreInfoDTO() {}
 
-    public AdminStoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword, OperationDTO operationTime) {
+    public AdminStoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, String storeCategory, long userNo, int posNumber, KeywordDTO storeKeyword, OperationDTO operationTime, String storeRegistDate) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
@@ -27,11 +28,12 @@ public class AdminStoreInfoDTO {
         this.longitude = longitude;
         this.storeProfile = storeProfile;
         this.storeMenu = storeMenu;
-        this.storeCategoryNo = storeCategoryNo;
+        this.storeCategory = storeCategory;
         this.userNo = userNo;
         this.posNumber = posNumber;
         this.storeKeyword = storeKeyword;
         this.operationTime = operationTime;
+        this.storeRegistDate = storeRegistDate;
     }
 
     public long getStoreNo() {
@@ -98,12 +100,12 @@ public class AdminStoreInfoDTO {
         this.storeMenu = storeMenu;
     }
 
-    public int getStoreCategoryNo() {
-        return storeCategoryNo;
+    public String getStoreCategory() {
+        return storeCategory;
     }
 
-    public void setStoreCategoryNo(int storeCategoryNo) {
-        this.storeCategoryNo = storeCategoryNo;
+    public void setStoreCategory(String storeCategory) {
+        this.storeCategory = storeCategory;
     }
 
     public long getUserNo() {
@@ -138,9 +140,17 @@ public class AdminStoreInfoDTO {
         this.operationTime = operationTime;
     }
 
+    public String getStoreRegistDate() {
+        return storeRegistDate;
+    }
+
+    public void setStoreRegistDate(String storeRegistDate) {
+        this.storeRegistDate = storeRegistDate;
+    }
+
     @Override
     public String toString() {
-        return "StoreInfoDTO{" +
+        return "AdminStoreInfoDTO{" +
                 "storeNo=" + storeNo +
                 ", storeName='" + storeName + '\'' +
                 ", storeDes='" + storeDes + '\'' +
@@ -149,11 +159,12 @@ public class AdminStoreInfoDTO {
                 ", longitude=" + longitude +
                 ", storeProfile='" + storeProfile + '\'' +
                 ", storeMenu='" + storeMenu + '\'' +
-                ", storeCategoryNo=" + storeCategoryNo +
+                ", storeCategory='" + storeCategory + '\'' +
                 ", userNo=" + userNo +
                 ", posNumber=" + posNumber +
                 ", storeKeyword=" + storeKeyword +
                 ", operationTime=" + operationTime +
+                ", storeRegistDate='" + storeRegistDate + '\'' +
                 '}';
     }
 }
