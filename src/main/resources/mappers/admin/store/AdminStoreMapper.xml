@@ -228,4 +228,62 @@
         WHERE STORE_NO = #{storeNo}
     </delete>
 
+    <select id="lastStoreNo">
+        SELECT
+            MAX(STORE_NO)
+        FROM TBL_STORE
+    </select>
+
+    <insert id="insertOperationTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.OperationDTO">
+        INSERT INTO TBL_OPERATION VALUES (#{storeNo}, #{monday}, #{tuesday}, #{wednesday}, #{thursday}, #{friday}, #{saturday}, #{sunday}, #{breakTime})
+    </insert>
+
+    <insert id="insertKeyword" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.KeywordDTO">
+        INSERT INTO TBL_KEYWORD VALUES (#{storeNo},#{keyword1}, #{keyword2}, #{keyword3}, #{keyword4}, #{keyword5}, #{keyword6})
+    </insert>
+
+    <insert id="insertBanner" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.BannerDTO">
+        INSERT INTO TBL_BANNER VALUES (#{storeNo}, #{banner1}, #{banner2}, #{banner3}, #{banner4}, #{banner5}, 'zzzzz')
+    </insert>
+
+    <insert id="insertStoreUser" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreUserDTO">
+        INSERT INTO TBL_USER VALUES (0, #{userId}, #{userPassword}, #{email}, #{userName}, LOAD_FILE('C:\ukki\front\src\images\profile.png'), 'STORE', null)
+    </insert>
+
+    <select id="searchCurrentStoreUser">
+        SELECT
+            USER_NO
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <insert id="insertStore" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreInfoDTO">
+        INSERT INTO TBL_STORE (
+        store_no,
+        store_name,
+        store_des,
+        store_address,
+        latitude,
+        longitude,
+        store_profile,
+        store_menu,
+        store_category_no,
+        user_no,
+        pos_number,
+        store_regist_date
+        ) VALUES (
+        #{storeNo},
+        #{storeName},
+        #{storeDes},
+        #{storeAddress},
+        #{latitude},
+        #{longitude},
+        #{storeProfile},
+        #{storeMenu},
+        #{storeCategoryNo},
+        #{userNo},
+        #{posNumber},
+        #{storeRegistDate}
+        );
+    </insert>
 </mapper>

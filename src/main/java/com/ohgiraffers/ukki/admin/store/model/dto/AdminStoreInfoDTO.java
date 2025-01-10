@@ -15,10 +15,10 @@ public class AdminStoreInfoDTO {
     private int storeCategoryNo;
     private long userNo;
     private int posNumber; // 예약 가능 인원
+    private String storeRegistDate;
     private KeywordDTO storeKeyword;
     private List<CategoryDTO> storeCategory;
     private OperationDTO operationTime;
-    private String storeRegistDate;
 
     public AdminStoreInfoDTO() {}
 

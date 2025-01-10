@@ -35,4 +35,18 @@ public interface AdminStoreMapper {
     void deleteStoreOperation(int storeNo);
 
     void editBanner(BannerDTO bannerDTO);
+
+    int lastStoreNo();
+
+    int insertOperationTime(OperationDTO operationDTO);
+
+    int insertKeyword(KeywordDTO keywordDTO);
+
+    int insertBanner(BannerDTO bannerDTO);
+
+    void insertStoreUser(AdminStoreUserDTO userData);
+
+    void insertStore(AdminStoreInfoDTO storeData);
+
+    int searchCurrentStoreUser(String userId);
 }
