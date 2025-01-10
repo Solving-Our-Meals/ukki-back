@@ -44,4 +44,24 @@ public class AdminStoreService {
     public OperationDTO getOperation(long storeNo) {
         return adminStoreMapper.getOperation(storeNo);
     }
+
+    public List<CategoryDTO> getCategory() { return adminStoreMapper.getCategory();
+    }
+
+    public void editOperationTime(OperationDTO operationTime) {
+            adminStoreMapper.editOperationTime(operationTime);
+    }
+
+    public void editKeyword(KeywordDTO storeKeyword) {
+        adminStoreMapper.editKeyword(storeKeyword);
+    }
+
+    public void editStore(AdminStoreInfoDTO storeData) {
+        adminStoreMapper.editStore(storeData);
+    }
+
+    public int deleteStoreInfo(int storeNo) {
+
+        return adminStoreMapper.deleteStoreInfo(storeNo);
+    }
 }

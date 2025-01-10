@@ -20,15 +20,15 @@
 
     <select id="findUserReservationByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
         SELECT
-        u.USER_ID,
-        s.STORE_NAME,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
         r.RES_DATE AS date,
         r.RES_TIME AS time,
         r.QR
         FROM
         TBL_RESERVATION r
         LEFT JOIN
-        TBL_USER u ON r.USER_NO = u.USER_NO  -- USER_NO와 USER_NO를 비교
+        TBL_USER u ON r.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON r.STORE_NO = s.STORE_NO
         WHERE
@@ -37,21 +37,50 @@
         UNION
 
         SELECT
-        u.USER_ID,
-        s.STORE_NAME,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
         er.RES_DATE AS date,
         er.RES_TIME AS time,
         er.QR
         FROM
         TBL_END_RES er
         LEFT JOIN
-        TBL_USER u ON er.USER_NO = u.USER_NO  -- USER_NO와 USER_NO를 비교
+        TBL_USER u ON er.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON er.STORE_NO = s.STORE_NO
         WHERE
         u.USER_ID = #{userId}
+
+        ORDER BY
+        date DESC, time DESC;
     </select>
 
+    <select id="findUserReviewByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
+        SELECT
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
+        r.REVIEW_DATE AS reviewDate,
+        r.REVIEW_CONTENT AS reviewText,
+        r.REVIEW_SCOPE AS star
+        FROM
+        TBL_REVIEW r
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = r.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON s.STORE_NO = r.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+
+        ORDER BY
+        reviewDate DESC;
+    </select>
+
+    <delete id="deleteReviewById" parameterType="int">
+        DELETE FROM TBL_REVIEW
+        WHERE REVIEW_NO = #{reviewNo}
+    </delete>
 
 
 

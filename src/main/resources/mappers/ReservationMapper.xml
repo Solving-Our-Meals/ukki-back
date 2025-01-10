@@ -33,7 +33,7 @@
                STORE_NO
              , REP_PHOTO
           FROM TBL_BANNER
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{ storeNo }
     </select>
 
     <select id="getReservationedStoreInfo" parameterType="long" resultMap="reservationedStoreInfoResultMap">
@@ -44,7 +44,7 @@
              , LATITUDE
              , LONGITUDE
           FROM TBL_STORE
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{ storeNo }
     </select>
 
     <insert id="insertReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
@@ -52,20 +52,16 @@
         (
                RES_DATE
              , RES_TIME
-             , IS_RANDOM
              , USER_NO
              , STORE_NO
-             , QR_CONFIRM
              , QR
         )
         VALUES
         (
                #{ resDate }
              , #{ resTime }
-             , N
              , #{ userNo }
              , #{ storeNo }
-             , N
              , #{ qr }
         )
     </insert>
@@ -77,5 +73,12 @@
           FROM TBL_USER
          WHERE USER_NO = #{ userNo }
     </select>
+
+    <!-- 예약 시 유저 활동의 예약 횟수 + 1 -->
+    <update id="increaseReservation" parameterType="long">
+        UPDATE TBL_USER_ACT_INFO
+           SET RES_COUNT = RES_COUNT + 1
+         WHERE USER_NO = #{ userNo }
+    </update>
 
 </mapper>

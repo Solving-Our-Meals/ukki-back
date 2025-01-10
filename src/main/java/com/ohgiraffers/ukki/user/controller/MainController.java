@@ -30,30 +30,27 @@ public class MainController {
         return storeService.getStoresLocation(category);
     }
 
-    @PostMapping("/directions")
-    public ResponseEntity<String> getDirections(@RequestBody DirectionsRequest directionsRequest) {
-        // 카카오 API 호출을 위한 URL
-        String url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
+    // 예시: Spring Boot를 사용하는 경우
+    @RequestMapping(value = "/main/directions", method = RequestMethod.POST)
+    public ResponseEntity<?> getDirections(@RequestBody DirectionsRequest request) {
+        try {
+            String url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "KakaoAK 1d0bf0e6ccf05d20983add3f6153007d"); // 카카오 API 키
 
-        // 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK 1d0bf0e6ccf05d20983add3f6153007d");
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity = new HttpEntity<>(request.toJson(), headers);
 
-        // 요청 바디 설정
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("origin", directionsRequest.getOrigin());
-        requestBody.put("destination", directionsRequest.getDestination());
-        requestBody.put("waypoints", directionsRequest.getWaypoints());
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        // 요청 생성
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // RestTemplate을 사용하여 API 호출
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        return response;
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.ok(response.getBody());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("경로를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
+        }
     }
+
 }
 
