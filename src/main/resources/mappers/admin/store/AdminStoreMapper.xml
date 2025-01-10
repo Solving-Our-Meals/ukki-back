@@ -20,7 +20,7 @@
         <result property="longitude" column="LONGITUDE"/>
         <result property="storeProfile" column="STORE_PROFILE"/>
         <result property="storeMenu" column="STORE_MENU"/>
-        <result property="storeCategory" column="CATEGORY_NAME"/>
+        <result property="storeCategoryNo" column="STORE_CATEGORY_NO"/>
         <result property="userNo" column="USER_NO"/>
         <result property="posNumber" column="POS_NUMBER"/>
         <result property="storeRegistDate" column="STORE_REGIST_DATE"/>
@@ -55,6 +55,11 @@
         <result property="breakTime" column="BREAK_TIME"/>
     </resultMap>
 
+    <resultMap id="categoryResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.CategoryDTO">
+        <id property="categoryNo" column="CATEGORY_NO"/>
+        <result property="categoryName" column="CATEGORY_NAME"/>
+    </resultMap>
+
 
     <select id="monthlyRegistStore" resultMap="month">
         SELECT
@@ -69,8 +74,7 @@
         YEAR, MON;
     </select>
 
-    <select id="totalRegistStore">
-        -- 현재 가게 수
+    <select id="totalRegistStore" resultType="int">
         SELECT
         COUNT(*)
         FROM TBL_STORE;
@@ -105,25 +109,22 @@
 
     <select id="searchStoreInfo" resultMap="storeInfoResultMap">
         SELECT
-        a.STORE_NO,
-        a.STORE_NAME,
-        a.STORE_DES,
-        a.LATITUDE,
-        a.LONGITUDE,
-        a.STORE_PROFILE,
-        a.STORE_MENU,
-        a.POS_NUMBER,
-        b.CATEGORY_NAME,
-        a.USER_NO,
-        a.STORE_ADDRESS,
-        a.STORE_REGIST_DATE
-        FROM TBL_STORE a
-        LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
+        STORE_NO,
+        STORE_NAME,
+        STORE_DES,
+        LATITUDE,
+        LONGITUDE,
+        STORE_PROFILE,
+        STORE_MENU,
+        POS_NUMBER,
+        STORE_CATEGORY_NO,
+        USER_NO,
+        STORE_ADDRESS,
+        STORE_REGIST_DATE
+        FROM TBL_STORE
         WHERE STORE_NO = #{storeNo}
     </select>
 
-
-    <!--  가게 키워드  -->
     <select id="getKeyword" resultMap="keywordResultMap">
         SELECT
         STORE_NO
@@ -135,16 +136,65 @@
         , KEYWORD6
         FROM TBL_KEYWORD
         WHERE STORE_NO = #{storeNo}
-        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
-    <!--  운영 시간 불러오기  -->
     <select id="getOperation" resultMap="operationResultMap">
         SELECT
         *
         FROM TBL_OPERATION
         WHERE STORE_NO = #{storeNo}
-        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
+
+    <select id="getCategory" resultMap="categoryResultMap">
+        SELECT
+        *
+        FROM TBL_STORE_CATEGORY
+    </select>
+
+    <update id="editOperationTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.OperationDTO">
+        UPDATE TBL_OPERATION
+        <set>
+            <if test="monday != null">MONDAY = #{monday},</if>
+            <if test="tuesday != null">TUESDAY = #{tuesday},</if>
+            <if test="wednesday != null">WEDNESDAY = #{wednesday},</if>
+            <if test="thursday != null">THURSDAY = #{thursday},</if>
+            <if test="friday != null">FRIDAY = #{friday},</if>
+            <if test="saturday != null">SATURDAY = #{saturday},</if>
+            <if test="sunday != null">SUNDAY = #{sunday},</if>
+            <if test="breakTime != null">BREAK_TIME = #{breakTime},</if>
+        </set>
+        WHERE STORE_NO = #{storeNo}
+    </update>
+
+    <update id="editKeyword" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.KeywordDTO">
+        UPDATE TBL_KEYWORD
+        <set>
+            <if test="keyword1 != null">KEYWORD1 = #{keyword1},</if>
+            <if test="keyword2 != null">KEYWORD2 = #{keyword2},</if>
+            <if test="keyword3 != null">KEYWORD3 = #{keyword3},</if>
+            <if test="keyword4 != null">KEYWORD4 = #{keyword4},</if>
+            <if test="keyword5 != null">KEYWORD5 = #{keyword5},</if>
+            <if test="keyword6 != null">KEYWORD6 = #{keyword6},</if>
+        </set>
+        WHERE STORE_NO = #{storeNo}
+    </update>
+
+    <update id="editStore" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreInfoDTO">
+        UPDATE TBL_STORE
+        <set>
+            <if test="storeName != null">STORE_NAME = #{storeName},</if>
+            <if test="storeDes != null">STORE_DES = #{storeDes},</if>
+            <if test="storeAddress != null">STORE_ADDRESS = #{storeAddress},</if>
+            <if test="latitude != null">LATITUDE = #{latitude},</if>
+            <if test="longitude != null">LONGITUDE = #{longitude},</if>
+            <if test="storeProfile != null">STORE_PROFILE = #{storeProfile},</if>
+            <if test="storeMenu != null">STORE_MENU = #{storeMenu},</if>
+            <if test="storeCategoryNo != null">STORE_CATEGORY_NO = #{storeCategoryNo},</if>
+            <if test="posNumber != null">POS_NUMBER = #{posNumber},</if>
+        </set>
+        WHERE STORE_NO = #{storeNo}
+    </update>
+
+
 
 </mapper>
