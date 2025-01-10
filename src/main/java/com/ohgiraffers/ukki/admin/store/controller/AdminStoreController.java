@@ -5,6 +5,7 @@ import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import com.ohgiraffers.ukki.admin.store.model.service.AdminStoreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -108,7 +109,36 @@ public class AdminStoreController {
         }
     }
 
+    @DeleteMapping("/info/{storeNo}/delete")
+    @Transactional
+    public ResponseEntity<?> deleteStoreInfo(@PathVariable int storeNo){
+        System.out.println("삭제하러 옴");
+        Map<String, String> response = new HashMap<>();
+        String message = "";
+        try {
+
+            int result = adminStoreService.deleteStoreInfo(storeNo);
+
+            if(result > 1){
+                message = "삭제에 실패했습니다.";
+            }else{
+                message = "삭제에 성공했습니다.";
+            }
+
+            response.put("message", message);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "가게 정보를 삭제하는 도중 에러가 발생했습니다.";
+            response.put("message", message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(response);
+        }
+    }
+
         @PutMapping("/info/{storeNo}/edit")
+        @Transactional
     public ResponseEntity<?> updateStore(
             @PathVariable Long storeNo,
             @RequestPart(value = "storeData", required = false) String storeDataJson,

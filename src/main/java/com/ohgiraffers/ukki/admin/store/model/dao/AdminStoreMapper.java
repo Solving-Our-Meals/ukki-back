@@ -27,4 +27,6 @@ public interface AdminStoreMapper {
     void editKeyword(KeywordDTO storeKeyword);
 
     void editStore(AdminStoreInfoDTO storeData);
+
+    int deleteStoreInfo(int storeNo);
 }
