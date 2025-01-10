@@ -4,6 +4,7 @@ import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
+import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,4 +65,25 @@ public class MypageService {
         return reservations;
     }
 
+    public List<MypageReviewDTO> getUserReviewFromToken(String jwtToken, String userId) {
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+
+        List<MypageReviewDTO> reviews = mypageMapper.findUserReviewByUserId(userId);
+
+        if (reviews == null || reviews.isEmpty()) {
+            throw new IllegalArgumentException("예약 정보를 찾을 수 없음");
+        }
+
+        return reviews;
+    }
 }
