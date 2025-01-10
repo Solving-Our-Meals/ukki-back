@@ -30,4 +30,8 @@ public class ReservationService {
     public String getEmail(ReservationInfoDTO reservationInfoDTO) {
         return reservationMapper.getEmail(reservationInfoDTO);
     }
+
+    public void increaseReservation(long userNo) {
+        reservationMapper.increaseReservation(userNo);
+    }
 }

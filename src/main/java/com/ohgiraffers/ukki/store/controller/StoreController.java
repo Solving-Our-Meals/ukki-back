@@ -256,7 +256,7 @@ public class StoreController {
     @ResponseBody
     public void createReview(@RequestParam("params") String params, @RequestPart("reviewImage") MultipartFile singleFile) {
 
-//        System.out.println("리뷰 등록하러 왔다.");
+        System.out.println("리뷰 등록하러 왔다.");
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> paramMap;
@@ -277,11 +277,17 @@ public class StoreController {
                 case "reviewContent":
                     reviewContentDTO.setReviewContent(value);
                     break;
+                case "reviewScope":
+                    reviewContentDTO.setReviewScope(Integer.parseInt(value));
+                    break;
                 case "storeNo":
                     reviewContentDTO.setStoreNo(Long.parseLong(value));
                     break;
                 case "userNo":
                     reviewContentDTO.setUserNo(Long.parseLong(value));
+                    break;
+                case "resNo":
+                    reviewContentDTO.setResNo(Long.parseLong(value));
                     break;
             }
         });
@@ -331,22 +337,36 @@ public class StoreController {
             throw new RuntimeException(e);
         }
 
+        // 리뷰 달기 완성 후 유저 활동 +1 늘리기
+        storeService.increaseReview(reviewContentDTO.getUserNo());
+
 
     }
 
 
-    // 리뷰 버튼 활성화를 위한 리뷰 작성 권환 확인용
+    // 리뷰 작성하기 버튼 활성화를 위한 리뷰 작성 권환 확인용 -> 예약 tbl에서 해당 아이디, 가게번호 넘겨서 확인하기
     @GetMapping(value = "/getreviewlist")
     public ResponseEntity<List<ReservationInfoDTO>> getUserReviewList(@RequestParam("userId") String userId, @RequestParam("storeNo") long storeNo, Model model, @ModelAttribute List<ReservationInfoDTO> reservationList){
-        System.out.println("리뷰 권한 넘어옴");
-        System.out.println("userId : " + userId + " , storeNo : " + storeNo);
+//        System.out.println("리뷰 권한 넘어옴");
+//        System.out.println("userId : " + userId + " , storeNo : " + storeNo);
 
         reservationList = storeService.getUserReviewList(userId, storeNo);
 
-        System.out.println("reservationList = " + reservationList);
+//        System.out.println("reservationList = " + reservationList);
 
         return ResponseEntity.ok(reservationList);
 
+    }
+
+    // 리뷰 버튼 활성화를 위한 리뷰 작성 권한 확인용 -> 리뷰 tbl에서 예약 번호 확인하기
+    @GetMapping(value = "/checkReviewList")
+    public ResponseEntity<Boolean> checkReviewList(@RequestParam("resNo") long resNo){
+
+//        System.out.println("리뷰 권한2 넘어옴");
+
+        boolean result = storeService.checkReviewList(resNo);
+
+        return ResponseEntity.ok(result);
     }
 }
 

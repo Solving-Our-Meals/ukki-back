@@ -65,6 +65,7 @@
         <result property="userName" column="USER_NAME"/>
         <result property="userProfile" column="USER_PROFILE"/>
         <result property="reportCount" column="REPORT_COUNT"/>
+        <result property="resNo" column="RES_NO"/>
     </resultMap>
 
     <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
@@ -93,7 +94,7 @@
              , USER_NO
              , POS_NUMBER
           FROM TBL_STORE
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
@@ -108,7 +109,7 @@
              , KEYWORD5
              , KEYWORD6
           FROM TBL_KEYWORD
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
@@ -117,7 +118,7 @@
         SELECT
                *
           FROM TBL_OPERATION
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
@@ -131,7 +132,7 @@
              , BANNER4
              , BANNER5
           FROM TBL_BANNER
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = 6
     </select>
 
     <!-- 리뷰 정보 가져오기 / 최신순 -->
@@ -151,9 +152,10 @@
              , B.USER_NAME
              , B.USER_PROFILE
              , A.REPORT_COUNT
+             , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 5
+         WHERE A.STORE_NO = 6
          ORDER BY REVIEW_NO DESC;
     </select>
 
@@ -174,9 +176,10 @@
              , B.USER_NAME
              , B.USER_PROFILE
              , A.REPORT_COUNT
+             , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 5
+         WHERE A.STORE_NO = 6
         ORDER BY REVIEW_SCOPE DESC;
     </select>
 
@@ -196,20 +199,25 @@
             REVIEW_CONTENT
           , REVIEW_IMG
           , REVIEW_DATE
+          , REVIEW_SCOPE
           , STORE_NO
           , USER_NO
+          , RES_NO
         )
         VALUES
         (
             #{ reviewContent }
           , #{ reviewImage }
           , #{ reviewDate }
+<!--          , #{ reviewScope }-->
+          , #{ reviewScope }
           , #{ storeNo }
           , #{ userNo }
+          , #{ resNo }
         )
     </insert>
 
-    <!-- 리뷰 작성 권한을 위한 리뷰 내역 조회 -->
+    <!-- 리뷰 작성 권한을 위한 예약 내역 조회 -->
     <select id="getUserReviewList" parameterType="map" resultMap="reservationInfoDTOResultMap">
         SELECT
                A.RES_NO
@@ -226,8 +234,24 @@
                               FROM TBL_USER
                              WHERE USER_ID = #{ userId })
                AND
-<!--               A.STORE_NO = #{ storeNO }-->
-              A.STORE_NO = 1;
+               A.STORE_NO = #{ storeNo }
     </select>
 
+    <select id="checkReviewList" parameterType="long" resultType="boolean">
+        SELECT CASE
+                    WHEN EXISTS
+                                ( SELECT
+                                         *
+                                    FROM TBL_REVIEW
+                                   WHERE RES_NO = #{ resNo })THEN FALSE
+                    ELSE TRUE
+                END AS result;
+    </select>
+
+    <!-- 리뷰 작성 완료 시 유저 활동 + 1 -->
+    <update id="increaseReview" parameterType="long">
+        UPDATE TBL_USER_ACT_INFO
+           SET REVIEW_COUNT = REVIEW_COUNT + 1
+         WHERE USER_NO = #{ userNo }
+    </update>
 </mapper>
