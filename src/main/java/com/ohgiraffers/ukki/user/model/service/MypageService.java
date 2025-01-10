@@ -86,4 +86,10 @@ public class MypageService {
 
         return reviews;
     }
+
+    public boolean deleteReview(int reviewNo) {
+        int result = mypageMapper.deleteReviewById(reviewNo);
+
+        return result > 0;
+    }
 }

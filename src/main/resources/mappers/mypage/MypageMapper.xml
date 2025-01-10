@@ -59,6 +59,8 @@
         SELECT
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
         r.REVIEW_DATE AS reviewDate,
         r.REVIEW_CONTENT AS reviewText,
         r.REVIEW_SCOPE AS star
@@ -69,8 +71,16 @@
         LEFT JOIN
         TBL_STORE s ON s.STORE_NO = r.STORE_NO
         WHERE
-        u.USER_ID = #{userId} <!-- 사용자의 아이디로 리뷰 조회 -->
+        u.USER_ID = #{userId}
+
+        ORDER BY
+        reviewDate DESC;
     </select>
+
+    <delete id="deleteReviewById" parameterType="int">
+        DELETE FROM TBL_REVIEW
+        WHERE REVIEW_NO = #{reviewNo}
+    </delete>
 
 
 

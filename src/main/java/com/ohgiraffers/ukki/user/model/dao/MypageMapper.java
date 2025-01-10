@@ -14,4 +14,6 @@ public interface MypageMapper {
     List<MypageReservationDTO> findUserReservationByUserId(String userId);
 
     List<MypageReviewDTO> findUserReviewByUserId(String userId);
+
+    int deleteReviewById(int reviewNo);
 }
