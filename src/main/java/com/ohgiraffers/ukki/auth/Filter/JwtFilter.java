@@ -3,6 +3,7 @@
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 요청 헤더에서 JWT 토큰 추출
-        String token = getTokenFromRequest(request);
+        String token = getTokenFromCookies(request);
 
         // 토큰 유효성 검증
         if (token != null && jwtService.validateToken(token)) {
@@ -34,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String userId = (String) userInfo.get("userId");  // userId 추출
             String userRole = (String) userInfo.get("userRole");  // userRole 추출
+            int userNo = (int) userInfo.get("userNo"); // userNo 추출
 
 
             // 인증 객체 생성
@@ -52,10 +54,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     // HTTP 요청에서 Authorization 헤더를 통해 토큰 추출
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // "Bearer " 이후의 토큰만 추출
+    public String getTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("authToken".equals(cookie.getName())) { // authToken 쿠키에서 JWT를 찾음
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

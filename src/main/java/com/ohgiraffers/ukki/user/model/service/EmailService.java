@@ -1,11 +1,14 @@
 package com.ohgiraffers.ukki.user.model.service;
 
 import com.ohgiraffers.ukki.user.model.dao.EmailMapper;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -30,12 +33,28 @@ public class EmailService {
 
     public boolean sendAuthCodeEmail(String email, String authCode) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject("이메일 인증 코드");
-            message.setText("귀하의 인증 코드: " + authCode);
+            // 기존에 쓰던 심플메일은 텍스트만 가능
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);  // true indicates multipart message
 
-            mailSender.send(message);  // 이메일 전송
+            helper.setTo(email);
+            helper.setSubject("ukki(우리들의 끼니해결) 인증메일");
+            helper.setText("<html><body>" +
+                    "<p style='font-weight: bold; font-size: 40px; width:auto;'>우끼 인증번호 : " + authCode + "</p>" +
+                    "<img src='cid:logoImage' style='width: 400px; height: auto;' alt='Logo' />" +
+                    "</body></html>", true);
+
+            // 랜덤 이미지 정하려고 넣었다. - 이미지 경로 문제있으면 메일 안가니까 조심 -> 이메일 보내기 실패 뜨면 여기부터 확인
+            String[] imageFiles = {"images/logo1.png", "images/logo2.png", "images/logo3.png", "images/logo4.png", "images/logo5.png", "images/logo6.png"};
+            Random rand = new Random();
+            int randomIndex = rand.nextInt(imageFiles.length);
+            String selectedImage = imageFiles[randomIndex];
+
+            ClassPathResource resource = new ClassPathResource(selectedImage);
+            helper.addInline("logoImage", resource);
+
+            mailSender.send(message);
+
             return true;
         } catch (Exception e) {
             return false;  // 이메일 전송 실패
@@ -70,5 +89,10 @@ public class EmailService {
         String storedCode = redisTemplate.opsForValue().get(redisKey);
 
         return storedCode != null && storedCode.equals(authCode);
+    }
+
+    public boolean isNoshowLimitExceeded(String email) {
+        int noshowCount = emailMapper.getNoshowCountByEmail(email);
+        return noshowCount >= 3;
     }
 }

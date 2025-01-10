@@ -42,44 +42,73 @@
 
     <resultMap id="bannerResultMap" type="com.ohgiraffers.ukki.store.model.dto.BannerDTO">
         <id property="storeNo" column="STORE_NO"/>
-        <result property="banner1" column="IMAGE1"/>
-        <result property="banner2" column="IMAGE2"/>
-        <result property="banner3" column="IMAGE3"/>
-        <result property="banner4" column="IMAGE4"/>
-        <result property="banner5" column="IMAGE5"/>
+        <result property="banner1" column="BANNER1"/>
+        <result property="banner2" column="BANNER2"/>
+        <result property="banner3" column="BANNER3"/>
+        <result property="banner4" column="BANNER4"/>
+        <result property="banner5" column="BANNER5"/>
+    </resultMap>
+
+    <resultMap id="getReviewInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <collection property="reviewList" resultMap="reviewListResultMap"/>
+    </resultMap>
+
+    <resultMap id="reviewListResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        <id property="reviewNo" column="REVIEW_NO"/>
+        <result property="reviewContent" column="REVIEW_CONTENT"/>
+        <result property="reviewImage" column="REVIEW_IMG"/>
+        <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="reviewScope" column="REVIEW_SCOPE"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="reportCount" column="REPORT_COUNT"/>
+    </resultMap>
+
+    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+        <id property="resNo" column="RES_NO"/>
+        <result property="resDate" column="RES_DATE"/>
+        <result property="resTime" column="RES_TIME"/>
+        <result property="isRandom" column="IS_RANDOM"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="qrConfirm" column="QR_CONFIRM"/>
+        <result property="qr" column="QR"/>
     </resultMap>
 
     <!--  가게 정보  -->
     <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
         SELECT
-        STORE_NO
-        , STORE_NAME
-        , STORE_DES
-        , STORE_ADDRESS
-        , LATITUDE
-        , LONGITUDE
-        , STORE_PROFILE
-        , STORE_MENU
-        , STORE_CATEGORY_NO
-        , USER_NO
-        , POS_NUMBER
-        FROM TBL_STORE
-        WHERE STORE_NO = 5
+               STORE_NO
+             , STORE_NAME
+             , STORE_DES
+             , STORE_ADDRESS
+             , LATITUDE
+             , LONGITUDE
+             , STORE_PROFILE
+             , STORE_MENU
+             , STORE_CATEGORY_NO
+             , USER_NO
+             , POS_NUMBER
+          FROM TBL_STORE
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
     <!--  가게 키워드  -->
     <select id="getKeyword" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="keywordResultMap">
         SELECT
-        STORE_NO
-        , KEYWORD1
-        , KEYWORD2
-        , KEYWORD3
-        , KEYWORD4
-        , KEYWORD5
-        , KEYWORD6
-        FROM TBL_KEYWORD
-        WHERE STORE_NO = 5
+               STORE_NO
+             , KEYWORD1
+             , KEYWORD2
+             , KEYWORD3
+             , KEYWORD4
+             , KEYWORD5
+             , KEYWORD6
+          FROM TBL_KEYWORD
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
@@ -95,10 +124,110 @@
     <!--  배너 불러오기  -->
     <select id="getBannerList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
         SELECT
-               *
+               STORE_NO
+             , BANNER1
+             , BANNER2
+             , BANNER3
+             , BANNER4
+             , BANNER5
           FROM TBL_BANNER
          WHERE STORE_NO = 5
     </select>
 
+    <!-- 리뷰 정보 가져오기 / 최신순 -->
+    <select id="getReviewList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+        SELECT
+               A.STORE_NO
+             , (SELECT
+                       COUNT(*)
+                  FROM TBL_REVIEW
+                 WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = 5
+         ORDER BY REVIEW_NO DESC;
+    </select>
+
+    <!-- 리뷰 정보 가져오기 / 별점순 -->
+    <select id="getReviewListByScope" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+        SELECT
+                A.STORE_NO
+              , (SELECT
+                        COUNT(*)
+                   FROM TBL_REVIEW
+                  WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = 5
+        ORDER BY REVIEW_SCOPE DESC;
+    </select>
+
+
+    <!-- 리뷰 이미지 순서 정하기 위한 리뷰이미지 갯수 가져오기 -->
+    <select id="getReviewCount" parameterType="String">
+        SELECT
+               COUNT(REVIEW_IMG)
+          FROM TBL_REVIEW
+         WHERE REVIEW_DATE = #{today}
+    </select>
+
+    <!-- 리뷰 등록하기 -->
+    <insert id="createReview" parameterType="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        INSERT INTO TBL_REVIEW
+        (
+            REVIEW_CONTENT
+          , REVIEW_IMG
+          , REVIEW_DATE
+          , STORE_NO
+          , USER_NO
+        )
+        VALUES
+        (
+            #{ reviewContent }
+          , #{ reviewImage }
+          , #{ reviewDate }
+          , #{ storeNo }
+          , #{ userNo }
+        )
+    </insert>
+
+    <!-- 리뷰 작성 권한을 위한 리뷰 내역 조회 -->
+    <select id="getUserReviewList" parameterType="map" resultMap="reservationInfoDTOResultMap">
+        SELECT
+               A.RES_NO
+             , A.RES_DATE
+             , A.RES_TIME
+             , A.IS_RANDOM
+             , A.USER_NO
+             , A.STORE_NO
+             , A.QR_CONFIRM
+             , A.QR
+          FROM TBL_RESERVATION A
+         WHERE A.USER_NO = (SELECT
+                                   USER_NO
+                              FROM TBL_USER
+                             WHERE USER_ID = #{ userId })
+               AND
+<!--               A.STORE_NO = #{ storeNO }-->
+              A.STORE_NO = 1;
+    </select>
 
 </mapper>

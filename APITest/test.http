@@ -1,0 +1,3 @@
+## 마이페이지 유저 정보 가져오는 profile쪽
+
+#GET http://localhost:8080/user/100000001

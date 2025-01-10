@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.reservation.model.dao.ReservationMapper">
+
+    <resultMap id="bannerResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.StoreBannerDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="repPhoto" column="REP_PHOTO"/>
+    </resultMap>
+
+    <resultMap id="reservationedStoreInfoResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.ReservationStoreDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeProfile" column="STORE_PROFILE"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="longitude" column="LONGITUDE"/>
+    </resultMap>
+
+    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
+        <id property="resNo" column="RES_NO"/>
+        <result property="resDate" column="RES_DATE"/>
+        <result property="resTime" column="RES_TIME"/>
+        <result property="isRandom" column="IS_RANDOM"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="qrConfirm" column="QU_CONFIRM"/>
+        <result property="qr" column="QR"/>
+    </resultMap>
+
+    <select id="getRepPhotoName" parameterType="long" resultMap="bannerResultMap">
+        SELECT
+               STORE_NO
+             , REP_PHOTO
+          FROM TBL_BANNER
+         WHERE STORE_NO = 5
+    </select>
+
+    <select id="getReservationedStoreInfo" parameterType="long" resultMap="reservationedStoreInfoResultMap">
+        SELECT
+               STORE_NO
+             , STORE_NAME
+             , STORE_PROFILE
+             , LATITUDE
+             , LONGITUDE
+          FROM TBL_STORE
+         WHERE STORE_NO = 5
+    </select>
+
+    <insert id="insertReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
+        INSERT INTO TBL_RESERVATION
+        (
+               RES_DATE
+             , RES_TIME
+             , IS_RANDOM
+             , USER_NO
+             , STORE_NO
+             , QR_CONFIRM
+             , QR
+        )
+        VALUES
+        (
+               #{ resDate }
+             , #{ resTime }
+             , N
+             , #{ userNo }
+             , #{ storeNo }
+             , N
+             , #{ qr }
+        )
+    </insert>
+
+    <!-- 유저 이메일 받아오기 -->
+    <select id="getEmail" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO" resultType="String">
+        SELECT
+               EMAIL
+          FROM TBL_USER
+         WHERE USER_NO = #{ userNo }
+    </select>
+
+</mapper>

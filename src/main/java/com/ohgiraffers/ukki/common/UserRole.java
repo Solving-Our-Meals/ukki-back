@@ -2,7 +2,7 @@ package com.ohgiraffers.ukki.common;
 
 public enum UserRole {
     USER("USER"),
-    BADUSER("BADUSER"),
+    BAD_USER("BAD_USER"),
     STORE("STORE"),
     ADMIN("ADMIN");
 

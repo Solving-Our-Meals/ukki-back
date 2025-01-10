@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,6 +23,7 @@ public class JwtService {
 
     // JWT 토큰 생성용 (엑세스 토큰)
     public String createToken(String userId, UserRole userRole, int userNo) {
+
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("userRole", userRole);
         claims.put("userNo", userNo);
@@ -42,14 +44,14 @@ public class JwtService {
             Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY) // 비밀키 bearer뒤에 올 키에 대한 값 확인용인듯? 내가 application.yml에 저장한 값이 있는지 검증하는 것으로 보임 - 서명 검증 키
                     .build() // 새로운 버전에서는 parerbuilder()를 사용하면서 build()가 추가된듯
-                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조되 경우 예외 발생
+                    .parseClaimsJws(token); // JWT 파싱 및 서명 검증 -> 서명이 검증되지 않거나 변조돼 경우 예외 발생
             return true;
         } catch (Exception e) {
             return false; // 서명 검즘이 안되면 false 반환하겠다.
         }
     }
 
-    // 토큰에서 사용자 아이디와 userRole 추출용도
+    // 토큰에서 사용자 아이디와 userRole 추출용도 -> 고생한 부분 -> 리프레시 토큰은 아이디만 담겨있으므로 새로 만들어야함
     public Map<String, Object> getUserInfoFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
@@ -70,6 +72,22 @@ public class JwtService {
     }
 
     // 리프레시 토큰에 대한 부분이 없어 추가해야 한다.
+
+    // 리프레시 토큰에서 사용자 아이디만 추출
+    public Map<String, Object> getUserInfoFromRefreshToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        String userId = claims.getSubject(); // 사용자 아이디
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", userId);
+
+        return userInfo;
+    }
 
     // 리프토 생성
     public String createRefreshToken(String userId) {
@@ -109,5 +127,24 @@ public class JwtService {
             }
         }
         return null;
+    }
+
+    public String getUserInfoFromTokenId(String jwtToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String userId = claims.getSubject(); // 사용자 아이디
+        String userRole = (String) claims.get("userRole"); // 사용자 역할 (userRole는 claims에 "userRole" 저장)
+        int userNo = (int) claims.get("userNo");
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", userId);
+        userInfo.put("userRole", userRole);
+        userInfo.put("userNo", userNo);
+
+        return userId;
     }
 }

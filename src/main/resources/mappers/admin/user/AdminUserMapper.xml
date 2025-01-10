@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.admin.user.model.dao.AdminUserMapper">
+    <resultMap id="user" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="userRole" column="USER_ROLE"/>
+        <result property="noShow" column="NOSHOW"/>
+    </resultMap>
+
+    <resultMap id="userInfo" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserInfoDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="userRole" column="USER_ROLE"/>
+        <result property="noShow" column="NOSHOW"/>
+        <result property="resCount" column="RES_COUNT"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <result property="randomCount" column="RANDOM_COUNT"/>
+    </resultMap>
+
+    <insert id="insertActInfo">
+        INSERT INTO TBL_USER_ACT_INFO VALUES
+        <foreach collection="actInfoList" item="actInfo" separator="," close=";">
+            (#{actInfo.userNo}, #{actInfo.resCount}, #{actInfo.reviewCount}, #{actInfo.randomCount})
+        </foreach>
+    </insert>
+
+    <select id="searchBy" parameterType="map" resultMap="user">
+        SELECT * FROM TBL_USER
+        WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
+        <if test="category != null and word != null">
+            AND ${category} LIKE CONCAT('%', #{word}, '%')
+        </if>
+        <if test="category == null and word != null">
+            AND CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
+        </if>
+    </select>
+    
+    <select id="searchUserInfo" resultMap="userInfo">
+        SELECT
+        a.USER_NO,
+        a.USER_ID,
+        a.EMAIL,
+        a.USER_NAME,
+        a.USER_PROFILE,
+        a.USER_ROLE,
+        a.NOSHOW,
+        b.RES_COUNT,
+        b.REVIEW_COUNT,
+        b.RANDOM_COUNT
+        FROM TBL_USER a
+        LEFT JOIN TBL_USER_ACT_INFO b ON a.USER_NO = b.USER_NO
+        WHERE a.USER_NO = #{userNo};
+    </select>
+
+    <select id="searchSaneName">
+        SELECT
+        USER_NAME
+        FROM TBL_USER
+        WHERE USER_NAME LIKE CONCAT('건전한우끼', '%')
+        ORDER BY USER_NAME DESC
+        LIMIT 1;
+    </select>
+
+    <update id="updateUserName" parameterType="map">
+        UPDATE TBL_USER
+        SET USER_NAME = #{newSaneName}
+        WHERE USER_NO = #{userNo};
+    </update>
+
+    <delete id="deleteUserInfo">
+        DELETE FROM TBL_USER
+        WHERE USER_NO = #{userNo}
+    </delete>
+</mapper>

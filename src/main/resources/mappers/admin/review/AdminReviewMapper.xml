@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.admin.review.model.dao.AdminReviewMapper">
+    <resultMap id="userActReview" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserReviewDTO">
+        <id property="userNo" column="USER_NO"/>
+        <result property="totalReview" column="TOTAL_REVIEW"/>
+    </resultMap>
+
+    <select id="userReviewList" resultMap="userActReview">
+        SELECT
+        USER_NO,
+        COUNT(*) AS 'TOTAL_REVIEW'
+        FROM tbl_review
+        GROUP BY USER_NO
+        ORDER BY USER_NO;
+    </select>
+</mapper>

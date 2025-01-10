@@ -1,10 +1,10 @@
 package com.ohgiraffers.ukki.store.model.dao;
 
-import com.ohgiraffers.ukki.store.model.dto.BannerDTO;
-import com.ohgiraffers.ukki.store.model.dto.KeywordDTO;
-import com.ohgiraffers.ukki.store.model.dto.OperationDTO;
-import com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO;
+import com.ohgiraffers.ukki.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface StoreMapper {
@@ -16,4 +16,16 @@ public interface StoreMapper {
     OperationDTO getOperation(StoreInfoDTO storeInfoDTO);
 
     BannerDTO getBannerList(StoreInfoDTO storeInfoDTO);
+
+    ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO);
+
+    String getReviewCount(String today);
+
+    void createReview(ReviewContentDTO reviewContentDTO);
+
+    List<StoreInfoDTO> getStoresLocation(@Param("category") int category);
+
+    ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO);
+
+    List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo);
 }

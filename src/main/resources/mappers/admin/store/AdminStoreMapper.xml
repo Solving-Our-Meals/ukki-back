@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.admin.store.model.dao.AdminStoreMapper">
+    <resultMap id="storeListResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreListDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeCategory" column="CATEGORY_NAME"/>
+        <result property="storeAddress" column="STORE_ADDRESS"/>
+        <result property="storeRegistDate" column="STORE_REGIST_DATE"/>
+    </resultMap>
+
+    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreInfoDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeDes" column="STORE_DES"/>
+        <result property="storeAddress" column="STORE_ADDRESS"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="longitude" column="LONGITUDE"/>
+        <result property="storeProfile" column="STORE_PROFILE"/>
+        <result property="storeMenu" column="STORE_MENU"/>
+        <result property="storeCategory" column="CATEGORY_NAME"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="posNumber" column="POS_NUMBER"/>
+        <result property="storeRegistDate" column="STORE_REGIST_DATE"/>
+    </resultMap>
+
+    <resultMap id="month" type="com.ohgiraffers.ukki.admin.store.model.dto.MonthlyRegistStoreDTO">
+        <result property="year" column="YEAR"/>
+        <result property="month" column="MON"/>
+        <result property="registStore" column="value"/>
+    </resultMap>
+
+
+    <resultMap id="keywordResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.KeywordDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="keyword1" column="KEYWORD1"/>
+        <result property="keyword2" column="KEYWORD2"/>
+        <result property="keyword3" column="KEYWORD3"/>
+        <result property="keyword4" column="KEYWORD4"/>
+        <result property="keyword5" column="KEYWORD5"/>
+        <result property="keyword6" column="KEYWORD6"/>
+    </resultMap>
+
+    <resultMap id="operationResultMap" type="com.ohgiraffers.ukki.admin.store.model.dto.OperationDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="monday" column="MONDAY"/>
+        <result property="tuesday" column="TUESDAY"/>
+        <result property="wednesday" column="WEDNESDAY"/>
+        <result property="thursday" column="THURSDAY"/>
+        <result property="friday" column="FRIDAY"/>
+        <result property="saturday" column="SATURDAY"/>
+        <result property="sunday" column="SUNDAY"/>
+        <result property="breakTime" column="BREAK_TIME"/>
+    </resultMap>
+
+
+    <select id="monthlyRegistStore" resultMap="month">
+        SELECT
+        YEAR(STORE_REGIST_DATE) AS YEAR,
+        MONTH(STORE_REGIST_DATE) AS MON,
+        COUNT(*) AS value
+        FROM
+        tbl_store
+        GROUP BY
+        YEAR, MON
+        ORDER BY
+        YEAR, MON;
+    </select>
+
+    <select id="totalRegistStore">
+        -- 현재 가게 수
+        SELECT
+        COUNT(*)
+        FROM TBL_STORE;
+    </select>
+
+    <select id="searchBy" resultMap="storeListResultMap" parameterType="map">
+        SELECT
+        a.STORE_NO,
+        a.STORE_NAME,
+        b.CATEGORY_NAME,
+        a.STORE_ADDRESS,
+        a.STORE_REGIST_DATE
+        FROM TBL_STORE a
+        LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
+        <where>
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "CATEGORY_NAME"'>
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                CONCAT(a.STORE_NO, ' ', a.STORE_NAME, ' ', b.CATEGORY_NAME, ' ', a.STORE_ADDRESS, ' ', a.STORE_REGIST_DATE) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+        ORDER BY a.STORE_REGIST_DATE;
+    </select>
+
+    <select id="searchStoreInfo" resultMap="storeInfoResultMap">
+        SELECT
+        a.STORE_NO,
+        a.STORE_NAME,
+        a.STORE_DES,
+        a.LATITUDE,
+        a.LONGITUDE,
+        a.STORE_PROFILE,
+        a.STORE_MENU,
+        a.POS_NUMBER,
+        b.CATEGORY_NAME,
+        a.USER_NO,
+        a.STORE_ADDRESS,
+        a.STORE_REGIST_DATE
+        FROM TBL_STORE a
+        LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
+        WHERE STORE_NO = #{storeNo}
+    </select>
+
+
+    <!--  가게 키워드  -->
+    <select id="getKeyword" resultMap="keywordResultMap">
+        SELECT
+        STORE_NO
+        , KEYWORD1
+        , KEYWORD2
+        , KEYWORD3
+        , KEYWORD4
+        , KEYWORD5
+        , KEYWORD6
+        FROM TBL_KEYWORD
+        WHERE STORE_NO = #{storeNo}
+        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
+    </select>
+
+    <!--  운영 시간 불러오기  -->
+    <select id="getOperation" resultMap="operationResultMap">
+        SELECT
+        *
+        FROM TBL_OPERATION
+        WHERE STORE_NO = #{storeNo}
+        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
+    </select>
+
+</mapper>

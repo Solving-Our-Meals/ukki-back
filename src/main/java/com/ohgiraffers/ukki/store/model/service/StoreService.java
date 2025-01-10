@@ -1,11 +1,10 @@
 package com.ohgiraffers.ukki.store.model.service;
 
 import com.ohgiraffers.ukki.store.model.dao.StoreMapper;
-import com.ohgiraffers.ukki.store.model.dto.BannerDTO;
-import com.ohgiraffers.ukki.store.model.dto.KeywordDTO;
-import com.ohgiraffers.ukki.store.model.dto.OperationDTO;
-import com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO;
+import com.ohgiraffers.ukki.store.model.dto.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class StoreService {
@@ -31,5 +30,30 @@ public class StoreService {
 
     public BannerDTO getBannerList(StoreInfoDTO storeInfoDTO) {
         return storeMapper.getBannerList(storeInfoDTO);
+    }
+
+    public ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO) {
+        return storeMapper.getReviewList(storeInfoDTO);
+    }
+
+    public String getReviewCount(String today) {
+        return storeMapper.getReviewCount(today);
+    }
+
+    public void createReview(ReviewContentDTO reviewContentDTO) {
+        storeMapper.createReview(reviewContentDTO);
+    }
+
+    public List<StoreInfoDTO> getStoresLocation(int category) {
+        return storeMapper.getStoresLocation(category);
+    }
+
+
+    public ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO) {
+        return storeMapper.getReviewListByScope(storeInfoDTO);
+    }
+
+    public List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
+        return storeMapper.getUserReviewList(userId, storeNo);
     }
 }
