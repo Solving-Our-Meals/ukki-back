@@ -110,7 +110,7 @@ public class AdminStoreController {
     }
 
     @DeleteMapping("/info/{storeNo}/delete")
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> deleteStoreInfo(@PathVariable int storeNo){
         System.out.println("삭제하러 옴");
         Map<String, String> response = new HashMap<>();
@@ -119,12 +119,15 @@ public class AdminStoreController {
 
             int result = adminStoreService.deleteStoreInfo(storeNo);
 
-            if(result > 1){
-                message = "삭제에 실패했습니다.";
-            }else{
+            if(result > 0){
                 message = "삭제에 성공했습니다.";
+                adminStoreService.deleteStoreBanner(storeNo);
+                adminStoreService.deleteStoreOperation(storeNo);
+            }else{
+                message = "삭제에 실패했습니다.";
             }
 
+            System.out.println(message);
             response.put("message", message);
 
             return ResponseEntity.ok(response);
@@ -138,7 +141,7 @@ public class AdminStoreController {
     }
 
         @PutMapping("/info/{storeNo}/edit")
-        @Transactional
+        @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> updateStore(
             @PathVariable Long storeNo,
             @RequestPart(value = "storeData", required = false) String storeDataJson,
@@ -169,7 +172,6 @@ public class AdminStoreController {
             }
             
             String[] bannerStatusParse = null;
-
             int count = 0;
             if (bannerStatus != null) {
                 bannerStatusParse = mapper.readValue(bannerStatus, String[].class);
@@ -243,13 +245,17 @@ public class AdminStoreController {
                 }
             }
 
+            String[] bannerNameArr = new String[5];
+            for(int i = 0; i < count; i++){
+                bannerNameArr[i] = storeNo+"banner"+(i+1);
+            }
             for (Map.Entry<Integer, MultipartFile> entry : bannerUpdates.entrySet()) {
                 int key = entry.getKey();
                 MultipartFile file = entry.getValue();
 
                 // 파일 이름 생성
                 String fileName = storeNo + "banner" + key;
-
+                bannerNameArr[key-1] = fileName;
                 // fileController 호출하여 파일 저장
                 int result = fileController(file, fileName);
                 if (result == 2) {
@@ -261,11 +267,10 @@ public class AdminStoreController {
                 }
             }
 
+            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            System.out.println(bannerDTO);
+            adminStoreService.editBanner(bannerDTO);
 
-            // 서비스 호출
-            // adminStoreService.updateStore(storeNo, storeData, menuImage, profileImage, bannerImages);
-            
-            // 모든 작업이 완료된 후 storeData를 업데이트
             if (storeData != null) {
                 adminStoreService.editStore(storeData);
             }
