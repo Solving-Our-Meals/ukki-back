@@ -35,8 +35,8 @@ public class ReservationController {
     }
 
     // 대표 사진
-    @GetMapping(value = "/{storeNo}/repPhoto")
-    public ResponseEntity<String> getRepPhotoName(@PathVariable("storeNo") long storeNo){
+    @GetMapping(value = "/repPhoto")
+    public ResponseEntity<String> getRepPhotoName(@RequestParam("storeNo") long storeNo){
 
         StoreBannerDTO storeBannerDTO = reservationService.getRepPhotoName(storeNo);
         String bannerName = storeBannerDTO.getRepPhoto();
@@ -67,8 +67,8 @@ public class ReservationController {
     }
 
     // 프로필 사진
-    @GetMapping (value = "/{storeNo}/profile")
-    ResponseEntity<String> getProfileName(@PathVariable("storeNo") long storeNo, ReservationStoreDTO reservationStoreDTO){
+    @GetMapping (value = "/profile")
+    ResponseEntity<String> getProfileName(@RequestParam("storeNo") long storeNo, ReservationStoreDTO reservationStoreDTO){
 
 //        long storeNo = 5;
         reservationStoreDTO = reservationService.getReservationedStoreInfo(storeNo);
@@ -120,5 +120,7 @@ public class ReservationController {
 //        System.out.println("어디까지 왔니3");
 
         reservationService.insertReservation(reservationInfoDTO);
+
+        reservationService.increaseReservation(reservationInfoDTO.getUserNo());
     }
 }

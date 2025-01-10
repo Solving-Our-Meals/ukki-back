@@ -14,4 +14,6 @@ public interface ReservationMapper {
     void insertReservation(ReservationInfoDTO reservationInfoDTO);
 
     String getEmail(ReservationInfoDTO reservationInfoDTO);
+
+    void increaseReservation(long userNo);
 }

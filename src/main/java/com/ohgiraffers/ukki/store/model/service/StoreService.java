@@ -56,4 +56,12 @@ public class StoreService {
     public List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
         return storeMapper.getUserReviewList(userId, storeNo);
     }
+
+    public boolean checkReviewList(long resNo) {
+        return storeMapper.checkReviewList(resNo);
+    }
+
+    public void increaseReview(long userNo) {
+        storeMapper.increaseReview(userNo);
+    }
 }

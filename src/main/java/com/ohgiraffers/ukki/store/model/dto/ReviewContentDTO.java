@@ -12,10 +12,11 @@ public class ReviewContentDTO {
     private String userName;
     private String userProfile;
     private long reportCount;
+    private long resNo;
 
     public ReviewContentDTO(){}
 
-    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, int reviewScope, long storeNo, long userNo, String userName, String userProfile, long reportCount) {
+    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, int reviewScope, long storeNo, long userNo, String userName, String userProfile, long reportCount, long resNo) {
         this.reviewNo = reviewNo;
         this.reviewContent = reviewContent;
         this.reviewImage = reviewImage;
@@ -26,6 +27,7 @@ public class ReviewContentDTO {
         this.userName = userName;
         this.userProfile = userProfile;
         this.reportCount = reportCount;
+        this.resNo = resNo;
     }
 
     public long getReviewNo() {
@@ -108,6 +110,14 @@ public class ReviewContentDTO {
         this.reportCount = reportCount;
     }
 
+    public long getResNo() {
+        return resNo;
+    }
+
+    public void setResNo(long resNo) {
+        this.resNo = resNo;
+    }
+
     @Override
     public String toString() {
         return "ReviewContentDTO{" +
@@ -121,6 +131,7 @@ public class ReviewContentDTO {
                 ", userName='" + userName + '\'' +
                 ", userProfile='" + userProfile + '\'' +
                 ", reportCount=" + reportCount +
+                ", resNo=" + resNo +
                 '}';
     }
 }
