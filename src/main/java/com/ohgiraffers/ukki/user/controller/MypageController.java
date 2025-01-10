@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.user.controller;
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
+import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
 import com.ohgiraffers.ukki.user.model.service.MypageService;
 import jakarta.servlet.http.Cookie;
@@ -81,6 +82,29 @@ public class MypageController {
         }
 
         List<MypageReservationDTO> reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+
+        if (reservations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(reservations);
+    }
+
+    @GetMapping("/review")
+    public ResponseEntity<List<MypageReviewDTO>> getUseReview(HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        List<MypageReviewDTO> reservations = mypageService.getUserReviewFromToken(jwtToken, userId);
 
         if (reservations.isEmpty()) {
             return ResponseEntity.noContent().build();

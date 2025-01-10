@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.user.model.dao;
 
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
+import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface MypageMapper {
     MypageDTO findUserInfoByUserId(String userId);
 
     List<MypageReservationDTO> findUserReservationByUserId(String userId);
+
+    List<MypageReviewDTO> findUserReviewByUserId(String userId);
 }
