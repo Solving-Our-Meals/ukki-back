@@ -59,4 +59,9 @@ public class AdminStoreService {
     public void editStore(AdminStoreInfoDTO storeData) {
         adminStoreMapper.editStore(storeData);
     }
+
+    public int deleteStoreInfo(int storeNo) {
+
+        return adminStoreMapper.deleteStoreInfo(storeNo);
+    }
 }

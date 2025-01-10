@@ -195,6 +195,9 @@
         WHERE STORE_NO = #{storeNo}
     </update>
 
-
+    <delete id="deleteStoreInfo">
+        DELETE FROM TBL_STORE
+        WHERE STORE_NO = #{storeNo}
+    </delete>
 
 </mapper>
