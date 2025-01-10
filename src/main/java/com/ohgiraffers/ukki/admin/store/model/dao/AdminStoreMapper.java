@@ -19,4 +19,12 @@ public interface AdminStoreMapper {
     KeywordDTO getKeyword(long storeNo);
 
     OperationDTO getOperation(long storeNo);
+
+    List<CategoryDTO> getCategory();
+
+    void editOperationTime(OperationDTO operationTime);
+
+    void editKeyword(KeywordDTO storeKeyword);
+
+    void editStore(AdminStoreInfoDTO storeData);
 }

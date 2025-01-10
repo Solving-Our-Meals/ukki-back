@@ -1,8 +1,6 @@
 package com.ohgiraffers.ukki.admin.store.model.dto;
 
-import java.util.List;
-
-public class AdminStoreInfoDTO {
+public class StoreDTO {
 
     private long storeNo;
     private String storeName;
@@ -15,14 +13,11 @@ public class AdminStoreInfoDTO {
     private int storeCategoryNo;
     private long userNo;
     private int posNumber; // 예약 가능 인원
-    private KeywordDTO storeKeyword;
-    private List<CategoryDTO> storeCategory;
-    private OperationDTO operationTime;
     private String storeRegistDate;
 
-    public AdminStoreInfoDTO() {}
+    public StoreDTO() {}
 
-    public AdminStoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword, List<CategoryDTO> storeCategory, OperationDTO operationTime, String storeRegistDate) {
+    public StoreDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, String storeRegistDate) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
@@ -34,9 +29,6 @@ public class AdminStoreInfoDTO {
         this.storeCategoryNo = storeCategoryNo;
         this.userNo = userNo;
         this.posNumber = posNumber;
-        this.storeKeyword = storeKeyword;
-        this.storeCategory = storeCategory;
-        this.operationTime = operationTime;
         this.storeRegistDate = storeRegistDate;
     }
 
@@ -128,30 +120,6 @@ public class AdminStoreInfoDTO {
         this.posNumber = posNumber;
     }
 
-    public KeywordDTO getStoreKeyword() {
-        return storeKeyword;
-    }
-
-    public void setStoreKeyword(KeywordDTO storeKeyword) {
-        this.storeKeyword = storeKeyword;
-    }
-
-    public List<CategoryDTO> getStoreCategory() {
-        return storeCategory;
-    }
-
-    public void setStoreCategory(List<CategoryDTO> storeCategory) {
-        this.storeCategory = storeCategory;
-    }
-
-    public OperationDTO getOperationTime() {
-        return operationTime;
-    }
-
-    public void setOperationTime(OperationDTO operationTime) {
-        this.operationTime = operationTime;
-    }
-
     public String getStoreRegistDate() {
         return storeRegistDate;
     }
@@ -162,7 +130,7 @@ public class AdminStoreInfoDTO {
 
     @Override
     public String toString() {
-        return "AdminStoreInfoDTO{" +
+        return "StoreDTO{" +
                 "storeNo=" + storeNo +
                 ", storeName='" + storeName + '\'' +
                 ", storeDes='" + storeDes + '\'' +
@@ -174,12 +142,7 @@ public class AdminStoreInfoDTO {
                 ", storeCategoryNo=" + storeCategoryNo +
                 ", userNo=" + userNo +
                 ", posNumber=" + posNumber +
-                ", storeKeyword=" + storeKeyword +
-                ", storeCategory=" + storeCategory +
-                ", operationTime=" + operationTime +
                 ", storeRegistDate='" + storeRegistDate + '\'' +
                 '}';
     }
 }
-
-
