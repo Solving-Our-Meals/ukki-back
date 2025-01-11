@@ -79,6 +79,26 @@
         <result property="qr" column="QR"/>
     </resultMap>
 
+    <resultMap id="getResPosNumResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="day" column=""/>
+        <collection property="listDayResPosNumDTO" resultMap="resPosNumByDay"/>
+    </resultMap>
+
+    <resultMap id="resPosNumByDay" type="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">
+        <result property="operTime" column="OPER_TIME"/>
+        <result property="resPosNum" column="POS_NUMBER"/>
+    </resultMap>
+
+    <resultMap id="getChangedResNumInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ChangedResNumInfoDTO">
+        <id property="rInfo" column="R_INFO"/>
+        <result property="storeNo" column="STORE_NO"/>
+        <result property="rDay" column="R_DAY"/>
+        <result property="rDate" column="R_DATE"/>
+        <result property="rOperTime" column="R_OPER_TIME"/>
+        <result property="resPosNumber" column="RES_POS_NUMBER"/>
+    </resultMap>
+
     <!--  가게 정보  -->
     <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
         SELECT
@@ -253,4 +273,17 @@
            SET REVIEW_COUNT = REVIEW_COUNT + 1
          WHERE USER_NO = #{ userNo }
     </update>
+
+    <!-- 요일별, 시간별 예약 가능 인원 조회 -->
+    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultMap="getResPosNumResultMap">
+        SELECT * FROM ${day} WHERE STORE_NO = #{storeNo}
+    </select>
+
+    <!-- 예약 가능 인원 변경 사항 -->
+    <select id="getChangedRedPosInfo" parameterType="long" resultMap="getChangedResNumInfoResultMap">
+        SELECT
+               *
+          FROM TBL_RES_POS_NUMBER
+         WHERE STORE_NO = #{ storeNo }
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -458,5 +459,75 @@ public class StoreController {
 
         return ResponseEntity.ok(result);
     }
+
+    // 예약 가능 인원 조회
+    @GetMapping(value = "/resPosNumber")
+    public ResponseEntity<StoreResPosNumDTO> getResPosNumber(@RequestParam("storeNo") long storeNo, @RequestParam("day") String day, StoreResPosNumDTO storeResPosNumDTO) {
+
+        // TBL_MONDAY ~ TBL_SUNDAY 에서 가져오기
+        storeResPosNumDTO.setStoreNo(storeNo);
+
+        switch (day) {
+            case "0" : storeResPosNumDTO.setDay("TBL_SUNDAY"); break;
+            case "1" : storeResPosNumDTO.setDay("TBL_MONDAY"); break;
+            case "2" : storeResPosNumDTO.setDay("TBL_TUESDAY"); break;
+            case "3" : storeResPosNumDTO.setDay("TBL_WEDNESDAY"); break;
+            case "4" : storeResPosNumDTO.setDay("TBL_THURSDAY"); break;
+            case "5" : storeResPosNumDTO.setDay("TBL_FRIDAY"); break;
+            case "6" : storeResPosNumDTO.setDay("TBL_SATURDAY"); break;
+        }
+
+        storeResPosNumDTO = storeService.getResPosNum(storeResPosNumDTO);
+
+        switch (day) {
+            case "0" : storeResPosNumDTO.setDay("SUNDAY"); break;
+            case "1" : storeResPosNumDTO.setDay("MONDAY"); break;
+            case "2" : storeResPosNumDTO.setDay("TUESDAY"); break;
+            case "3" : storeResPosNumDTO.setDay("WEDNESDAY"); break;
+            case "4" : storeResPosNumDTO.setDay("THURSDAY"); break;
+            case "5" : storeResPosNumDTO.setDay("FRIDAY"); break;
+            case "6" : storeResPosNumDTO.setDay("SATURDAY"); break;
+        }
+
+        System.out.println("storeResPosNumDTO : " + storeResPosNumDTO);
+
+        List<ChangedResNumInfoDTO> listChangedResNumInfoDTO = storeService.getChangedRedPosInfo(storeNo);
+
+        System.out.println("ListChangedResNumInfoDTO = " + listChangedResNumInfoDTO);
+
+        Date currentDate = new Date();
+
+        // 각 rDate 값을 추출하여 출력
+//        for (ChangedResNumInfoDTO info : listChangedResNumInfoDTO) {
+//            System.out.println("rDate: " + info.getrDate());
+//            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//            try {
+//                if (info.getrDate() != null && !info.getrDate().isEmpty()) {
+//                    Date date = formatter.parse(info.getrDate());
+//                    System.out.println("Date: " + date);
+//                } else {
+//                    System.out.println("rDate is null or empty");
+//                }
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        return ResponseEntity.ok(storeResPosNumDTO);
+    }
+
+
+
+//    @GetMapping(value = "/changedResPosNum")
+//    public ResponseEntity<List<ChangedResNumInfoDTO>> getChangedResPosNum(@RequestParam("storeNo") long storeNo) {
+//
+//        List<ChangedResNumInfoDTO> ListChangedResNumInfoDTO = storeService.getChangedRedPosInfo(storeNo);
+//
+//        System.out.println("ListChangedResNumInfoDTO = " + ListChangedResNumInfoDTO);
+//
+//
+//        return ResponseEntity.ok(ListChangedResNumInfoDTO);
+//    }
+
 }
 

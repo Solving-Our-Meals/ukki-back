@@ -64,4 +64,12 @@ public class StoreService {
     public void increaseReview(long userNo) {
         storeMapper.increaseReview(userNo);
     }
+
+    public StoreResPosNumDTO getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
+        return storeMapper.getResPosNum(storeResPosNumDTO);
+    }
+
+    public List<ChangedResNumInfoDTO> getChangedRedPosInfo(long storeNo) {
+        return storeMapper.getChangedRedPosInfo(storeNo);
+    }
 }

@@ -32,4 +32,8 @@ public interface StoreMapper {
     boolean checkReviewList(long resNo);
 
     void increaseReview(long userNo);
+
+    StoreResPosNumDTO getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
+
+    List<ChangedResNumInfoDTO> getChangedRedPosInfo(long storeNo);
 }
