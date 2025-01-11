@@ -94,7 +94,7 @@
              , USER_NO
              , POS_NUMBER
           FROM TBL_STORE
-         WHERE STORE_NO = 6
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
@@ -109,7 +109,7 @@
              , KEYWORD5
              , KEYWORD6
           FROM TBL_KEYWORD
-         WHERE STORE_NO = 6
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
@@ -118,7 +118,7 @@
         SELECT
                *
           FROM TBL_OPERATION
-         WHERE STORE_NO = 6
+         WHERE STORE_NO = 5
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
@@ -132,7 +132,7 @@
              , BANNER4
              , BANNER5
           FROM TBL_BANNER
-         WHERE STORE_NO = 6
+         WHERE STORE_NO = 5
     </select>
 
     <!-- 리뷰 정보 가져오기 / 최신순 -->
@@ -155,7 +155,7 @@
              , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 6
+         WHERE A.STORE_NO = 5
          ORDER BY REVIEW_NO DESC;
     </select>
 
@@ -179,7 +179,7 @@
              , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 6
+         WHERE A.STORE_NO = 5
         ORDER BY REVIEW_SCOPE DESC;
     </select>
 
@@ -209,7 +209,6 @@
             #{ reviewContent }
           , #{ reviewImage }
           , #{ reviewDate }
-<!--          , #{ reviewScope }-->
           , #{ reviewScope }
           , #{ storeNo }
           , #{ userNo }
