@@ -32,4 +32,6 @@ public interface StoreMapper {
     boolean checkReviewList(long resNo);
 
     void increaseReview(long userNo);
+
+    List<StoreInfoDTO> searchStores(String storeName);
 }

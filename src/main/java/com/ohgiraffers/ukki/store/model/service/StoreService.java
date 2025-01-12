@@ -64,4 +64,8 @@ public class StoreService {
     public void increaseReview(long userNo) {
         storeMapper.increaseReview(userNo);
     }
+
+    public List<StoreInfoDTO> searchStores(String storeName) {
+        return storeMapper.searchStores(storeName);  // StoreMapper의 searchStores 호출
+    }
 }

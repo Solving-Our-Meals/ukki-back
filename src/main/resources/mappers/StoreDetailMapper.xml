@@ -254,4 +254,21 @@
            SET REVIEW_COUNT = REVIEW_COUNT + 1
          WHERE USER_NO = #{ userNo }
     </update>
+
+
+
+
+    <select id="getSearchInfo" resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+        SELECT
+        STORE_NO,
+        STORE_NAME,
+        STORE_DES,
+        STORE_ADDRESS,
+        STORE_PROFILE,
+        STORE_CATEGORY_NO,
+        POS_NUMBER
+        FROM TBL_STORE
+        WHERE STORE_NAME LIKE CONCAT('%', #{storeName}, '%')
+    </select>
+
 </mapper>
