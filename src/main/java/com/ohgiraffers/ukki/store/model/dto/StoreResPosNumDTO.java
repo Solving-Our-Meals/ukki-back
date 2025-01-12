@@ -5,13 +5,15 @@ import java.util.List;
 public class StoreResPosNumDTO {
 
     private long storeNo;
+    private String date;
     private String day; // 요일
     private List<DayResPosNumDTO> listDayResPosNumDTO;
 
     public StoreResPosNumDTO(){}
 
-    public StoreResPosNumDTO(long storeNo, String day, List<DayResPosNumDTO> listDayResPosNumDTO) {
+    public StoreResPosNumDTO(long storeNo, String date, String day, List<DayResPosNumDTO> listDayResPosNumDTO) {
         this.storeNo = storeNo;
+        this.date = date;
         this.day = day;
         this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
@@ -22,6 +24,14 @@ public class StoreResPosNumDTO {
 
     public void setStoreNo(long storeNo) {
         this.storeNo = storeNo;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getDay() {
@@ -44,6 +54,7 @@ public class StoreResPosNumDTO {
     public String toString() {
         return "StoreResPosNumDTO{" +
                 "storeNo=" + storeNo +
+                ", date='" + date + '\'' +
                 ", day='" + day + '\'' +
                 ", listDayResPosNumDTO=" + listDayResPosNumDTO +
                 '}';

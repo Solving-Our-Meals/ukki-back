@@ -79,28 +79,14 @@
         <result property="qr" column="QR"/>
     </resultMap>
 
-    <resultMap id="getResPosNumResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
-        <result property="storeNo" column="STORE_NO"/>
-        <result property="day" column=""/>
-        <collection property="listDayResPosNumDTO" resultMap="resPosNumByDay"/>
-    </resultMap>
-
     <resultMap id="resPosNumByDay" type="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">
         <result property="operTime" column="OPER_TIME"/>
-        <result property="resPosNum" column="POS_NUMBER"/>
+        <result property="resPosNum" column="RES_POS_NUMBER"/>
     </resultMap>
 
-    <resultMap id="getChangedResNumInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ChangedResNumInfoDTO">
-        <id property="rInfo" column="R_INFO"/>
-        <result property="storeNo" column="STORE_NO"/>
-        <result property="rDay" column="R_DAY"/>
-        <result property="rDate" column="R_DATE"/>
-        <result property="rOperTime" column="R_OPER_TIME"/>
-        <result property="resPosNumber" column="RES_POS_NUMBER"/>
-    </resultMap>
 
     <!--  가게 정보  -->
-    <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+    <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="long">
         SELECT
                STORE_NO
              , STORE_NAME
@@ -114,12 +100,12 @@
              , USER_NO
              , POS_NUMBER
           FROM TBL_STORE
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{storeNo}
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
     <!--  가게 키워드  -->
-    <select id="getKeyword" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="keywordResultMap">
+    <select id="getKeyword" parameterType="long" resultMap="keywordResultMap">
         SELECT
                STORE_NO
              , KEYWORD1
@@ -129,21 +115,21 @@
              , KEYWORD5
              , KEYWORD6
           FROM TBL_KEYWORD
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{storeNo}
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기 -->
     </select>
 
     <!--  운영 시간 불러오기  -->
-    <select id="getOperation" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="operationResultMap">
+    <select id="getOperation" parameterType="long" resultMap="operationResultMap">
         SELECT
                *
           FROM TBL_OPERATION
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{storeNo}
         <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
     </select>
 
     <!--  배너 불러오기  -->
-    <select id="getBannerList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="bannerResultMap">
+    <select id="getBannerList" parameterType="long" resultMap="bannerResultMap">
         SELECT
                STORE_NO
              , BANNER1
@@ -152,11 +138,11 @@
              , BANNER4
              , BANNER5
           FROM TBL_BANNER
-         WHERE STORE_NO = 5
+         WHERE STORE_NO = #{storeNo}
     </select>
 
     <!-- 리뷰 정보 가져오기 / 최신순 -->
-    <select id="getReviewList" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+    <select id="getReviewList" parameterType="long" resultMap="getReviewInfoResultMap">
         SELECT
                A.STORE_NO
              , (SELECT
@@ -175,12 +161,12 @@
              , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 5
+         WHERE A.STORE_NO = #{storeNo}
          ORDER BY REVIEW_NO DESC;
     </select>
 
     <!-- 리뷰 정보 가져오기 / 별점순 -->
-    <select id="getReviewListByScope" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO" resultMap="getReviewInfoResultMap">
+    <select id="getReviewListByScope" parameterType="long" resultMap="getReviewInfoResultMap">
         SELECT
                 A.STORE_NO
               , (SELECT
@@ -199,7 +185,7 @@
              , A.RES_NO
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
-         WHERE A.STORE_NO = 5
+         WHERE A.STORE_NO = #{storeNo}
         ORDER BY REVIEW_SCOPE DESC;
     </select>
 
@@ -275,15 +261,23 @@
     </update>
 
     <!-- 요일별, 시간별 예약 가능 인원 조회 -->
-    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultMap="getResPosNumResultMap">
-        SELECT * FROM ${day} WHERE STORE_NO = #{storeNo}
+    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultMap="resPosNumByDay">
+        SELECT DISTINCT
+               A.OPER_TIME
+             , IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)
+                    - IFNULL((
+                                SELECT COUNT(1)
+                                  FROM TBL_RESERVATION A_2
+                                 WHERE A.STORE_NO = A_2.STORE_NO
+                                   AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
+                            ),0) AS RES_POS_NUMBER
+          FROM ${day} A
+          LEFT
+          JOIN TBL_RES_POS_NUMBER B
+            ON A.STORE_NO = B.STORE_NO
+           AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')
+           AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{date}
+         WHERE A.STORE_NO = #{storeNo};
     </select>
 
-    <!-- 예약 가능 인원 변경 사항 -->
-    <select id="getChangedRedPosInfo" parameterType="long" resultMap="getChangedResNumInfoResultMap">
-        SELECT
-               *
-          FROM TBL_RES_POS_NUMBER
-         WHERE STORE_NO = #{ storeNo }
-    </select>
 </mapper>

@@ -16,24 +16,24 @@ public class StoreService {
     }
 
 
-    public StoreInfoDTO getStoreInfo(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getStoreInfo(storeInfoDTO);
+    public StoreInfoDTO getStoreInfo(long storeNo) {
+        return storeMapper.getStoreInfo(storeNo);
     }
 
-    public KeywordDTO getKeyword(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getKeyword(storeInfoDTO);
+    public KeywordDTO getKeyword(long storeNo) {
+        return storeMapper.getKeyword(storeNo);
     }
 
-    public OperationDTO getOperation(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getOperation(storeInfoDTO);
+    public OperationDTO getOperation(long storeNo) {
+        return storeMapper.getOperation(storeNo);
     }
 
-    public BannerDTO getBannerList(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getBannerList(storeInfoDTO);
+    public BannerDTO getBannerList(long storeNo) {
+        return storeMapper.getBannerList(storeNo);
     }
 
-    public ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getReviewList(storeInfoDTO);
+    public ReviewDTO getReviewList(long storeNo) {
+        return storeMapper.getReviewList(storeNo);
     }
 
     public String getReviewCount(String today) {
@@ -49,8 +49,8 @@ public class StoreService {
     }
 
 
-    public ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO) {
-        return storeMapper.getReviewListByScope(storeInfoDTO);
+    public ReviewDTO getReviewListByScope(long storeNo) {
+        return storeMapper.getReviewListByScope(storeNo);
     }
 
     public List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
@@ -65,11 +65,7 @@ public class StoreService {
         storeMapper.increaseReview(userNo);
     }
 
-    public StoreResPosNumDTO getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
+    public List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
         return storeMapper.getResPosNum(storeResPosNumDTO);
-    }
-
-    public List<ChangedResNumInfoDTO> getChangedRedPosInfo(long storeNo) {
-        return storeMapper.getChangedRedPosInfo(storeNo);
     }
 }

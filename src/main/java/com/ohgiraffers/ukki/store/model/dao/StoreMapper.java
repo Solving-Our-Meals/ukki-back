@@ -9,15 +9,15 @@ import java.util.List;
 @Mapper
 public interface StoreMapper {
 
-    StoreInfoDTO getStoreInfo(StoreInfoDTO storeInfoDTO);
+    StoreInfoDTO getStoreInfo(long storeNo);
 
-    KeywordDTO getKeyword(StoreInfoDTO storeInfoDTO);
+    KeywordDTO getKeyword(long storeNo);
 
-    OperationDTO getOperation(StoreInfoDTO storeInfoDTO);
+    OperationDTO getOperation(long storeNo);
 
-    BannerDTO getBannerList(StoreInfoDTO storeInfoDTO);
+    BannerDTO getBannerList(long storeNo);
 
-    ReviewDTO getReviewList(StoreInfoDTO storeInfoDTO);
+    ReviewDTO getReviewList(long storeNo);
 
     String getReviewCount(String today);
 
@@ -25,7 +25,7 @@ public interface StoreMapper {
 
     List<StoreInfoDTO> getStoresLocation(@Param("category") int category);
 
-    ReviewDTO getReviewListByScope(StoreInfoDTO storeInfoDTO);
+    ReviewDTO getReviewListByScope(long storeNo);
 
     List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo);
 
@@ -33,7 +33,6 @@ public interface StoreMapper {
 
     void increaseReview(long userNo);
 
-    StoreResPosNumDTO getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
+    List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
-    List<ChangedResNumInfoDTO> getChangedRedPosInfo(long storeNo);
 }
