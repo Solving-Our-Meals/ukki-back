@@ -49,4 +49,8 @@ public class AdminUserService {
     public int deleteUserInfo(int userNo) {
         return adminUserMapper.deleteUserInfo(userNo);
     }
+
+    public int totalUser() {
+        return adminUserMapper.totalUser();
+    }
 }

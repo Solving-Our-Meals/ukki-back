@@ -254,7 +254,7 @@
         SELECT
             USER_NO
         FROM TBL_USER
-        WHERE USER_ID = #{userId}
+        WHERE USER_ID = #{userId} AND USER_ROLE != 'ADMIN'
     </select>
 
     <insert id="insertStore" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.AdminStoreInfoDTO">
