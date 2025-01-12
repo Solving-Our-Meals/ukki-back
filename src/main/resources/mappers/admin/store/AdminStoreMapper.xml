@@ -228,6 +228,11 @@
         WHERE STORE_NO = #{storeNo}
     </delete>
 
+    <delete id="deleteStoreKeyword">
+        DELETE FROM TBL_KEYWORD
+        WHERE STORE_NO = #{storeNo}
+    </delete>
+
     <select id="lastStoreNo">
         SELECT
             MAX(STORE_NO)

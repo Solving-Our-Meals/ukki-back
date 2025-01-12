@@ -49,4 +49,6 @@ public interface AdminStoreMapper {
     void insertStore(AdminStoreInfoDTO storeData);
 
     int searchCurrentStoreUser(String userId);
+
+    void deleteStoreKeyword(int storeNo);
 }
