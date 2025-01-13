@@ -27,17 +27,18 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin(origins = "http://localhost:3000")
 public class StoreController {
 
-    private final StoreService storeService;
+
 //    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+
+
 
     public StoreController(StoreService storeService){
         this.storeService = storeService;
     }
 
     // 검색 페이지 만들어지면 pathvariable로 변경하기
-    @GetMapping(value="/test", produces = "application/json; charset=UTF-8")
+    @GetMapping(value="/getInfo", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public StoreInfoDTO getStoreInfo(ModelAndView mv, @ModelAttribute StoreInfoDTO storeInfoDTO){
 
@@ -253,9 +254,100 @@ private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop
     }
 
     // 리뷰 등록하기
+//    @PostMapping(value="/5/review", consumes = "multipart/form-data")
+//    @ResponseBody
+//    public void createReview(@RequestParam("params") String params, @RequestPart("reviewImage") MultipartFile singleFile) {
+//
+//        System.out.println("리뷰 등록하러 왔다.");
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        Map<String, String> paramMap;
+//        ReviewContentDTO reviewContentDTO = new ReviewContentDTO();
+//
+//        try {
+//            paramMap = objectMapper.readValue(params, Map.class);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        paramMap.forEach((key, value) -> {
+//            switch (key) {
+//                case "reviewDate":
+//                    reviewContentDTO.setReviewDate(value);
+//                    break;
+//                case "reviewContent":
+//                    reviewContentDTO.setReviewContent(value);
+//                    break;
+//                case "reviewScope":
+//                    reviewContentDTO.setReviewScope(Integer.parseInt(value));
+//                    break;
+//                case "storeNo":
+//                    reviewContentDTO.setStoreNo(Long.parseLong(value));
+//                    break;
+//                case "userNo":
+//                    reviewContentDTO.setUserNo(Long.parseLong(value));
+//                    break;
+//                case "resNo":
+//                    reviewContentDTO.setResNo(Long.parseLong(value));
+//                    break;
+//            }
+//        });
+//
+//        // 파일명 커스텀하기 ex)REVIEW2401022
+//        Date nowDate = new Date();
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String today = simpleDateFormat.format(nowDate);
+//
+//        long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
+//
+//        // reviewImage 필드 값 설정
+//        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyMMdd");
+////        System.out.println("simpleDateFormat2 = " + simpleDateFormat2);
+//
+//        String reviewDate = simpleDateFormat2.format(nowDate).toString();
+////        System.out.println("reviewDate = " + reviewDate);
+//
+//        String reviewImageValue = "REVIEW" + reviewDate;
+////        System.out.println("reviewImageValue = " + reviewImageValue);
+//
+//        reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
+////        System.out.println("reviewContentDTO : " + reviewContentDTO);
+//
+//        storeService.createReview(reviewContentDTO);
+//
+//        // 파일 업로드하기
+//        String filePath = SHARED_FOLDER;
+//        File dir = new File(filePath);
+//        if(!dir.exists()){
+//            dir.mkdirs();
+//        }
+//
+//        // 파일명을 reviewContentDTO.getReviewImage()와 같은 값으로 저장
+//        String originFileName = singleFile.getOriginalFilename();
+//        String ext = originFileName.substring(originFileName.lastIndexOf('.'));
+//        String savedName = reviewContentDTO.getReviewImage() + ext;
+//        String fullPath = filePath + "/" + savedName;
+////        System.out.println("리뷰 이미지 file 경로 : " + fullPath);
+//
+//        try {
+//            //파일 저장
+//            singleFile.transferTo(new File(fullPath));
+////            System.out.println("파일 저장 완료");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
+//
+//        // 리뷰 달기 완성 후 유저 활동 +1 늘리기
+//        storeService.increaseReview(reviewContentDTO.getUserNo());
+//
+//
+//    }
+
     @PostMapping(value="/5/review", consumes = "multipart/form-data")
     @ResponseBody
-    public void createReview(@RequestParam("params") String params, @RequestPart("reviewImage") MultipartFile singleFile) {
+    public void createReview(@RequestParam("params") String params, @RequestPart(value = "reviewImage", required = false) MultipartFile singleFile) {
 
         System.out.println("리뷰 등록하러 왔다.");
 
@@ -293,56 +385,55 @@ private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop
             }
         });
 
-        // 파일명 커스텀하기 ex)REVIEW2401022
-        Date nowDate = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String today = simpleDateFormat.format(nowDate);
 
-        long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
+        // 파일 업로드가 있을 때만 파일명 커스텀 및 업로드 처리
+        if (singleFile != null && !singleFile.isEmpty()) {
+            // 파일명 커스텀하기 ex)REVIEW2401022
+            Date nowDate = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String today = simpleDateFormat.format(nowDate);
 
-        // reviewImage 필드 값 설정
-        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyMMdd");
-//        System.out.println("simpleDateFormat2 = " + simpleDateFormat2);
+            long reviewImageCount = Long.parseLong(storeService.getReviewCount(today)) + 1;
 
-        String reviewDate = simpleDateFormat2.format(nowDate).toString();
-//        System.out.println("reviewDate = " + reviewDate);
+            // reviewImage 필드 값 설정
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyMMdd");
 
-        String reviewImageValue = "REVIEW" + reviewDate;
-//        System.out.println("reviewImageValue = " + reviewImageValue);
+            String reviewDate = simpleDateFormat2.format(nowDate).toString();
 
-        reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
-//        System.out.println("reviewContentDTO : " + reviewContentDTO);
+            String reviewImageValue = "REVIEW" + reviewDate;
+
+            reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
+
+            String filePath = SHARED_FOLDER;
+            File dir = new File(filePath);
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            // 파일명을 reviewContentDTO.getReviewImage()와 같은 값으로 저장
+            String originFileName = singleFile.getOriginalFilename();
+            String ext = originFileName.substring(originFileName.lastIndexOf('.'));
+            String savedName = reviewContentDTO.getReviewImage() + ext;
+            String fullPath = filePath + "/" + savedName;
+
+            try {
+                // 파일 저장
+                singleFile.transferTo(new File(fullPath));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        } else {
+            // 이미지가 없을 경우 기본 값을 설정
+            reviewContentDTO.setReviewImage("DEFAULT_REVIEW_IMG");
+        }
 
         storeService.createReview(reviewContentDTO);
 
-        // 파일 업로드하기
-        String filePath = SHARED_FOLDER;
-        File dir = new File(filePath);
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-
-        // 파일명을 reviewContentDTO.getReviewImage()와 같은 값으로 저장
-        String originFileName = singleFile.getOriginalFilename();
-        String ext = originFileName.substring(originFileName.lastIndexOf('.'));
-        String savedName = reviewContentDTO.getReviewImage() + ext;
-        String fullPath = filePath + "/" + savedName;
-//        System.out.println("리뷰 이미지 file 경로 : " + fullPath);
-
-        try {
-            //파일 저장
-            singleFile.transferTo(new File(fullPath));
-//            System.out.println("파일 저장 완료");
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
         // 리뷰 달기 완성 후 유저 활동 +1 늘리기
         storeService.increaseReview(reviewContentDTO.getUserNo());
-
-
     }
+
 
 
     // 리뷰 작성하기 버튼 활성화를 위한 리뷰 작성 권환 확인용 -> 예약 tbl에서 해당 아이디, 가게번호 넘겨서 확인하기
