@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
 
     public StoreController(StoreService storeService){
@@ -342,6 +342,13 @@ public class StoreController {
 
         // 리뷰 달기 완성 후 유저 활동 +1 늘리기
         storeService.increaseReview(reviewContentDTO.getUserNo());
+    }
+
+    // 리뷰 삭제하기
+    @DeleteMapping(value = "/{storeNo}/deletereview")
+    public void deleteReview(@PathVariable("storeNo") long storeNo, @RequestParam("reviewNo") long reviewNo){
+
+        storeService.deleteReview(reviewNo);
     }
 
     // 리뷰 작성하기 버튼 활성화를 위한 리뷰 작성 권환 확인용 -> 예약 tbl에서 해당 아이디, 가게번호 넘겨서 확인하기

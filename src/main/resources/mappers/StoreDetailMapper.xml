@@ -228,6 +228,11 @@
         )
     </insert>
 
+    <delete id="deleteReview" parameterType="long">
+        DELETE FROM TBL_REVIEW
+         WHERE REVIEW_NO = #{ reviewNo }
+    </delete>
+
     <!-- 리뷰 작성 권한을 위한 예약 내역 조회 -->
     <select id="getUserReviewList" parameterType="map" resultMap="reservationInfoDTOResultMap">
         SELECT

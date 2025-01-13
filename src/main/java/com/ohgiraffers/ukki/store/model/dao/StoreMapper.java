@@ -24,6 +24,8 @@ public interface StoreMapper {
 
     void createReview(ReviewContentDTO reviewContentDTO);
 
+    void deleteReview(long reviewNo);
+
     List<StoreInfoDTO> getStoresLocation(@Param("category") int category);
 
     ReviewDTO getReviewListByScope(long storeNo);
@@ -37,11 +39,13 @@ public interface StoreMapper {
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
 
+
     List<StoreInfoDTO> searchStores(@Param("storeName") String storeName);
 
     List<SearchDTO> getPopularSearches();  // 반환 타입을 SearchDTO 리스트로 수정
 
     void insertOrUpdateSearch(@Param("storeName") String storeName);
+
 
 }
 
