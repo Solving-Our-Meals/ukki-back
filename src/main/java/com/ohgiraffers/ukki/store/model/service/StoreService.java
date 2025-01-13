@@ -2,8 +2,10 @@ package com.ohgiraffers.ukki.store.model.service;
 
 import com.ohgiraffers.ukki.store.model.dao.StoreMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
+import com.ohgiraffers.ukki.user.model.dto.SearchDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -76,5 +78,34 @@ public class StoreService {
     public List<StoreInfoDTO> searchStores(String storeName) {
         return storeMapper.searchStores(storeName);  // StoreMapper의 searchStores 호출
     }
+
+
+    public List<String> getPopularSearches() {
+        // DB에서 데이터를 조회하는 메서드 호출
+        List<SearchDTO> searchDTOList = storeMapper.getPopularSearches();
+        List<String> popularSearches = new ArrayList<>();
+        System.out.println("Retrieved SearchDTO List: " + searchDTOList);
+
+        // SearchDTO에서 searchWord만 추출하여 리스트에 추가
+        for (SearchDTO searchDTO : searchDTOList) {
+            if (searchDTO != null && searchDTO.getSearchWord() != null) {
+                popularSearches.add(searchDTO.getSearchWord());
+            } else {
+                System.out.println("Skipping null or invalid searchWord in SearchDTO");
+            }
+        }
+
+        System.out.println("Popular Searches: " + popularSearches);
+        return popularSearches;
+    }
+
+
+
+
+    public void insertOrUpdateSearch(String keyword) {
+        storeMapper.insertOrUpdateSearch(keyword);
+    }
+
+
 
 }

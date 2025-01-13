@@ -18,6 +18,4 @@
         WHERE STORE_CATEGORY_NO = #{category}
     </select>
 
-
-
 </mapper>
