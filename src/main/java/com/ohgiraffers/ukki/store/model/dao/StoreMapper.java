@@ -36,5 +36,5 @@ public interface StoreMapper {
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
     List<StoreInfoDTO> searchStores(String storeName);
-
 }
+
