@@ -107,5 +107,4 @@
         i.INQ_NO DESC;
     </select>
 
-
 </mapper>
