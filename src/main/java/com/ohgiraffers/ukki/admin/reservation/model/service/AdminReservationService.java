@@ -5,6 +5,7 @@ import com.ohgiraffers.ukki.admin.reservation.model.dto.MonthlyNoShowDTO;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationListDTO;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserResDTO;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationInfoDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class AdminReservationService {
     }
 
     public List<ReservationListDTO> searchRes(String category, String word) {
+        System.out.println("today"+category);
+        System.out.println(word);
         return adminReservationMapper.searchRes(category, word);
     }
 
@@ -46,6 +49,24 @@ public class AdminReservationService {
     }
 
     public List<ReservationListDTO> searchEndRes(String category, String word) {
+        System.out.println("end"+category);
+        System.out.println(word);
         return adminReservationMapper.searchEndRes(category, word);
+    }
+
+    public ReservationInfoDTO todayResInfo(int resNo) {
+        return adminReservationMapper.todayResInfo(resNo);
+    }
+
+    public ReservationInfoDTO endResInfo(int resNo) {
+        return adminReservationMapper.endResInfo(resNo);
+    }
+
+    public void deleteTodayRes(int resNo) {
+        adminReservationMapper.deleteTodayRes(resNo);
+    }
+
+    public void deleteEndRes(int resNo) {
+        adminReservationMapper.deleteEndRes(resNo);
     }
 }

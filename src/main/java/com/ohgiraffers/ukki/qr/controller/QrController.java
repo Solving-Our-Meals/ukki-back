@@ -90,7 +90,6 @@ public class QrController {
 //
 //    }
 
-    @GetMapping("/qr")
     public String qrCertificate(String resDate, String resTime, String email) throws WriterException {
 
 //        qrCertificate -> qrName을 만들고 reservation에 저장할 수 있도록
