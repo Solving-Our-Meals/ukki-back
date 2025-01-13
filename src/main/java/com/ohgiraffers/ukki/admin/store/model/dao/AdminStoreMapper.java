@@ -29,4 +29,10 @@ public interface AdminStoreMapper {
     void editStore(AdminStoreInfoDTO storeData);
 
     int deleteStoreInfo(int storeNo);
+
+    void deleteStoreBanner(int storeNo);
+
+    void deleteStoreOperation(int storeNo);
+
+    void editBanner(BannerDTO bannerDTO);
 }

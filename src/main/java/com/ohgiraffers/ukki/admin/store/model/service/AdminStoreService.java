@@ -64,4 +64,16 @@ public class AdminStoreService {
 
         return adminStoreMapper.deleteStoreInfo(storeNo);
     }
+
+    public void deleteStoreBanner(int storeNo) {
+        adminStoreMapper.deleteStoreBanner(storeNo);
+    }
+
+    public void deleteStoreOperation(int storeNo) {
+        adminStoreMapper.deleteStoreOperation(storeNo);
+    }
+
+    public void editBanner(BannerDTO bannerDTO) {
+        adminStoreMapper.editBanner(bannerDTO);
+    }
 }
