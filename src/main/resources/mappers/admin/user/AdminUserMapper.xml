@@ -80,4 +80,8 @@
         DELETE FROM TBL_USER
         WHERE USER_NO = #{userNo}
     </delete>
+
+    <select id="totalUser">
+        SELECT COUNT(*) FROM TBL_USER WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
+    </select>
 </mapper>

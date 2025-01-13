@@ -20,6 +20,16 @@
         <result property="monthlyNoShow" column="NOSHOW"/>
     </resultMap>
 
+    <resultMap id="resList" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationListDTO">
+        <result property="resNo" column="RES_NO"/>
+        <result property="resDate" column="RES_DATE"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="resTime" column="RES_TIME"/>
+        <result property="qrConfirm" column="QR_CONFIRM"/>
+        <result property="isToday" column="isToday"/>
+    </resultMap>
+
     <resultMap id="userActRes" type="com.ohgiraffers.ukki.admin.user.model.dto.AdminUserResDTO">
         <id property="userNo" column="USER_NO"/>
         <result property="totalRes" column="TOTAL_RES"/>
@@ -57,6 +67,92 @@
         sum(case when QR_CONFIRM = 0 then 1 else 0 end) AS 'NOSHOW'
         from tbl_end_res
         where date_format(res_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m');
+    </select>
+
+    <select id="searchRes" resultMap="resList">
+        SELECT
+        a.RES_NO,
+        a.RES_DATE,
+        b.USER_ID,
+        c.STORE_NAME,
+        a.RES_TIME,
+        a.QR_CONFIRM,
+        'Y' AS isToday
+        FROM TBL_RESERVATION a
+        LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
+        LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
+        <where>
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "USER_ID"'>
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <when test='category == "STORE_NAME"'>
+                        c.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+            <choose>
+                <when test="word.matches('^\\d{4}-\\d{2}-\\d{2}$')">
+                    a.RES_DATE = #{word}
+                </when>
+                <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
+                    a.RES_DATE LIKE CONCAT (#{word}, '%')
+                </when>
+                <otherwise>
+                    CONCAT(a.RES_NO, ' ', a.RES_DATE, ' ', b.USER_ID, ' ', c.STORE_NAME, ' ', a.RES_TIME, ' ', a.QR_CONFIRM)
+                    LIKE CONCAT('%', #{word}, '%')
+                </otherwise>
+            </choose>
+            </if>
+        </where>
+        ORDER BY a.RES_NO DESC;
+    </select>
+
+
+    <select id="searchEndRes" resultMap="resList">
+        SELECT
+        a.RES_NO,
+        a.RES_DATE,
+        b.USER_ID,
+        c.STORE_NAME,
+        a.RES_TIME,
+        a.QR_CONFIRM,
+        'N' AS isToday
+        FROM TBL_RESERVATION a
+        LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
+        LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
+        <where>
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "USER_ID"'>
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <when test='category == "STORE_NAME"'>
+                        c.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                CONCAT(a.RES_DATE, ' ', b.USER_ID, ' ', c.STORE_NAME, ' ', a.RES_TIME, ' ', a.QR_CONFIRM) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+        ORDER BY a.RES_NO DESC;
+    </select>
+
+    <select id="totalTodayReservation">
+        SELECT COUNT(*) FROM TBL_RESERVATION
+    </select>
+
+    <select id="totalEndReservation">
+        SELECT COUNT(*) FROM TBL_END_RES
     </select>
 
     <select id="userResList" resultMap="userActRes">

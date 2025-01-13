@@ -131,4 +131,14 @@ public class AdminUserController {
             responseMap.put("success", false);
         } return ResponseEntity.ok(responseMap);
     }
+
+    @GetMapping("total")
+    public ResponseEntity<?> totalUser(){
+        int totalUser = adminUserService.totalUser();
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("totalUser", totalUser);
+
+        return ResponseEntity.ok(responseMap);
+    }
 }
