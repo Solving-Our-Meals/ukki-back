@@ -369,5 +369,14 @@ private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/{storeNo}")
+    public String viewStorePage(@PathVariable("storeNo") int storeNo) {
+        // storeNo에 해당하는 가게 정보 조회
+
+        // 해당 가게의 예약 페이지를 보여주는 뷰 반환
+        return "storePage";
+    }
+
 }
 
