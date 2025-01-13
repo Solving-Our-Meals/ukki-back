@@ -102,6 +102,7 @@ public class AdminStoreService {
     }
 
     public int searchCurrentStoreUser(String userId) {
+        System.out.println(userId);
         return adminStoreMapper.searchCurrentStoreUser(userId);
     }
 }

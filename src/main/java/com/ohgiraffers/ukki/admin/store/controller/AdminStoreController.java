@@ -321,6 +321,17 @@ public class AdminStoreController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("cancel/user")
+    public ResponseEntity<?> cancelUserSession(HttpSession session) {
+        session.removeAttribute("userId");
+        session.removeAttribute("userPassword");
+        session.removeAttribute("userName");
+        session.removeAttribute("email");
+        Map<String, Object> response = new HashMap<>();
+        response.put("userDTO", new AdminStoreUserDTO());
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("regist/store")
     @Transactional
     public ResponseEntity<?> registStore(
@@ -344,8 +355,7 @@ public class AdminStoreController {
             System.out.println(banner4);
             System.out.println(banner5);
 
-//            int storeNo = adminStoreService.lastStoreNo()+1;
-            int storeNo = 3505;
+            int storeNo = adminStoreService.lastStoreNo()+1;
             // JSON 문자열을 객체로 변환
             ObjectMapper mapper = new ObjectMapper();
             AdminStoreInfoDTO storeData = new AdminStoreInfoDTO();
@@ -445,15 +455,15 @@ public class AdminStoreController {
 
             adminStoreService.insertStoreUser(userData);
             int userNo = adminStoreService.searchCurrentStoreUser(userData.getUserId());
-            storeData.setStoreNo(userNo);
+            storeData.setStoreNo(storeNo);
+            storeData.setUserNo(userNo);
             adminStoreService.insertStore(storeData);
 
 
             return ResponseEntity.ok().body("가게 정보가 성공적으로 등록되었습니다.");
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage());
+            throw new RuntimeException("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
 
     }
