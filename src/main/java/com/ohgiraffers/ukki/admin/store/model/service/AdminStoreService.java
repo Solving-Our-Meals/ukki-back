@@ -105,4 +105,8 @@ public class AdminStoreService {
         System.out.println(userId);
         return adminStoreMapper.searchCurrentStoreUser(userId);
     }
+
+    public void deleteStoreKeyword(int storeNo) {
+        adminStoreMapper.deleteStoreKeyword(storeNo);
+    }
 }

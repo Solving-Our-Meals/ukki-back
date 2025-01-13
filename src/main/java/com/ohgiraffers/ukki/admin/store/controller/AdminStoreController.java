@@ -128,6 +128,7 @@ public class AdminStoreController {
             if(result > 0){
                 message = "삭제에 성공했습니다.";
                 adminStoreService.deleteStoreBanner(storeNo);
+                adminStoreService.deleteStoreKeyword(storeNo);
                 adminStoreService.deleteStoreOperation(storeNo);
             }else{
                 message = "삭제에 실패했습니다.";
