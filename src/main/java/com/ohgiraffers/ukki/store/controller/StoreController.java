@@ -402,6 +402,4 @@ public class StoreController {
         return "storePage";
     }
 
-
 }
-
