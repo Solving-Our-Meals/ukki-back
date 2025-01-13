@@ -44,6 +44,10 @@ public class StoreService {
         storeMapper.createReview(reviewContentDTO);
     }
 
+    public void deleteReview(long reviewNo) {
+        storeMapper.deleteReview(reviewNo);
+    }
+
     public List<StoreInfoDTO> getStoresLocation(int category) {
         return storeMapper.getStoresLocation(category);
     }
@@ -72,4 +76,5 @@ public class StoreService {
     public List<StoreInfoDTO> searchStores(String storeName) {
         return storeMapper.searchStores(storeName);  // StoreMapper의 searchStores 호출
     }
+
 }
