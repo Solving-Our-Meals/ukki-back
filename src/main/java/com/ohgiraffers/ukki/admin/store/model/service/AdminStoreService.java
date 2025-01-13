@@ -64,4 +64,49 @@ public class AdminStoreService {
 
         return adminStoreMapper.deleteStoreInfo(storeNo);
     }
+
+    public void deleteStoreBanner(int storeNo) {
+        adminStoreMapper.deleteStoreBanner(storeNo);
+    }
+
+    public void deleteStoreOperation(int storeNo) {
+        adminStoreMapper.deleteStoreOperation(storeNo);
+    }
+
+    public void editBanner(BannerDTO bannerDTO) {
+        adminStoreMapper.editBanner(bannerDTO);
+    }
+
+    public int lastStoreNo() {
+        return adminStoreMapper.lastStoreNo();
+    }
+
+    public int insertOperationTime(OperationDTO operationDTO) {
+        return adminStoreMapper.insertOperationTime(operationDTO);
+    }
+
+    public int insertKeyword(KeywordDTO keywordDTO) {
+        return adminStoreMapper.insertKeyword(keywordDTO);
+    }
+
+    public int insertBanner(BannerDTO bannerDTO) {
+        return adminStoreMapper.insertBanner(bannerDTO);
+    }
+
+    public void insertStoreUser(AdminStoreUserDTO userData) {
+        adminStoreMapper.insertStoreUser(userData);
+    }
+
+    public void insertStore(AdminStoreInfoDTO storeData) {
+        adminStoreMapper.insertStore(storeData);
+    }
+
+    public int searchCurrentStoreUser(String userId) {
+        System.out.println(userId);
+        return adminStoreMapper.searchCurrentStoreUser(userId);
+    }
+
+    public void deleteStoreKeyword(int storeNo) {
+        adminStoreMapper.deleteStoreKeyword(storeNo);
+    }
 }

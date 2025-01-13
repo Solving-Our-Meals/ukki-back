@@ -27,4 +27,6 @@ public interface AdminUserMapper {
     int updateUserName(Map<String, String> params);
 
     int deleteUserInfo(int userNo);
+
+    int totalUser();
 }

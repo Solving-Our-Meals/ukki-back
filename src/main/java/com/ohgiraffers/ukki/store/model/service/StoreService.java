@@ -67,5 +67,8 @@ public class StoreService {
 
     public List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
         return storeMapper.getResPosNum(storeResPosNumDTO);
+
+    public List<StoreInfoDTO> searchStores(String storeName) {
+        return storeMapper.searchStores(storeName);  // StoreMapper의 searchStores 호출
     }
 }

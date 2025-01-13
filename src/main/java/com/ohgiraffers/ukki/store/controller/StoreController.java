@@ -32,6 +32,7 @@ public class StoreController {
 //    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
+
     public StoreController(StoreService storeService){
         this.storeService = storeService;
     }
@@ -389,6 +390,16 @@ public class StoreController {
 
 
         return ResponseEntity.ok(storeResPosNumDTO);
+    }
+
+
+
+    @GetMapping("/{storeNo}")
+    public String viewStorePage(@PathVariable("storeNo") int storeNo) {
+        // storeNo에 해당하는 가게 정보 조회
+
+        // 해당 가게의 예약 페이지를 보여주는 뷰 반환
+        return "storePage";
     }
 
 
