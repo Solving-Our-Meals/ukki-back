@@ -82,6 +82,33 @@
         WHERE REVIEW_NO = #{reviewNo}
     </delete>
 
+    <select id="findUserInquiryByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        i.INQ_NO AS inquiryNo,
+        i.INQ_TITLE AS title,
+        i.INQ_CONTENT AS text,
+        i.INQ_DATE AS inquiryDate,
+        i.ANS_TITLE AS answerTitle,
+        i.ANS_CONTENT AS answerContent,
+        i.ANS_DATE AS answerDate,
+        i.FILE AS file,
+        i.STATE AS inquiryState,
+        c.CATEGORY_NO AS categoryNo,
+        c.CATEGORY_NAME AS category
+        FROM
+        TBL_INQUIRY i
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = i.USER_NO
+        LEFT JOIN
+        TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
+        WHERE
+        u.USER_ID = #{userId}
+        ORDER BY
+        i.INQ_DATE DESC;
+
+    </select>
 
 
 </mapper>

@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.user.controller;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
+import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
@@ -126,6 +127,29 @@ public class MypageController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 삭제 실패");
         }
+    }
+
+    @GetMapping("/inquiry")
+    public ResponseEntity<List<MypageInquiryDTO>> getUseInquiry(HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        List<MypageInquiryDTO> inquiry = mypageService.getUserInquiryFromToken(jwtToken, userId);
+
+        if (inquiry.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(inquiry);
     }
 
 
