@@ -99,15 +99,12 @@
         c.CATEGORY_NAME AS category
         FROM
         TBL_INQUIRY i
-        LEFT JOIN
-        TBL_USER u ON u.USER_NO = i.USER_NO
-        LEFT JOIN
-        TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
+        LEFT JOIN TBL_USER u ON u.USER_NO = i.USER_NO
+        LEFT JOIN TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
         WHERE
         u.USER_ID = #{userId}
         ORDER BY
-        i.INQ_DATE DESC;
-
+        i.INQ_NO DESC;
     </select>
 
 
