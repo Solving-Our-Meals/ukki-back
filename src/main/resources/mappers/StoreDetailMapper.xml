@@ -84,6 +84,12 @@
         <result property="resPosNum" column="RES_POS_NUMBER"/>
     </resultMap>
 
+    <resultMap id="popularSearchResultMap" type="com.ohgiraffers.ukki.user.model.dto.SearchDTO">
+        <result property="searchWord" column="SEARCH_WORD"/>
+        <result property="searchCount" column="SEARCH_COUNT"/>
+    </resultMap>
+
+
 
     <!--  가게 정보  -->
     <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="long">
@@ -293,5 +299,48 @@
         FROM TBL_STORE
         WHERE STORE_NAME LIKE CONCAT('%', #{storeName}, '%')
     </select>
+
+    <select id="searchStores" resultMap="storeInfoResultMap" parameterType="java.lang.String">
+        SELECT
+        STORE_NO,
+        STORE_NAME,
+        STORE_DES,
+        STORE_ADDRESS,
+        STORE_PROFILE,
+        STORE_CATEGORY_NO,
+        POS_NUMBER
+        FROM TBL_STORE
+        WHERE
+        STORE_NAME LIKE CONCAT('%', #{storeName}, '%')
+        AND (#{storeName} IS NOT NULL AND #{storeName} != '')
+    </select>
+
+
+
+    <insert id="insertOrUpdateSearch" parameterType="String">
+        INSERT INTO
+        TBL_SEARCH
+        (
+        SEARCH_WORD,
+        SEARCH_COUNT
+        )
+        VALUES
+        (
+        #{storeName}, 1
+        )
+        ON DUPLICATE KEY UPDATE SEARCH_COUNT = SEARCH_COUNT + 1;
+    </insert>
+
+
+
+    <select id="getPopularSearches" resultMap="popularSearchResultMap">
+        SELECT
+        SEARCH_WORD,
+        SEARCH_COUNT
+        FROM TBL_SEARCH
+        ORDER BY SEARCH_COUNT DESC
+        LIMIT 10;
+    </select>
+
 
 </mapper>

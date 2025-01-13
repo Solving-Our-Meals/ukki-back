@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
@@ -401,5 +402,49 @@ public class StoreController {
         // 해당 가게의 예약 페이지를 보여주는 뷰 반환
         return "storePage";
     }
+
+
+    @GetMapping("/search")
+    public List<StoreInfoDTO> searchStores(@RequestParam("name") String storeName) {
+        // 검색어가 비어있지 않으면, 검색어를 TBL_SEARCH 테이블에 저장 또는 업데이트
+        if (storeName != null && !storeName.trim().isEmpty()) {
+            storeService.insertOrUpdateSearch(storeName);
+        }
+
+        // 검색어가 비어있을 경우 예외 처리
+        if (storeName == null || storeName.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "검색어를 입력하세요.");
+        }
+
+        return storeService.searchStores(storeName);
+    }
+
+
+
+    @GetMapping("/popular-searches")
+    public List<String> getPopularSearches() {
+        try {
+            return storeService.getPopularSearches();
+        } catch (Exception e) {
+            e.printStackTrace();  // 서버 로그에 예외 출력
+            throw new RuntimeException("인기 검색어를 가져오는 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/insertOrUpdateSearch")
+    public ResponseEntity<String> insertOrUpdateSearch(@RequestBody Map<String, String> searchRequest) {
+        String searchWord = searchRequest.get("storeName");
+
+        if (searchWord != null && !searchWord.trim().isEmpty()) {
+            // 검색어를 DB에 저장하거나 업데이트
+            storeService.insertOrUpdateSearch(searchWord);
+            return ResponseEntity.ok("검색어 기록 성공");
+        } else {
+            return ResponseEntity.badRequest().body("유효하지 않은 검색어입니다.");
+        }
+    }
+
+
+
 
 }

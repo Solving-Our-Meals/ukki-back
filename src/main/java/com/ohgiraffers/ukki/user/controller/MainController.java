@@ -53,9 +53,6 @@ public class MainController {
     }
 
 
-/*    @GetMapping("/api/store/search")
-    public List<StoreInfoDTO> searchStores(@RequestParam("name") String storeName) {
-        return storeService.searchStores(storeName);
-    }*/
+
 }
 

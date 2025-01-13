@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.store.model.dao;
 
 import com.ohgiraffers.ukki.store.model.dto.*;
+import com.ohgiraffers.ukki.user.model.dto.SearchDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -35,6 +36,12 @@ public interface StoreMapper {
 
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
-    List<StoreInfoDTO> searchStores(String storeName);
+
+    List<StoreInfoDTO> searchStores(@Param("storeName") String storeName);
+
+    List<SearchDTO> getPopularSearches();  // 반환 타입을 SearchDTO 리스트로 수정
+
+    void insertOrUpdateSearch(@Param("storeName") String storeName);
+
 }
 
