@@ -36,16 +36,17 @@ public interface StoreMapper {
 
     void increaseReview(long userNo);
 
+    void decreaseReview(long userNo);
+
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
-
+    // 메인
 
     List<StoreInfoDTO> searchStores(@Param("storeName") String storeName);
 
     List<SearchDTO> getPopularSearches();  // 반환 타입을 SearchDTO 리스트로 수정
 
     void insertOrUpdateSearch(@Param("storeName") String storeName);
-
 
 }
 

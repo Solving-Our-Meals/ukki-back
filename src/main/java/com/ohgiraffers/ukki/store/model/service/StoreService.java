@@ -71,9 +71,16 @@ public class StoreService {
         storeMapper.increaseReview(userNo);
     }
 
+    public void decreaseReview(long userNo) {
+        storeMapper.decreaseReview(userNo);
+    }
+
     public List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
         return storeMapper.getResPosNum(storeResPosNumDTO);
     }
+
+
+    // 메인
 
     public List<StoreInfoDTO> searchStores(String storeName) {
         return storeMapper.searchStores(storeName);  // StoreMapper의 searchStores 호출
@@ -99,13 +106,8 @@ public class StoreService {
         return popularSearches;
     }
 
-
-
-
     public void insertOrUpdateSearch(String keyword) {
         storeMapper.insertOrUpdateSearch(keyword);
     }
-
-
 
 }

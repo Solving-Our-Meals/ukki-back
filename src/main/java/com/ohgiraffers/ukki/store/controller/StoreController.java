@@ -31,7 +31,7 @@ public class StoreController {
 
     private final StoreService storeService;
     private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
 
 
     public StoreController(StoreService storeService){
@@ -346,9 +346,16 @@ public class StoreController {
 
     // 리뷰 삭제하기
     @DeleteMapping(value = "/{storeNo}/deletereview")
-    public void deleteReview(@PathVariable("storeNo") long storeNo, @RequestParam("reviewNo") long reviewNo){
+    public void deleteReview(@PathVariable("storeNo") long storeNo, @RequestParam("reviewNo") long reviewNo, @RequestParam("userNo") long userNo){
+        System.out.println("리뷰 삭제 옴");
 
+        // 리뷰 삭제
         storeService.deleteReview(reviewNo);
+
+        System.out.println("리뷰 삭제 userNo : " + userNo);
+
+        // 리뷰 달기 완성 후 유저 활동 +1 늘리기
+        storeService.decreaseReview(userNo);
     }
 
     // 리뷰 작성하기 버튼 활성화를 위한 리뷰 작성 권환 확인용 -> 예약 tbl에서 해당 아이디, 가게번호 넘겨서 확인하기
@@ -395,13 +402,11 @@ public class StoreController {
         storeResPosNumDTO.setListDayResPosNumDTO(listDayResPosNum);
         System.out.println("storeResPosNumDTO = " + storeResPosNumDTO);
 
-
-
         return ResponseEntity.ok(storeResPosNumDTO);
     }
 
 
-
+    // 메인
     @GetMapping("/{storeNo}")
     public String viewStorePage(@PathVariable("storeNo") int storeNo) {
         // storeNo에 해당하는 가게 정보 조회
