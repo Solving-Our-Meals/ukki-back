@@ -23,6 +23,8 @@ public interface StoreMapper {
 
     void createReview(ReviewContentDTO reviewContentDTO);
 
+    void deleteReview(long reviewNo);
+
     List<StoreInfoDTO> getStoresLocation(@Param("category") int category);
 
     ReviewDTO getReviewListByScope(long storeNo);
@@ -36,5 +38,6 @@ public interface StoreMapper {
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
     List<StoreInfoDTO> searchStores(String storeName);
+
 }
 
