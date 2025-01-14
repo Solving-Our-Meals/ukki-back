@@ -107,4 +107,10 @@
         i.INQ_NO DESC;
     </select>
 
+    <update id="updateInquiryStatus" parameterType="map">
+        UPDATE TBL_INQUIRY
+        SET STATE = #{inquiryState}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
 </mapper>

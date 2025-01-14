@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.user.controller;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/user/mypage")
 public class MypageController {
 
     private final JwtService jwtService;
@@ -151,6 +152,44 @@ public class MypageController {
 
         return ResponseEntity.ok(inquiry);
     }
+
+    @PutMapping("/inquiry/{inquiryNo}/status")
+    public ResponseEntity<String> updateInquiryStatusToRead(@PathVariable int inquiryNo, HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
+
+        MypageInquiryDTO inquiry = inquiries.stream()
+                .filter(i -> i.getInquiryNo() == inquiryNo)
+                .findFirst()
+                .orElse(null);
+
+
+        if (inquiry == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 문의를 찾을 수 없습니다.");
+        }
+
+        if (inquiry.getAnswerDate() != null && inquiry.getInquiryState() != InquiryState.CHECK) {
+            boolean updated = mypageService.updateInquiryStatus(inquiryNo, InquiryState.CHECK);
+            if (updated) {
+                return ResponseEntity.ok("문의 상태가 '읽음'으로 업데이트되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상태 업데이트에 실패했습니다.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("답변이 없습니다.");
+        }
+    }
+
+
 
 
 }

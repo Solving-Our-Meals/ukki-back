@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.user.model.dao;
 
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
@@ -19,4 +20,6 @@ public interface MypageMapper {
     int deleteReviewById(int reviewNo);
 
     List<MypageInquiryDTO> findUserInquiryByUserId(String userId);
+
+    int updateInquiryStatus(int inquiryNo, InquiryState inquiryState);
 }

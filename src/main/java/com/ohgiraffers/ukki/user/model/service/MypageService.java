@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.user.model.service;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
@@ -115,4 +116,11 @@ public class MypageService {
 
         return inquiry;
     }
+
+    public boolean updateInquiryStatus(int inquiryNo, InquiryState inquiryState) {
+        int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
+
+        return result > 0;
+    }
+
 }
