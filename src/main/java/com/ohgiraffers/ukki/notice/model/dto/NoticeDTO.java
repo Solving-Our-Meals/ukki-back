@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.notice.model.dto;
 
-public class UserNoticeDTO {
+public class NoticeDTO {
 
     private long noticeNo;
     private String noticeTitle;
@@ -8,9 +8,9 @@ public class UserNoticeDTO {
     private String date;
     private long categoryNo;
 
-    public UserNoticeDTO(){}
+    public NoticeDTO(){}
 
-    public UserNoticeDTO(long noticeNo, String noticeTitle, String noticeContent, String date, long categoryNo) {
+    public NoticeDTO(long noticeNo, String noticeTitle, String noticeContent, String date, long categoryNo) {
         this.noticeNo = noticeNo;
         this.noticeTitle = noticeTitle;
         this.noticeContent = noticeContent;
@@ -60,7 +60,7 @@ public class UserNoticeDTO {
 
     @Override
     public String toString() {
-        return "UserNoticeDTO{" +
+        return "NoticeDTO{" +
                 "noticeNo=" + noticeNo +
                 ", noticeTitle='" + noticeTitle + '\'' +
                 ", noticeContent='" + noticeContent + '\'' +

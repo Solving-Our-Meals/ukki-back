@@ -4,7 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.notice.model.dao.NoticeMapper">
 
-    <resultMap id="userNoticeResultMap" type="com.ohgiraffers.ukki.notice.model.dto.UserNoticeDTO">
+    <resultMap id="getNoticeResultMap" type="com.ohgiraffers.ukki.notice.model.dto.NoticeDTO">
         <id property="noticeNo" column="NOTICE_NO"/>
         <result property="noticeTitle" column="NOTICE_TITLE"/>
         <result property="noticeContent" column="NOTICE_CONTENT"/>
@@ -13,12 +13,18 @@
     </resultMap>
 
     <!-- 유저 공지사항 전체 조회 -->
-    <select id="getUserNoticeList" resultMap="userNoticeResultMap">
+    <select id="getUserNoticeList" resultMap="getNoticeResultMap">
         SELECT
                *
           FROM TBL_NOTICE
          WHERE CATEGORY_NO = 1
             OR CATEGORY_NO = 2
+    </select>
+
+    <select id="getBossNoticeList" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE;
     </select>
 
 </mapper>
