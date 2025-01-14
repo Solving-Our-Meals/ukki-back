@@ -272,6 +272,9 @@ public class StoreController {
             return;
         }
 
+        System.out.println("리뷰 정보들 : " + paramMap);
+        System.out.println("리뷰 사진" + singleFile);
+
         paramMap.forEach((key, value) -> {
             switch (key) {
                 case "reviewDate":
