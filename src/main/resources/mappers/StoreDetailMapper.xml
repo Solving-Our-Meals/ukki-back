@@ -271,6 +271,13 @@
          WHERE USER_NO = #{ userNo }
     </update>
 
+    <!-- 리뷰 삭제 완료 시 유저 활동 - 1 -->
+    <update id="decreaseReview" parameterType="long">
+        UPDATE TBL_USER_ACT_INFO
+           SET REVIEW_COUNT = REVIEW_COUNT - 1
+         WHERE USER_NO = #{ userNo }
+    </update>
+
 
     <!-- 요일별, 시간별 예약 가능 인원 조회 -->
     <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultMap="resPosNumByDay">
@@ -291,6 +298,8 @@
            AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{date}
          WHERE A.STORE_NO = #{storeNo};
     </select>
+
+    <!-- 메인 -->
 
     <select id="getSearchInfo" resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
         SELECT
