@@ -53,23 +53,6 @@ public class MypageController {
         return mypageService.getUserInfoFromToken(jwtToken, userId);
     }*/
 
-//    httpOnly를 사용하면서 이 방식으로 전부 백엔드에서 사용합니다.
-    @GetMapping("/info")
-    public MypageDTO getUserInfo(HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request);
-
-        if (jwtToken == null) {
-            throw new IllegalArgumentException("토큰이 일치하지 않음");
-        }
-
-        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
-
-        if (userId == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-
-        return mypageService.getUserInfoFromToken(jwtToken, userId);
-    }
 
     @GetMapping("/reservation")
     public ResponseEntity<List<MypageReservationDTO>> getUserReservation(HttpServletRequest request) {
