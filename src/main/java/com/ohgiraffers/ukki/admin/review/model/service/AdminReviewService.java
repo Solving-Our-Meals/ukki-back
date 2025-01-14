@@ -39,4 +39,9 @@ public class AdminReviewService {
     public ReviewInfoDTO searchReviewInfo(String reviewNo) {
         return adminReviewMapper.searchReviewInfo(reviewNo);
     }
+
+    public int deleteReview(int reviewNo) {
+        return adminReviewMapper.deleteReview(reviewNo);
+
+    }
 }

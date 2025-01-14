@@ -17,4 +17,6 @@ public interface AdminReviewMapper {
     List<ReviewListDTO> searchReview(Map<String, String> params);
 
     ReviewInfoDTO searchReviewInfo(String reviewNo);
+
+    int deleteReview(int reviewNo);
 }

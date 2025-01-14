@@ -128,6 +128,17 @@ public class AdminStoreController {
             if(result > 0){
                 message = "삭제에 성공했습니다.";
                 adminStoreService.deleteStoreBanner(storeNo);
+                for (int i = 1; i <= 5; i++) {
+                    String fileToDelete = storeNo + "banner" + i + ".png";
+                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
+                    Files.deleteIfExists(filePath);
+                }
+                String fileToDeleteProfile = storeNo + "profile" + ".png";
+                Path filePathProfile = Paths.get(SHARED_FOLDER, fileToDeleteProfile);
+                Files.deleteIfExists(filePathProfile);
+                String fileToDeleteMenu = storeNo + "menu" + ".png";
+                Path filePathMenu = Paths.get(SHARED_FOLDER, fileToDeleteMenu);
+                Files.deleteIfExists(filePathMenu);
                 adminStoreService.deleteStoreKeyword(storeNo);
                 adminStoreService.deleteStoreOperation(storeNo);
             }else{

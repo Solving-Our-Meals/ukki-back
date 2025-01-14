@@ -112,4 +112,8 @@
         TBL_USER c ON a.USER_NO = c.USER_NO
         WHERE REVIEW_NO = #{reviewNo}
     </select>
+
+    <delete id="deleteReview">
+        DELETE FROM TBL_REVIEW WHERE REVIEW_NO = #{reviewNo}
+    </delete>
 </mapper>
