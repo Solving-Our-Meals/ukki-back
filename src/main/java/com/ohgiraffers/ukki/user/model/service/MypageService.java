@@ -119,7 +119,6 @@ public class MypageService {
 
     public boolean updateInquiryStatus(int inquiryNo, InquiryState inquiryState) {
         int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
-
         return result > 0;
     }
 
@@ -127,7 +126,6 @@ public class MypageService {
         try {
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
 
-            // 업데이트된 행이 있으면 true 반환
             return updatedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();
