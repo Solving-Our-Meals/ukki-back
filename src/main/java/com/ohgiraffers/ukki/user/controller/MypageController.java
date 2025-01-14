@@ -138,7 +138,9 @@ public class MypageController {
     }
 
     @PutMapping("/inquiry/{inquiryNo}/status")
-    public ResponseEntity<String> updateInquiryStatusToRead(@PathVariable int inquiryNo, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> updateInquiryStatusToRead(
+            @PathVariable int inquiryNo, HttpServletRequest request) {
+
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             throw new IllegalArgumentException("토큰이 일치하지 않음");
@@ -156,20 +158,26 @@ public class MypageController {
                 .findFirst()
                 .orElse(null);
 
-
         if (inquiry == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 문의를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
+        }
+
+        if (inquiry.getInquiryState() == InquiryState.CHECK) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "이미 문의는 '읽음' 상태입니다."));
         }
 
         if (inquiry.getAnswerDate() != null && inquiry.getInquiryState() != InquiryState.CHECK) {
             boolean updated = mypageService.updateInquiryStatus(inquiryNo, InquiryState.CHECK);
             if (updated) {
-                return ResponseEntity.ok("문의 상태가 '읽음'으로 업데이트되었습니다.");
+                return ResponseEntity.ok(Collections.singletonMap("message", "문의 상태가 '읽음'으로 업데이트되었습니다."));
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상태 업데이트에 실패했습니다.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("message", "상태 업데이트에 실패했습니다."));
             }
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("답변이 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", "답변이 없습니다."));
         }
     }
 
