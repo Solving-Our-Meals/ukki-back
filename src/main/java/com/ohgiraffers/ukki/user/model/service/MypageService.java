@@ -123,4 +123,15 @@ public class MypageService {
         return result > 0;
     }
 
+    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate) {
+        try {
+            int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
+
+            // 업데이트된 행이 있으면 true 반환
+            return updatedRows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

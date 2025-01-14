@@ -22,4 +22,6 @@ public interface MypageMapper {
     List<MypageInquiryDTO> findUserInquiryByUserId(String userId);
 
     int updateInquiryStatus(int inquiryNo, InquiryState inquiryState);
+
+    int updateInquiry(MypageInquiryDTO inquiryToUpdate);
 }

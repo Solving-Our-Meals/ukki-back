@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -172,7 +173,46 @@ public class MypageController {
         }
     }
 
+    @PutMapping("/inquiry/{inquiryNo}")
+    public ResponseEntity<Map<String, String>> updateInquiry(
+            @PathVariable int inquiryNo,
+            @RequestBody MypageInquiryDTO updatedInquiry,
+            HttpServletRequest request) {
 
+        String jwtToken = cookieService.getJWTCookie(request);
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
+
+        MypageInquiryDTO inquiryToUpdate = inquiries.stream()
+                .filter(i -> i.getInquiryNo() == inquiryNo)
+                .findFirst()
+                .orElse(null);
+
+        if (inquiryToUpdate == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
+        }
+
+        inquiryToUpdate.setTitle(updatedInquiry.getTitle());
+        inquiryToUpdate.setText(updatedInquiry.getText());
+
+        boolean updated = mypageService.updateInquiry(inquiryToUpdate);
+
+        if (updated) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
+        }
+    }
 
 
 }
