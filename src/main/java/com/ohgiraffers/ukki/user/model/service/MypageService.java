@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.user.model.service;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
+import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
@@ -114,5 +115,23 @@ public class MypageService {
         }
 
         return inquiry;
+    }
+
+    public boolean updateInquiryStatus(int inquiryNo, InquiryState inquiryState) {
+        int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
+
+        return result > 0;
+    }
+
+    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate) {
+        try {
+            int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
+
+            // 업데이트된 행이 있으면 true 반환
+            return updatedRows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
