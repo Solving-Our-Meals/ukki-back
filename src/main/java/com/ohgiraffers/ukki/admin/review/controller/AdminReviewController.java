@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.admin.review.controller;
 
+import com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO;
 import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,6 @@ public class AdminReviewController {
     @GetMapping("list")
     public ResponseEntity<?> searchReview(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
         try {
-            System.out.println(category);
-            System.out.println(word);
             List<ReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
             System.out.println(reviewList);
 
@@ -56,6 +55,22 @@ public class AdminReviewController {
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰리스트를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("info/{reviewNo}")
+    public ResponseEntity<?> searchReviewInfo(@PathVariable String reviewNo){
+        try {
+            ReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
+            System.out.println(reviewInfo);
+
+            return ResponseEntity.ok(reviewInfo);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
