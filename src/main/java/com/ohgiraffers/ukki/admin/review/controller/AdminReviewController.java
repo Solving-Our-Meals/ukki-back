@@ -1,5 +1,7 @@
 package com.ohgiraffers.ukki.admin.review.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO;
 import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +19,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/reviews")
 public class AdminReviewController {
+
+    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
 
     private final AdminReviewService adminReviewService;
 
@@ -44,8 +51,6 @@ public class AdminReviewController {
     @GetMapping("list")
     public ResponseEntity<?> searchReview(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
         try {
-            System.out.println(category);
-            System.out.println(word);
             List<ReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
             System.out.println(reviewList);
 
@@ -59,4 +64,48 @@ public class AdminReviewController {
         }
     }
 
+    @GetMapping("info/{reviewNo}")
+    public ResponseEntity<?> searchReviewInfo(@PathVariable String reviewNo){
+        try {
+            ReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
+            System.out.println(reviewInfo);
+
+            return ResponseEntity.ok(reviewInfo);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @DeleteMapping("info/{reviewNo}")
+    public ResponseEntity<?> deleteReview(@PathVariable int reviewNo, @RequestBody String content){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            System.out.println("삭제왔당");
+            System.out.println(content);
+            String reviewImg = mapper.readTree(content).get("reviewImg").asText()+".png";
+            System.out.println(reviewImg);
+
+            int result = adminReviewService.deleteReview(reviewNo);
+
+            if(result > 0){
+                Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
+                Files.deleteIfExists(filePathProfile);
+            }
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "삭제 성공");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
 }

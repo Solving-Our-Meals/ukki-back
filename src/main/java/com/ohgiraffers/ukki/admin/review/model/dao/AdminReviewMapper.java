@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.admin.review.model.dao;
 
+import com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO;
 import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,4 +15,8 @@ public interface AdminReviewMapper {
     int totalReview();
 
     List<ReviewListDTO> searchReview(Map<String, String> params);
+
+    ReviewInfoDTO searchReviewInfo(String reviewNo);
+
+    int deleteReview(int reviewNo);
 }
