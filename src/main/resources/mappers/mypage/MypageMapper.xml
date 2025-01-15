@@ -116,7 +116,8 @@
     <update id="updateInquiry" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
         UPDATE TBL_INQUIRY
         SET INQ_TITLE = #{title},
-        INQ_CONTENT = #{text}
+        INQ_CONTENT = #{text},
+        FILE = #{file}
         WHERE INQ_NO = #{inquiryNo}
     </update>
 

@@ -18,9 +18,25 @@ public class MypageInquiryDTO {
     private String answerTitle;
     private String answerContent;
     private Date answerDate;
-    private File file;
+    private String file;
 
     public MypageInquiryDTO() {}
+
+    public MypageInquiryDTO(String file, Date answerDate, String answerContent, String answerTitle, Date inquiryDate, String category, int categoryNo, String text, String title, InquiryState inquiryState, int inquiryNo, String userId, int userNo) {
+        this.file = file;
+        this.answerDate = answerDate;
+        this.answerContent = answerContent;
+        this.answerTitle = answerTitle;
+        this.inquiryDate = inquiryDate;
+        this.category = category;
+        this.categoryNo = categoryNo;
+        this.text = text;
+        this.title = title;
+        this.inquiryState = inquiryState;
+        this.inquiryNo = inquiryNo;
+        this.userId = userId;
+        this.userNo = userNo;
+    }
 
     public int getUserNo() {
         return userNo;
@@ -118,11 +134,30 @@ public class MypageInquiryDTO {
         this.answerDate = answerDate;
     }
 
-    public File getFile() {
+    public String getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    public void setFile(String file) {
         this.file = file;
+    }
+
+    @Override
+    public String toString() {
+        return "MypageInquiryDTO{" +
+                "userNo=" + userNo +
+                ", userId='" + userId + '\'' +
+                ", inquiryNo=" + inquiryNo +
+                ", inquiryState=" + inquiryState +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", categoryNo=" + categoryNo +
+                ", category='" + category + '\'' +
+                ", inquiryDate=" + inquiryDate +
+                ", answerTitle='" + answerTitle + '\'' +
+                ", answerContent='" + answerContent + '\'' +
+                ", answerDate=" + answerDate +
+                ", file='" + file + '\'' +
+                '}';
     }
 }
