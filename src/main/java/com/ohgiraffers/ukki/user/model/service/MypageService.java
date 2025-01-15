@@ -8,8 +8,13 @@ import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -141,4 +146,46 @@ public class MypageService {
 
         return result > 0;
     }
+
+    private String getFilePathByFileId(String fileId, String userId) {
+        return "/path/to/files/" + userId + "/" + fileId;
+    }
+
+    public Resource loadFile(String fileId, String userId) {
+        String filePath = getFilePathByFileId(fileId, userId);
+
+        if (filePath == null) {
+            return null;
+        }
+
+        Path path = Paths.get(filePath);
+        Resource resource = new FileSystemResource(path);
+
+        if (!resource.exists()) {
+            return null;
+        }
+        return resource;
+    }
+
+    public void uploadFile(int inquiryNo, MultipartFile file) {
+        // 파일 저장 경로 설정
+        String userDirectory = "/path/to/files/inquiries/" + inquiryNo;
+        Path path = Paths.get(userDirectory);
+        if (!path.toFile().exists()) {
+            path.toFile().mkdirs(); // 디렉토리가 없다면 생성
+        }
+
+        // 파일명 설정
+        String fileName = file.getOriginalFilename();
+        Path filePath = path.resolve(fileName);
+
+        try {
+            file.transferTo(filePath);
+
+            mypageMapper.saveFile(inquiryNo, fileName, filePath.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("파일 업로드 실패", e);
+        }
+    }
+
 }

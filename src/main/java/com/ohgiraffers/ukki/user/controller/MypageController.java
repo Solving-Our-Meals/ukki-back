@@ -11,9 +11,12 @@ import com.ohgiraffers.ukki.user.model.service.MypageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -259,5 +262,39 @@ public class MypageController {
         }
     }
 
+    // 스프링 프레임워크 리소스 사용 !
+    @GetMapping("/file/download/{fileId}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileId, HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        Resource resource = mypageService.loadFile(fileId, userId);
+
+        if (resource == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
+    @PostMapping("/{inquiryNo}/file")
+    public ResponseEntity<String> uploadFile(@PathVariable int inquiryNo, @RequestParam("file") MultipartFile file) {
+        try {
+            mypageService.uploadFile(inquiryNo, file);
+            return ResponseEntity.ok("파일 업로드 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패: " + e.getMessage());
+        }
+    }
 
 }
