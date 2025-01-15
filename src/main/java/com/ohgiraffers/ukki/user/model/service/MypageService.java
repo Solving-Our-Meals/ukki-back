@@ -135,4 +135,10 @@ public class MypageService {
             return false;
         }
     }
+
+    public boolean deleteInquiry(int inquiryNo) {
+        int result = mypageMapper.deleteInquiryById(inquiryNo);
+
+        return result > 0;
+    }
 }

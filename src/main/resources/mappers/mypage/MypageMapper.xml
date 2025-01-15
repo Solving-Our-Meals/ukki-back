@@ -120,4 +120,8 @@
         WHERE INQ_NO = #{inquiryNo}
     </update>
 
+    <delete id="deleteInquiryById" parameterType="int">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
 </mapper>
