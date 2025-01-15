@@ -10,4 +10,6 @@ public interface NoticeMapper {
     List<NoticeDTO> getUserNoticeList();
 
     List<NoticeDTO> getBossNoticeList();
+
+    NoticeDTO getSpecificNotice(long noticeNo);
 }
