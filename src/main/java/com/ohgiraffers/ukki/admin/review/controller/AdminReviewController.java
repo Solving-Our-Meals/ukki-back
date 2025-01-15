@@ -20,7 +20,8 @@ import java.util.Map;
 @RequestMapping("/admin/reviews")
 public class AdminReviewController {
 
-    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
+    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
 
     private final AdminReviewService adminReviewService;
 
@@ -85,15 +86,17 @@ public class AdminReviewController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("삭제왔당");
-            System.out.println(content);
             String reviewImg = mapper.readTree(content).get("reviewImg").asText()+".png";
-            System.out.println(reviewImg);
 
             int result = adminReviewService.deleteReview(reviewNo);
 
+
             if(result > 0){
-                Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
-                Files.deleteIfExists(filePathProfile);
+                if(!reviewImg.equals("DEFAULT_REVIEW_IMG.png")) {
+                    System.out.println("리뷰이미지 삭제 왔당");
+                    Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
+                    Files.deleteIfExists(filePathProfile);
+                }
             }
 
             Map<String, String> response = new HashMap<>();
