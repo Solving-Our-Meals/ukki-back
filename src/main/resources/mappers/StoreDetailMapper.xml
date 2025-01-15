@@ -4,6 +4,21 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.store.model.dao.StoreMapper">
 
+<!--    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">-->
+<!--        <id property="storeNo" column="STORE_NO"/>-->
+<!--        <result property="storeName" column="STORE_NAME"/>-->
+<!--        <result property="storeDes" column="STORE_DES"/>-->
+<!--        <result property="storeAddress" column="STORE_ADDRESS"/>-->
+<!--        <result property="latitude" column="LATITUDE"/>-->
+<!--        <result property="longitude" column="LONGITUDE"/>-->
+<!--        <result property="storeProfile" column="STORE_PROFILE"/>-->
+<!--        <result property="storeMenu" column="STORE_MENU"/>-->
+<!--        <result property="storeCategoryNo" column="STORE_CATEGORY_NO"/>-->
+<!--        <result property="userNo" column="USER_NO"/>-->
+<!--        <result property="posNumber" column="POS_NUMBER"/>-->
+<!--    </resultMap>-->
+
+
     <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
         <id property="storeNo" column="STORE_NO"/>
         <result property="storeName" column="STORE_NAME"/>
@@ -14,9 +29,17 @@
         <result property="storeProfile" column="STORE_PROFILE"/>
         <result property="storeMenu" column="STORE_MENU"/>
         <result property="storeCategoryNo" column="STORE_CATEGORY_NO"/>
-        <result property="userNo" column="USER_NO"/>
         <result property="posNumber" column="POS_NUMBER"/>
+        <association property="storeKeyword" javaType="com.ohgiraffers.ukki.store.model.dto.KeywordDTO">
+            <result property="keyword1" column="KEYWORD1"/>
+            <result property="keyword2" column="KEYWORD2"/>
+            <result property="keyword3" column="KEYWORD3"/>
+            <result property="keyword4" column="KEYWORD4"/>
+            <result property="keyword5" column="KEYWORD5"/>
+            <result property="keyword6" column="KEYWORD6"/>
+        </association>
     </resultMap>
+
 
     <resultMap id="keywordResultMap" type="com.ohgiraffers.ukki.store.model.dto.KeywordDTO">
         <id property="storeNo" column="STORE_NO"/>
@@ -90,6 +113,17 @@
     </resultMap>
 
 
+
+    <!-- 예약 가능한 시간 가져오기 -->
+    <select id="getNextAvailableTime" resultMap="reservationInfoDTOResultMap">
+        SELECT RES_TIME
+        FROM RESERVATIONS
+        WHERE STORE_NO = #{storeNo}
+        AND RES_DATE = #{resDate}
+        AND RES_TIME > #{currentTime}
+        ORDER BY RES_TIME ASC
+        LIMIT 1
+    </select>
 
     <!--  가게 정보  -->
     <select id="getStoreInfo"  resultMap="storeInfoResultMap" parameterType="long">
@@ -316,18 +350,25 @@
 
     <select id="searchStores" resultMap="storeInfoResultMap" parameterType="java.lang.String">
         SELECT
-        STORE_NO,
-        STORE_NAME,
-        STORE_DES,
-        STORE_ADDRESS,
-        STORE_PROFILE,
-        STORE_CATEGORY_NO,
-        POS_NUMBER
-        FROM TBL_STORE
-        WHERE
-        STORE_NAME LIKE CONCAT('%', #{storeName}, '%')
+        A.STORE_NO,
+        A.STORE_NAME,
+        A.STORE_DES,
+        A.STORE_ADDRESS,
+        A.STORE_PROFILE,
+        A.STORE_CATEGORY_NO,
+        A.POS_NUMBER,
+        B.KEYWORD1,
+        B.KEYWORD2,
+        B.KEYWORD3,
+        B.KEYWORD4,
+        B.KEYWORD5,
+        B.KEYWORD6
+        FROM TBL_STORE A
+        JOIN TBL_KEYWORD B ON A.STORE_NO = B.STORE_NO
+        WHERE A.STORE_NAME LIKE CONCAT('%', #{storeName}, '%')
         AND (#{storeName} IS NOT NULL AND #{storeName} != '')
     </select>
+
 
 
 
