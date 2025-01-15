@@ -222,5 +222,42 @@ public class MypageController {
         }
     }
 
+    @DeleteMapping("/inquiry/{inquiryNo}")
+    public ResponseEntity<Map<String, String>> deleteInquiry(
+            @PathVariable int inquiryNo,
+            HttpServletRequest request) {
+
+        String jwtToken = cookieService.getJWTCookie(request);
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
+
+        MypageInquiryDTO inquiryToDelete = inquiries.stream()
+                .filter(i -> i.getInquiryNo() == inquiryNo)
+                .findFirst()
+                .orElse(null);
+
+        if (inquiryToDelete == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
+        }
+
+        boolean deleted = mypageService.deleteInquiry(inquiryNo);
+
+        if (deleted) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 삭제되었습니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "문의 삭제에 실패했습니다."));
+        }
+    }
+
 
 }

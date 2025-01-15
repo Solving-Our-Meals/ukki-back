@@ -24,4 +24,6 @@ public interface MypageMapper {
     int updateInquiryStatus(int inquiryNo, InquiryState inquiryState);
 
     int updateInquiry(MypageInquiryDTO inquiryToUpdate);
+
+    int deleteInquiryById(int inquiryNo);
 }
