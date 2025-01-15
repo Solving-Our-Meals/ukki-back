@@ -10,6 +10,7 @@ import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public class MypageService {
         List<MypageReservationDTO> reservations = mypageMapper.findUserReservationByUserId(userId);
 
         if (reservations == null || reservations.isEmpty()) {
-            throw new IllegalArgumentException("예약 정보를 찾을 수 없음");
+            return new ArrayList<>();
         }
 
         return reservations;
@@ -79,15 +80,17 @@ public class MypageService {
             throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
         }
 
-
+        // 리뷰 목록을 조회
         List<MypageReviewDTO> reviews = mypageMapper.findUserReviewByUserId(userId);
 
+
         if (reviews == null || reviews.isEmpty()) {
-            throw new IllegalArgumentException("예약 정보를 찾을 수 없음");
+            return new ArrayList<>();
         }
 
         return reviews;
     }
+
 
     public boolean deleteReview(int reviewNo) {
         int result = mypageMapper.deleteReviewById(reviewNo);
@@ -111,7 +114,7 @@ public class MypageService {
         List<MypageInquiryDTO> inquiry = mypageMapper.findUserInquiryByUserId(userId);
 
         if (inquiry == null || inquiry.isEmpty()) {
-            throw new IllegalArgumentException("예약 정보를 찾을 수 없음");
+            return new ArrayList<>();
         }
 
         return inquiry;

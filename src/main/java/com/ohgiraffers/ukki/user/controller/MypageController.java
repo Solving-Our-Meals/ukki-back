@@ -110,7 +110,7 @@ public class MypageController {
         if (deleted) {
             return ResponseEntity.ok("리뷰가 삭제되었습니다.");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 삭제 실패");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 삭제에 실패했습니다.");
         }
     }
 
