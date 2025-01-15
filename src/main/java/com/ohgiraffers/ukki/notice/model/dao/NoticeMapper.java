@@ -9,7 +9,7 @@ import java.util.List;
 public interface NoticeMapper {
     List<NoticeDTO> getUserNoticeList(String searchWord);
 
-    List<NoticeDTO> getBossNoticeList();
+    List<NoticeDTO> getBossNoticeList(String searchWord);
 
     NoticeDTO getSpecificNotice(long noticeNo);
 }
