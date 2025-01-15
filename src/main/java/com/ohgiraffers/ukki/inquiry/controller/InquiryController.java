@@ -28,7 +28,9 @@ import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
 @RequestMapping("/inquiries")
 public class InquiryController {
 
+    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
     private final InquiryService inquiryService;
+
 
     @Autowired
     public InquiryController(InquiryService inquiryService){
@@ -207,7 +209,7 @@ public class InquiryController {
         String fileSetName = fileName+fileExtension;
         try{
 //                경로설정
-            Path networkPath = Paths.get("\\\\192.168.0.138\\ukki_nas\\inquiry");
+            Path networkPath = Paths.get(SHARED_FOLDER);
             if(!Files.exists(networkPath)){
                 Files.createDirectories(networkPath);
             }

@@ -1,20 +1,26 @@
 package com.ohgiraffers.ukki.admin.inquiry.controller;
 
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
+import com.ohgiraffers.ukki.common.InquiryState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/inquiries")
 public class AdminInquiryController {
 
+    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
     private final AdminInquiryService adminInquiryService;
 
     @Autowired
@@ -39,6 +45,55 @@ public class AdminInquiryController {
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("처리 중인 문의 수를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<?> totalInquiry() {
+        int totalInquiry = adminInquiryService.totalInquiry();
+
+
+        Map<String, Integer> response = new HashMap<>();
+        response.put("totalInquiry", totalInquiry);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/list/user")
+    public ResponseEntity<?> searchUserInquiry(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
+        try {
+            if ("STATE".equals(category) && word != null) {
+                word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
+            }
+            List<InquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
+
+            return ResponseEntity.ok(userInquiryList);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/list/store")
+    public ResponseEntity<?> searchStoreInquiry(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
+        try {
+            if ("STATE".equals(category) && word != null) {
+                word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
+            }
+            List<InquiryListDTO> storeInquiryList = adminInquiryService.searchStoreInquiry(category, word);
+            List<InquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
+
+
+            return ResponseEntity.ok(storeInquiryList);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
