@@ -121,12 +121,8 @@
         WHERE INQ_NO = #{inquiryNo}
     </update>
 
-
-    <update id="updateFilePath" parameterType="map">
-        UPDATE TBL_FILE_INFO
-        SET FILE_PATH = #{filePath}
+    <delete id="deleteInquiryById" parameterType="int">
+        DELETE FROM TBL_INQUIRY
         WHERE INQ_NO = #{inquiryNo}
-    </update>
-
-
+    </delete>
 </mapper>
