@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -130,8 +131,14 @@ public class MypageService {
         return result > 0;
     }
 
-    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate) {
+    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
+            if (file != null && !file.isEmpty()) {
+                String filePath = saveFile(file, userId);
+
+                inquiryToUpdate.setFile(filePath);
+            }
+
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
 
             return updatedRows > 0;
@@ -139,6 +146,20 @@ public class MypageService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static final String FILE_UPLOAD_DIR = "/path/to/your/upload/directory";  // 파일 경로
+
+    public String saveFile(MultipartFile file, String userId) throws IOException {
+        Path uploadPath = Paths.get(FILE_UPLOAD_DIR, userId);
+        if (!uploadPath.toFile().exists()) {
+            uploadPath.toFile().mkdirs();
+        }
+
+        Path filePath = uploadPath.resolve(file.getOriginalFilename());
+        file.transferTo(filePath.toFile());
+
+        return filePath.toString();
     }
 
     public boolean deleteInquiry(int inquiryNo) {
@@ -165,27 +186,6 @@ public class MypageService {
             return null;
         }
         return resource;
-    }
-
-    public void uploadFile(int inquiryNo, MultipartFile file) {
-        // 파일 저장 경로 설정
-        String userDirectory = "/path/to/files/inquiries/" + inquiryNo;
-        Path path = Paths.get(userDirectory);
-        if (!path.toFile().exists()) {
-            path.toFile().mkdirs(); // 디렉토리가 없다면 생성
-        }
-
-        // 파일명 설정
-        String fileName = file.getOriginalFilename();
-        Path filePath = path.resolve(fileName);
-
-        try {
-            file.transferTo(filePath);
-
-            mypageMapper.saveFile(inquiryNo, fileName, filePath.toString());
-        } catch (Exception e) {
-            throw new RuntimeException("파일 업로드 실패", e);
-        }
     }
 
 }

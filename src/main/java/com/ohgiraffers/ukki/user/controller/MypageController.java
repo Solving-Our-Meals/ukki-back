@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +189,9 @@ public class MypageController {
     @PutMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<Map<String, String>> updateInquiry(
             @PathVariable int inquiryNo,
-            @RequestBody MypageInquiryDTO updatedInquiry,
+            @RequestParam(required = false) MultipartFile file,
+            @RequestParam String title,
+            @RequestParam String text,
             HttpServletRequest request) {
 
         String jwtToken = cookieService.getJWTCookie(request);
@@ -212,10 +216,20 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
-        inquiryToUpdate.setTitle(updatedInquiry.getTitle());
-        inquiryToUpdate.setText(updatedInquiry.getText());
+        inquiryToUpdate.setTitle(title);
+        inquiryToUpdate.setText(text);
 
-        boolean updated = mypageService.updateInquiry(inquiryToUpdate);
+        if (file != null && !file.isEmpty()) {
+            try {
+                String filePath = mypageService.saveFile(file, userId);
+                inquiryToUpdate.setFile(filePath);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
+            }
+        }
+
+        boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
 
         if (updated) {
             return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
@@ -224,6 +238,8 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
         }
     }
+
+
 
     @DeleteMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<Map<String, String>> deleteInquiry(
@@ -285,16 +301,6 @@ public class MypageController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
-    }
-
-    @PostMapping("/{inquiryNo}/file")
-    public ResponseEntity<String> uploadFile(@PathVariable int inquiryNo, @RequestParam("file") MultipartFile file) {
-        try {
-            mypageService.uploadFile(inquiryNo, file);
-            return ResponseEntity.ok("파일 업로드 완료");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패: " + e.getMessage());
-        }
     }
 
 }
