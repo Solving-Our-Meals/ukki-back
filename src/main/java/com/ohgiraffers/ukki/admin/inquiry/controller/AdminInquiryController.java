@@ -1,20 +1,16 @@
 package com.ohgiraffers.ukki.admin.inquiry.controller;
 
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
 import com.ohgiraffers.ukki.common.InquiryState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/admin/inquiries")
@@ -86,6 +82,9 @@ public class AdminInquiryController {
             List<InquiryListDTO> storeInquiryList = adminInquiryService.searchStoreInquiry(category, word);
             List<InquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
 
+            storeInquiryList.addAll(storeReportList);
+
+            storeInquiryList.sort(Comparator.comparing(InquiryListDTO::getInqDate));
 
             return ResponseEntity.ok(storeInquiryList);
         } catch (Exception e) {
@@ -94,6 +93,39 @@ public class AdminInquiryController {
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/info/{inquiryNo}")
+    public ResponseEntity<?> inquiryInfo(@PathVariable int inquiryNo) {
+        try {
+            System.out.println("왔당");
+            InquiryInfoDTO inquiryInfo = adminInquiryService.inquiryInfo(inquiryNo);
+            System.out.println(inquiryInfo);
+
+            return ResponseEntity.ok(inquiryInfo);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/info/report/{reportNo}")
+    public ResponseEntity<?> reportInfo(@PathVariable int reportNo) {
+        try {
+            ReportInfoDTO reportInfo = adminInquiryService.reportInfo(reportNo);
+            System.out.println(reportInfo);
+
+            return ResponseEntity.ok(reportInfo);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
