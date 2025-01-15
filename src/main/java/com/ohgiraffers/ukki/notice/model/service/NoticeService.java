@@ -15,8 +15,8 @@ public class NoticeService {
         this.noticeMapper = noticeMapper;
     }
 
-    public List<NoticeDTO> getUserNoticeList() {
-        return noticeMapper.getUserNoticeList();
+    public List<NoticeDTO> getUserNoticeList(String searchWord) {
+        return noticeMapper.getUserNoticeList(searchWord);
     }
 
     public List<NoticeDTO> getBossNoticeList() {

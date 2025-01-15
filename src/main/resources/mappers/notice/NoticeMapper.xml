@@ -13,12 +13,14 @@
     </resultMap>
 
     <!-- 유저 공지사항 전체 조회 -->
-    <select id="getUserNoticeList" resultMap="getNoticeResultMap">
+    <select id="getUserNoticeList" parameterType="String" resultMap="getNoticeResultMap">
         SELECT
                *
           FROM TBL_NOTICE
-         WHERE CATEGORY_NO = 1
-            OR CATEGORY_NO = 2
+          WHERE (CATEGORY_NO = 1 OR CATEGORY_NO = 2)
+            <if test="searchWord != null">
+                AND (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+            </if>
     </select>
 
     <select id="getBossNoticeList" resultMap="getNoticeResultMap">
