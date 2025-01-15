@@ -109,4 +109,12 @@ public class AdminStoreService {
     public void deleteStoreKeyword(int storeNo) {
         adminStoreMapper.deleteStoreKeyword(storeNo);
     }
+
+    public String[] getReviewImgStoreNo(int storeNo) {
+        return adminStoreMapper.getReviewImgStoreNo(storeNo);
+    }
+
+    public void deleteReviewWithStore(int storeNo) {
+        adminStoreMapper.deleteReviewWithStore(storeNo);
+    }
 }

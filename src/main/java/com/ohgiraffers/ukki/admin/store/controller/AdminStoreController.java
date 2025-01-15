@@ -23,7 +23,8 @@ import java.util.*;
 @RequestMapping("/admin/stores")
 public class AdminStoreController {
 
-    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
+//    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
+private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -104,7 +105,6 @@ public class AdminStoreController {
             List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
             storeInfo.setStoreCategory(categoryDTO);
 
-
             return ResponseEntity.ok(storeInfo);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
@@ -141,6 +141,7 @@ public class AdminStoreController {
                 Files.deleteIfExists(filePathMenu);
                 adminStoreService.deleteStoreKeyword(storeNo);
                 adminStoreService.deleteStoreOperation(storeNo);
+                deleteReviewWithStore(storeNo);
             }else{
                 message = "삭제에 실패했습니다.";
             }
@@ -158,6 +159,18 @@ public class AdminStoreController {
         }
     }
 
+    public void deleteReviewWithStore(int storeNo) throws IOException {
+        String[] reviewImgArray = adminStoreService.getReviewImgStoreNo(storeNo);
+        for(int i = 0; i < reviewImgArray.length; i++){
+            System.out.println(reviewImgArray[i]);
+            String reviewImg = reviewImgArray[i]+".png";
+            Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
+            Files.deleteIfExists(filePathProfile);
+        }
+        adminStoreService.deleteReviewWithStore(storeNo);
+
+    }
+
         @PutMapping("/info/{storeNo}/edit")
         @Transactional(rollbackFor = Exception.class)
         public ResponseEntity<?> updateStore(
@@ -173,8 +186,7 @@ public class AdminStoreController {
             @RequestPart(value = "banner5", required = false) MultipartFile banner5
         ) {
             try {
-            System.out.println(profileImage);
-            System.out.println(menuImage);
+                System.out.println(bannerStatus);
 
             // JSON 문자열을 객체로 변환
             ObjectMapper mapper = new ObjectMapper();
@@ -194,7 +206,7 @@ public class AdminStoreController {
             if (bannerStatus != null) {
                 bannerStatusParse = mapper.readValue(bannerStatus, String[].class);
                 count = (int) Arrays.stream(bannerStatusParse)
-                       .filter(banner -> banner.contains("/store/api/files?filename="))
+                       .filter(banner -> banner.contains("/store/" + storeNo + "/api/files?filename="))
                        .count();
             }
             System.out.println("포함된 갯수: " + count);
@@ -255,9 +267,11 @@ public class AdminStoreController {
                 maxBannerKey = count;
             }
             if (maxBannerKey < 5) {
-                System.out.println(maxBannerKey);
+                System.out.println("max배너"+maxBannerKey);
                 for (int i = maxBannerKey+1; i <= 5; i++) {
+                    System.out.println(i);
                     String fileToDelete = storeNo + "banner" + i + ".png";
+                    System.out.println(fileToDelete);
                     Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
                     Files.deleteIfExists(filePath);
                 }

@@ -291,4 +291,16 @@
         #{storeRegistDate}
         );
     </insert>
+
+    <select id="getReviewImgStoreNo">
+        SELECT
+            REVIEW_IMG
+        FROM TBL_REVIEW
+        WHERE STORE_NO = #{storeNo}
+    </select>
+
+    <delete id="deleteReviewWithStore">
+        DELETE FROM TBL_REVIEW
+        WHERE STORE_NO = #{storeNo}
+    </delete>
 </mapper>

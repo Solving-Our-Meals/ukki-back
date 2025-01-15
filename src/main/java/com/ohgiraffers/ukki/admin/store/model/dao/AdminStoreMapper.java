@@ -51,4 +51,8 @@ public interface AdminStoreMapper {
     int searchCurrentStoreUser(String userId);
 
     void deleteStoreKeyword(int storeNo);
+
+    String[] getReviewImgStoreNo(int storeNo);
+
+    void deleteReviewWithStore(int storeNo);
 }
