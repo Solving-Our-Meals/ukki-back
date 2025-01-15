@@ -17,11 +17,73 @@
         <result property="file" column="FILE"/>
     </resultMap>
 
+    <resultMap id="inquiryList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO">
+            <id property="inqNo" column="INQ_NO" />
+            <result property="categoryName" column="CATEGORY_NAME" />
+            <result property="inqDate" column="INQ_DATE" />
+            <result property="inqTitle" column="INQ_TITLE" />
+            <result property="inqContent" column="INQ_CONTENT" />
+            <result property="state" column="STATE" typeHandler="com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler" />
+    </resultMap>
+
     <select id="processingInquiry">
         SELECT
-        COUNT(*)
+        SUM(cnt)
+        FROM (
+        SELECT COUNT(*) as cnt
         FROM TBL_INQUIRY
-        WHERE STATE='PROCESSING';
+        WHERE STATE = 'PROCESSING'
+        UNION ALL
+        SELECT COUNT(*) as cnt
+        FROM TBL_REVIEW_REPORT
+        WHERE STATE = 'PROCESSING'
+        ) as combined_counts;
     </select>
 
+
+    <select id="searchUserInquiry" resultMap="inquiryList">
+        SELECT
+            a.INQ_NO,
+            b.CATEGORY_NAME,
+            a.INQ_DATE,
+            a.INQ_TITLE,
+            a.INQ_CONTENT,
+            a.STATE
+        FROM TBL_INQUIRY a
+        LEFT JOIN TBL_INQUIRY_CATEGORY b ON a.CATEGORY_NO = b.CATEGORY_NO
+        <where>
+            a.CATEGORY_NO IN (1, 2, 3, 4)
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "CATEGORY_NAME"'>
+                        AND b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        AND a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="totalInquiry">
+        SELECT
+            COUNT(*)
+        FROM TBL_INQUIRY
+    </select>
+
+    <select id="searchCategory">
+
+    </select>
+
+    <select id="searchStoreInquiry" resultMap="inquiryList">
+
+    </select>
+
+    <select id="searchStoreReportInquiry">
+
+    </select>
 </mapper>
