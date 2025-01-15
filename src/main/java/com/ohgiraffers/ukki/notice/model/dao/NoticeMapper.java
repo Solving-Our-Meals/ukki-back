@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface NoticeMapper {
-    List<NoticeDTO> getUserNoticeList();
+    List<NoticeDTO> getUserNoticeList(String searchWord);
 
     List<NoticeDTO> getBossNoticeList();
 

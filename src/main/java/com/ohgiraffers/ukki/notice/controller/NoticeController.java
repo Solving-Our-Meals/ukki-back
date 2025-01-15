@@ -17,9 +17,9 @@ public class NoticeController {
     }
 
     @GetMapping(value = "/user")
-    public List<NoticeDTO> getUserNoticeList(@ModelAttribute NoticeDTO noticeDTO){
+    public List<NoticeDTO> getUserNoticeList(@ModelAttribute NoticeDTO noticeDTO, @RequestParam(value = "searchWord", required = false) String searchWord){
 
-        List<NoticeDTO> userNoticeList = noticeService.getUserNoticeList();
+        List<NoticeDTO> userNoticeList = noticeService.getUserNoticeList(searchWord);
 
         return userNoticeList;
     }
