@@ -110,4 +110,7 @@ public class StoreService {
         storeMapper.insertOrUpdateSearch(keyword);
     }
 
+    public ReviewContentDTO getReviewContent(long reviewNo) {
+        return storeMapper.getReviewContent(reviewNo);
+    }
 }

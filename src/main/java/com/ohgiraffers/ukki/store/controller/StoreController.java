@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -30,8 +31,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
 
 
     public StoreController(StoreService storeService){
@@ -91,6 +92,9 @@ public class StoreController {
             // 이 결합된 경로는 SHATED_FOLDER 경로와 filename을 합쳐서 완전한 파일 경로를 만든다.
             // 즉, 최종 경로가 \\\\192.168.0.138\\ukki_nas\\store\\5banner1 이 된다
             Path file = Paths.get(SHARED_FOLDER).resolve(filename + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(filename + ".jpg");
+            }
 
             // 디버깅 확인
 //            System.out.println("file 경로 : " + file.toString());
@@ -134,6 +138,10 @@ public class StoreController {
 
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(profileName + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(profileName + ".jpg");
+            }
+
             // 디버깅 확인
 //            System.out.println("프로필 파일 경로 : " + file);
             Resource resource = new UrlResource(file.toUri());
@@ -166,6 +174,9 @@ public class StoreController {
 
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(menuName + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(menuName + ".jpg");
+            }
 //            System.out.println("menu : " + file );
             Resource resource = new UrlResource(file.toUri());
 
@@ -213,10 +224,11 @@ public class StoreController {
     @ResponseBody
     public ResponseEntity<Resource> getReviewImg(@PathVariable("storeNo") long storeNo, @RequestParam("reviewImgName") String reviewImgName ){
 
-//        System.out.println("리뷰 이미지 api");
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".png");
-//            System.out.println("reviewImg : " + file );
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".jpg");
+            }
             Resource resource = new UrlResource(file.toUri());
 
             if(resource.exists() && resource.isReadable()){
@@ -239,6 +251,9 @@ public class StoreController {
 //        System.out.println("사용자 프로필 이미지 api");
         try {
             Path file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".jpg");
+            }
 //            System.out.println("유저 프로필 : " + file );
             Resource resource = new UrlResource(file.toUri());
 
@@ -352,12 +367,40 @@ public class StoreController {
     public void deleteReview(@PathVariable("storeNo") long storeNo, @RequestParam("reviewNo") long reviewNo, @RequestParam("userNo") long userNo){
         System.out.println("리뷰 삭제 옴");
 
+        // 삭제할 리뷰 정보 가져오기(리뷰 이미지 포함)
+        ReviewContentDTO reviewContentDTO = storeService.getReviewContent(reviewNo);
+
         // 리뷰 삭제
         storeService.deleteReview(reviewNo);
 
-        System.out.println("리뷰 삭제 userNo : " + userNo);
+        // 리뷰 이미지 파일 삭제
+        String pngFilePath = SHARED_FOLDER + "\\" + reviewContentDTO.getReviewImage() + ".png";
+        String jpgFilePath = SHARED_FOLDER + "\\" + reviewContentDTO.getReviewImage() + ".jpg";
 
-        // 리뷰 달기 완성 후 유저 활동 +1 늘리기
+        File pngFile = new File(pngFilePath);
+        File jpgFile = new File(jpgFilePath);
+
+        if (!reviewContentDTO.getReviewImage().equals("DEFAULT_REVIEW_IMG")) {
+            if (pngFile.exists()) {
+                if (pngFile.delete()) {
+                    System.out.println("PNG 이미지 파일 삭제 성공: " + pngFilePath);
+                } else {
+                    System.out.println("PNG 이미지 파일 삭제 실패: " + pngFilePath);
+                }
+            } else if (jpgFile.exists()) {
+                if (jpgFile.delete()) {
+                    System.out.println("JPG 이미지 파일 삭제 성공: " + jpgFilePath);
+                } else {
+                    System.out.println("JPG 이미지 파일 삭제 실패: " + jpgFilePath);
+                }
+            } else {
+                System.out.println("이미지 파일이 존재하지 않음: " + pngFilePath + " 또는 " + jpgFilePath);
+            }
+        } else {
+            System.out.println("기본 이미지이므로 삭제하지 않습니다: " + reviewContentDTO.getReviewImage());
+        }
+
+        // 리뷰 달기 완성 후 유저 활동 - 1 감소
         storeService.decreaseReview(userNo);
     }
 
