@@ -8,8 +8,14 @@ import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
 import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +131,14 @@ public class MypageService {
         return result > 0;
     }
 
-    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate) {
+    public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
+            if (file != null && !file.isEmpty()) {
+                String filePath = saveFile(file, userId);
+
+                inquiryToUpdate.setFile(filePath);
+            }
+
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
 
             return updatedRows > 0;
@@ -136,9 +148,44 @@ public class MypageService {
         }
     }
 
+    private static final String FILE_UPLOAD_DIR = "/path/to/your/upload/directory";  // 파일 경로
+
+    public String saveFile(MultipartFile file, String userId) throws IOException {
+        Path uploadPath = Paths.get(FILE_UPLOAD_DIR, userId);
+        if (!uploadPath.toFile().exists()) {
+            uploadPath.toFile().mkdirs();
+        }
+
+        Path filePath = uploadPath.resolve(file.getOriginalFilename());
+        file.transferTo(filePath.toFile());
+
+        return filePath.toString();
+    }
+
     public boolean deleteInquiry(int inquiryNo) {
         int result = mypageMapper.deleteInquiryById(inquiryNo);
 
         return result > 0;
     }
+
+    private String getFilePathByFileId(String fileId, String userId) {
+        return "/path/to/files/" + userId + "/" + fileId;
+    }
+
+    public Resource loadFile(String fileId, String userId) {
+        String filePath = getFilePathByFileId(fileId, userId);
+
+        if (filePath == null) {
+            return null;
+        }
+
+        Path path = Paths.get(filePath);
+        Resource resource = new FileSystemResource(path);
+
+        if (!resource.exists()) {
+            return null;
+        }
+        return resource;
+    }
+
 }

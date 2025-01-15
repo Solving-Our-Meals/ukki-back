@@ -1,6 +1,8 @@
 package com.ohgiraffers.ukki.admin.inquiry.model.dao;
 
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,4 +18,8 @@ public interface AdminInquiryMapper {
     List<InquiryListDTO> searchStoreInquiry(String category, String word);
 
     List<InquiryListDTO> searchStoreReportInquiry(String category, String word);
+
+    InquiryInfoDTO inquiryInfo(int inquiryNo);
+
+    ReportInfoDTO reportInfo(int reportNo);
 }

@@ -26,4 +26,6 @@ public interface MypageMapper {
     int updateInquiry(MypageInquiryDTO inquiryToUpdate);
 
     int deleteInquiryById(int inquiryNo);
+
+    void saveFile(int inquiryNo, String fileName, String string);
 }

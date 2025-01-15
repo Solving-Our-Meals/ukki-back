@@ -11,10 +11,15 @@ import com.ohgiraffers.ukki.user.model.service.MypageService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -184,21 +189,28 @@ public class MypageController {
     @PutMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<Map<String, String>> updateInquiry(
             @PathVariable int inquiryNo,
-            @RequestBody MypageInquiryDTO updatedInquiry,
+            @RequestParam String title,       // 제목
+            @RequestParam String text,        // 내용
+            @RequestParam(required = false) MultipartFile file, // 파일 (선택사항)
             HttpServletRequest request) {
 
+        // JWT 토큰 검사
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
-            throw new IllegalArgumentException("토큰이 일치하지 않음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "토큰이 일치하지 않음"));
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
         if (userId == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
+        // 사용자 문의 정보 가져오기
         List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
 
+        // 수정할 문의 찾기
         MypageInquiryDTO inquiryToUpdate = inquiries.stream()
                 .filter(i -> i.getInquiryNo() == inquiryNo)
                 .findFirst()
@@ -209,18 +221,44 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
-        inquiryToUpdate.setTitle(updatedInquiry.getTitle());
-        inquiryToUpdate.setText(updatedInquiry.getText());
+        // 제목과 내용 수정
+        inquiryToUpdate.setTitle(title);
+        inquiryToUpdate.setText(text);
 
-        boolean updated = mypageService.updateInquiry(inquiryToUpdate);
+        // 파일 업로드 처리 (파일이 있을 때만)
+        if (file != null && !file.isEmpty()) {
+            try {
+                String filePath = mypageService.saveFile(file, userId); // 파일 저장
+                inquiryToUpdate.setFile(filePath); // 파일 경로 저장
+            } catch (IOException e) {
+                // IOException 발생 시, 해당 오류 로그를 남기고 500 오류 응답을 반환
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
+            }
+        }
 
-        if (updated) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
-        } else {
+        // 문의 업데이트
+        try {
+            boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
+
+            if (updated) {
+                return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
+            }
+        } catch (Exception e) {
+            // 예기치 못한 오류에 대한 처리
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
+                    .body(Collections.singletonMap("message", "서버 오류 발생: " + e.getMessage()));
         }
     }
+
+
+
+
 
     @DeleteMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<Map<String, String>> deleteInquiry(
@@ -259,5 +297,29 @@ public class MypageController {
         }
     }
 
+    // 스프링 프레임워크 리소스 사용 !
+    @GetMapping("/file/download/{fileId}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileId, HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        Resource resource = mypageService.loadFile(fileId, userId);
+
+        if (resource == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
 }

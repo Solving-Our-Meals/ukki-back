@@ -10,16 +10,18 @@ public class InquiryListDTO {
     private String inqTitle;
     private String inqContent;
     private InquiryState state;
+    private boolean isInquiry;
 
     public InquiryListDTO(){}
 
-    public InquiryListDTO(int inqNo, String categoryName, String inqDate, String inqTitle, String inqContent, InquiryState state) {
+    public InquiryListDTO(int inqNo, String categoryName, String inqDate, String inqTitle, String inqContent, InquiryState state, boolean isInquiry) {
         this.inqNo = inqNo;
         this.categoryName = categoryName;
         this.inqDate = inqDate;
         this.inqTitle = inqTitle;
         this.inqContent = inqContent;
         this.state = state;
+        this.isInquiry = isInquiry;
     }
 
     public int getInqNo() {
@@ -70,6 +72,14 @@ public class InquiryListDTO {
         this.state = state;
     }
 
+    public boolean isInquiry() {
+        return isInquiry;
+    }
+
+    public void setInquiry(boolean inquiry) {
+        isInquiry = inquiry;
+    }
+
     @Override
     public String toString() {
         return "InquiryListDTO{" +
@@ -79,6 +89,7 @@ public class InquiryListDTO {
                 ", inqTitle='" + inqTitle + '\'' +
                 ", inqContent='" + inqContent + '\'' +
                 ", state=" + state +
+                ", isInquiry=" + isInquiry +
                 '}';
     }
 }
