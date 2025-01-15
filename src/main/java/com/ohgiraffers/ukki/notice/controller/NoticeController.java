@@ -2,10 +2,7 @@ package com.ohgiraffers.ukki.notice.controller;
 
 import com.ohgiraffers.ukki.notice.model.dto.NoticeDTO;
 import com.ohgiraffers.ukki.notice.model.service.NoticeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +32,16 @@ public class NoticeController {
         System.out.println("bossNoticeList = " + bossNoticeList);
 
         return bossNoticeList;
+    }
+
+    @GetMapping(value = "/getSpecificNotice")
+    public NoticeDTO getSpecificNotice(@ModelAttribute NoticeDTO noticeDTO, @RequestParam("noticeNo") long noticeNo){
+
+        noticeDTO = noticeService.getSpecificNotice(noticeNo);
+
+        System.out.println("noticeDTO = " + noticeDTO);
+
+        return noticeDTO;
     }
 
 }

@@ -27,4 +27,11 @@
           FROM TBL_NOTICE;
     </select>
 
+    <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+         WHERE NOTICE_NO = #{ noticeNo }
+    </select>
+
 </mapper>

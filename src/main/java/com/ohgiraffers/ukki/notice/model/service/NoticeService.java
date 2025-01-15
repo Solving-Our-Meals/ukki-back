@@ -22,4 +22,8 @@ public class NoticeService {
     public List<NoticeDTO> getBossNoticeList() {
         return noticeMapper.getBossNoticeList();
     }
+
+    public NoticeDTO getSpecificNotice(long noticeNo) {
+        return noticeMapper.getSpecificNotice(noticeNo);
+    }
 }
