@@ -3,16 +3,15 @@ package com.ohgiraffers.ukki.user.model.service;
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
-import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
+import com.ohgiraffers.ukki.user.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,9 +24,11 @@ public class MypageService {
 
     private final JwtService jwtService;
     private final MypageMapper mypageMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public MypageService(JwtService jwtService, MypageMapper mypageMapper) {
+    public MypageService(JwtService jwtService, MypageMapper mypageMapper, BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mypageMapper = mypageMapper;
     }
@@ -188,4 +189,65 @@ public class MypageService {
         return resource;
     }
 
+    public boolean verifyPassword(String userId, String password) {
+        String storedPassword = mypageMapper.findPasswordByUserId(userId);
+
+        if (storedPassword == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        }
+
+        return passwordEncoder.matches(password, storedPassword);
+    }
+
+    public MypageInfoDTO getUserInfo(String userId) {
+        MypageInfoDTO userInfo = mypageMapper.findUserProfileInfo(userId);
+
+        if (userInfo == null) {
+            return null;
+        }
+
+        return userInfo;
+    }
+
+    private final String profileImageDirectory = "/path/to/upload/directory"; // 업로드 디렉토리 경로
+
+    public boolean updateUserInfo(String userId, String userName, String userPass, MultipartFile profileImage) {
+        try {
+            MypageUpdateUserInfoDTO updateUserInfoDTO = new MypageUpdateUserInfoDTO();
+            updateUserInfoDTO.setUserId(userId);
+
+            // 1. 프로필 이미지 처리
+            if (profileImage != null && !profileImage.isEmpty()) {
+                // 파일을 저장할 경로 생성
+                String filename = userId + "_" + profileImage.getOriginalFilename();
+                File targetFile = new File(profileImageDirectory, filename);
+                profileImage.transferTo(targetFile); // 파일 저장
+
+                // 파일 경로를 DTO에 설정
+                updateUserInfoDTO.setFile(filename);
+            }
+
+            // 2. 닉네임 업데이트
+            if (userName != null && !userName.isEmpty()) {
+                updateUserInfoDTO.setUserName(userName);
+            }
+
+            // 3. 비밀번호 업데이트
+            if (userPass != null && !userPass.isEmpty()) {
+                String encodedPassword = passwordEncoder.encode(userPass);  // 비밀번호를 암호화
+                updateUserInfoDTO.setUserPass(encodedPassword);
+            }
+
+            // 4. 매퍼를 통해 사용자 정보 업데이트
+            int updatedRows = mypageMapper.updateUserInfo(updateUserInfoDTO);
+
+            return updatedRows > 0;  // 성공적으로 업데이트되었으면 true 반환
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;  // 파일 저장 실패 시 false 반환
+        }
+    }
+
+/*    public boolean deleteUser(String userId) {
+    }*/
 }
