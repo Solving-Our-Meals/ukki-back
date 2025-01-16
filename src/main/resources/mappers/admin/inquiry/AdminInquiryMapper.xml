@@ -175,4 +175,32 @@
         FROM TBL_REVIEW_REPORT
         WHERE REPORT_NO = #{reportNo}
     </select>
+
+    <update id="inquiryAnswer" parameterType="com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO">
+        UPDATE TBL_INQUIRY SET
+            ANS_TITLE = #{answerTitle},
+            ANS_CONTENT = #{answerContent},
+            ANS_DATE = #{answerDate},
+            STATE = #{state}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <delete id="inquiryDelete">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
+
+    <update id="reportAnswer" parameterType="com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO">
+        UPDATE TBL_REVIEW_REPORT SET
+        ANS_TITLE = #{answerTitle},
+        ANS_CONTENT = #{answerContent},
+        ANS_DATE = #{answerDate},
+        STATE = #{state}
+        WHERE REPORT_NO = #{inquiryNo}
+    </update>
+
+    <delete id="reportDelete">
+        DELETE FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </delete>
 </mapper>

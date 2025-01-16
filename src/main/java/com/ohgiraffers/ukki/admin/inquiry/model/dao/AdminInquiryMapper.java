@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.admin.inquiry.model.dao;
 
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
@@ -22,4 +23,12 @@ public interface AdminInquiryMapper {
     InquiryInfoDTO inquiryInfo(int inquiryNo);
 
     ReportInfoDTO reportInfo(int reportNo);
+
+    void inquiryAnswer(AnswerDTO answer);
+
+    void inquiryDelete(int inquiryNo);
+
+    void reportAnswer(AnswerDTO answer);
+
+    void reportDelete(int reportNo);
 }
