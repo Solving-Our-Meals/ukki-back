@@ -21,6 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -120,6 +123,16 @@ public class QrService {
 
 
     public void editQrConfirmRes(String qr) {
+        Path filePathInquiry = Paths.get(SHARED_FOLDER, qr+".png");
+
+        try {
+            System.out.println(filePathInquiry);
+            Files.deleteIfExists(filePathInquiry);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         qrMapper.editQrConfirmRes(qr);
+
     }
 }
