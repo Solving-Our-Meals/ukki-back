@@ -25,9 +25,9 @@ public class NoticeController {
     }
 
     @GetMapping(value = "/boss")
-    public List<NoticeDTO> getBossNoticeList(@ModelAttribute NoticeDTO noticeDTO){
+    public List<NoticeDTO> getBossNoticeList(@ModelAttribute NoticeDTO noticeDTO, @RequestParam(value = "searchWord", required = false) String searchWord){
 
-        List<NoticeDTO> bossNoticeList = noticeService.getBossNoticeList();
+        List<NoticeDTO> bossNoticeList = noticeService.getBossNoticeList(searchWord);
 
         System.out.println("bossNoticeList = " + bossNoticeList);
 

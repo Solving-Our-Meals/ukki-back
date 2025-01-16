@@ -23,10 +23,13 @@
             </if>
     </select>
 
-    <select id="getBossNoticeList" resultMap="getNoticeResultMap">
+    <select id="getBossNoticeList" parameterType="String" resultMap="getNoticeResultMap">
         SELECT
                *
-          FROM TBL_NOTICE;
+          FROM TBL_NOTICE
+        <if test="searchWord != null">
+            WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+        </if>
     </select>
 
     <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">
