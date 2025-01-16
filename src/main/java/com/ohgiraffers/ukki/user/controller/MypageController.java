@@ -2,10 +2,7 @@ package com.ohgiraffers.ukki.user.controller;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.common.InquiryState;
-import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
+import com.ohgiraffers.ukki.user.model.dto.*;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
 import com.ohgiraffers.ukki.user.model.service.MypageService;
 import jakarta.servlet.http.Cookie;
@@ -231,7 +228,6 @@ public class MypageController {
                 String filePath = mypageService.saveFile(file, userId); // 파일 저장
                 inquiryToUpdate.setFile(filePath); // 파일 경로 저장
             } catch (IOException e) {
-                // IOException 발생 시, 해당 오류 로그를 남기고 500 오류 응답을 반환
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
@@ -249,7 +245,6 @@ public class MypageController {
                         .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
             }
         } catch (Exception e) {
-            // 예기치 못한 오류에 대한 처리
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "서버 오류 발생: " + e.getMessage()));
@@ -321,5 +316,112 @@ public class MypageController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<Map<String, String>> confirmPassword(
+            @RequestBody Map<String, String> requestData, HttpServletRequest request) {
+
+        String password = requestData.get("password");
+
+        String jwtToken = cookieService.getJWTCookie(request);
+        if (jwtToken == null || jwtService.getUserInfoFromTokenId(jwtToken) == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+        if (mypageService.verifyPassword(userId, password)) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 확인되었습니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", "비밀번호가 일치하지 않습니다."));
+        }
+    }
+
+    @GetMapping("/profile-info")
+    public ResponseEntity<MypageInfoDTO> getUserInfo(HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
+
+        MypageInfoDTO userInfo = mypageService.getUserInfo(userId);
+
+        if (userInfo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+
+        return ResponseEntity.ok(userInfo);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Map<String, String>> updateUserInfo(
+            @RequestParam(required = false) MultipartFile profileImage,
+            @RequestParam(required = false) String userName,
+            @RequestParam(required = false) String userPass,
+            HttpServletRequest request) {
+
+        String jwtToken = cookieService.getJWTCookie(request);
+        if (jwtToken == null || jwtService.getUserInfoFromTokenId(jwtToken) == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        try {
+            boolean updated = mypageService.updateUserInfo(userId, userName, userPass, profileImage);
+
+            if (updated) {
+                return ResponseEntity.ok(Collections.singletonMap("message", "정보가 성공적으로 업데이트되었습니다."));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", "정보 업데이트에 실패했습니다."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "아무것도 변경하지 않았습니다."));
+        }
+    }
+
+/*    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request); // 쿠키에서 JWT 토큰을 가져옵니다.
+
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 유효하지 않습니다.");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+        }
+
+        try {
+            boolean deleted = mypageService.deleteUser(userId);
+
+            if (deleted) {
+                return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("회원 탈퇴 처리 중 오류가 발생했습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 처리 중 오류가 발생했습니다.");
+        }
+    }*/
+
+
 
 }

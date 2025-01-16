@@ -27,9 +27,9 @@
         SELECT
                *
           FROM TBL_NOTICE
-            <if test="searchWord != null">
-                WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
-            </if>
+        <if test="searchWord != null">
+            WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+        </if>
     </select>
 
     <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">

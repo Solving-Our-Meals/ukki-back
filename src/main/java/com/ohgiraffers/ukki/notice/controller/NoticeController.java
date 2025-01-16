@@ -29,6 +29,8 @@ public class NoticeController {
 
         List<NoticeDTO> bossNoticeList = noticeService.getBossNoticeList(searchWord);
 
+        System.out.println("bossNoticeList = " + bossNoticeList);
+
         return bossNoticeList;
     }
 

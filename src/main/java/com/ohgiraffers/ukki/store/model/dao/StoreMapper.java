@@ -48,5 +48,6 @@ public interface StoreMapper {
 
     void insertOrUpdateSearch(@Param("storeName") String storeName);
 
+    ReviewContentDTO getReviewContent(long reviewNo);
 }
 

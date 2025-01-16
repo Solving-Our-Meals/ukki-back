@@ -333,6 +333,14 @@
          WHERE A.STORE_NO = #{storeNo};
     </select>
 
+    <!-- 리뷰 삭제 시 리뷰 이미지 불러오기(드라이브에서 삭제할 리뷰 이미지 이름 가져오기) -->
+    <select id="getReviewContent" parameterType="long" resultMap="reviewListResultMap">
+        SELECT
+               *
+          FROM TBL_REVIEW
+         WHERE REVIEW_NO = #{ reviewNo }
+    </select>
+
     <!-- 메인 -->
 
     <select id="getSearchInfo" resultMap="storeInfoResultMap" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
