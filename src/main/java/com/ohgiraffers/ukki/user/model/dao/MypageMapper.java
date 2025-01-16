@@ -1,10 +1,7 @@
 package com.ohgiraffers.ukki.user.model.dao;
 
 import com.ohgiraffers.ukki.common.InquiryState;
-import com.ohgiraffers.ukki.user.model.dto.MypageDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO;
-import com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO;
+import com.ohgiraffers.ukki.user.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -28,4 +25,10 @@ public interface MypageMapper {
     int deleteInquiryById(int inquiryNo);
 
     void saveFile(int inquiryNo, String fileName, String string);
+
+    String findPasswordByUserId(String userId);
+
+    MypageInfoDTO findUserProfileInfo(String userId);
+
+    int updateUserInfo(MypageUpdateUserInfoDTO updateUserInfoDTO);
 }

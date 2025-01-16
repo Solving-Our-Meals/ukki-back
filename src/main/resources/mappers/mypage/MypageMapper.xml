@@ -125,4 +125,40 @@
         DELETE FROM TBL_INQUIRY
         WHERE INQ_NO = #{inquiryNo}
     </delete>
+
+    <select id="findPasswordByUserId" resultType="String">
+        SELECT USER_PWD
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="findUserProfileInfo" parameterType="String" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInfoDTO">
+        SELECT
+        user_id AS userId,
+        user_name AS userName,
+        email
+        FROM
+        TBL_USER
+        WHERE
+        user_id = #{userId}
+    </select>
+
+    <update id="updateUserInfo" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageUpdateUserInfoDTO">
+        UPDATE TBL_USER
+        <set>
+            <if test="userName != null">
+                USER_NAME = #{userName},
+            </if>
+            <if test="userPass != null">
+                USER_PWD = #{userPass},
+            </if>
+            <if test="file != null">
+                USER_PROFILE = #{file}
+            </if>
+        </set>
+        WHERE USER_ID = #{userId}
+    </update>
+
+
+
 </mapper>
