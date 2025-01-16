@@ -7,10 +7,19 @@ import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
 import com.ohgiraffers.ukki.common.InquiryState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -204,7 +213,7 @@ public class AdminInquiryController {
     }
 
     @DeleteMapping("/info/report/{reportNo}")
-    public ResponseEntity<?> reportDelete(@PathVariable int reportNo){
+    public ResponseEntity<?> reportDelete(@PathVariable int reportNo) {
         try {
             adminInquiryService.reportDelete(reportNo);
 
@@ -220,4 +229,37 @@ public class AdminInquiryController {
                     .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
+
+    @GetMapping("/files/{filename}")
+    public ResponseEntity<?> getFile(@PathVariable String filename) throws MalformedURLException {
+        try {
+            Path filePath = Paths.get(SHARED_FOLDER).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            String contentType = null;
+//        Files.probeContentType(Path) 메소드를 사용하여 지정된 파일의 MIME 타입을 알아내기.
+            try {
+                contentType = Files.probeContentType(filePath);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+//        파일 타입의 추론하지 못했을 때 "application/octet-stream" -> 일반적인 바이너리 데이터 타입으로 파일의 타입이 명확하지 않을 때 사용
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        }catch (Exception e){
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
 }

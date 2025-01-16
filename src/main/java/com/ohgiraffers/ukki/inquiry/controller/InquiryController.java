@@ -50,12 +50,13 @@ public class InquiryController {
             } else {
                 fileName = "inquiryFile" + (lastNo + 1);
             }
-
-            inquiryDTO.setFile(fileName);
-            int fileResult = fileController(file, fileName);
-            if(fileResult==1){
+            String fileResult = fileController(file, fileName);
+            if(fileResult==null){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("파일 저장 중 오류가 발생했습니다.");
             }
+
+            inquiryDTO.setFile(fileResult);
+
         }
 
         inquiryDTO.setInquiryDate(LocalDate.now());
@@ -89,12 +90,12 @@ public class InquiryController {
             } else {
                 fileName = "inquiryFile" + (lastNo + 1);
             }
-
-            inquiryDTO.setFile(fileName);
-            int fileResult = fileController(file, fileName);
-            if(fileResult==1){
+            String fileResult = fileController(file, fileName);
+            if(fileResult==null){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("파일 저장 중 오류가 발생했습니다.");
             }
+
+            inquiryDTO.setFile(fileResult);
         }
         inquiryDTO.setInquiryDate(LocalDate.now());
         inquiryDTO.setState(PROCESSING);
@@ -158,12 +159,13 @@ public class InquiryController {
         if (file != null && !file.isEmpty()) {
             //      마지막 문의번호 불러오기
             String fileName = "inquiryFile"+inquiryNo;
-            inquiryDTO.setFile(fileName);
-            int fileResult = fileController(file, fileName);
-            System.out.println(inquiryDTO);
-            if(fileResult==1){
+            String fileResult = fileController(file, fileName);
+            if(fileResult==null){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("파일 저장 중 오류가 발생했습니다.");
             }
+            inquiryDTO.setFile(fileName);
+            System.out.println(inquiryDTO);
+
         }
 
         int result = inquiryService.inquiryUpdate(inquiryDTO);
@@ -196,7 +198,7 @@ public class InquiryController {
         return ResponseEntity.ok(responseMap);
     }
 
-    public int fileController(MultipartFile file, String fileName){
+    public String fileController(MultipartFile file, String fileName){
 
         //                파일이름에서 확장자 뽑아내기
         String fileExtension = "";
@@ -221,10 +223,10 @@ public class InquiryController {
 
             System.out.println(file.getInputStream());
             System.out.println("파일 저장 성공: " + fileSetName);
-            return 2;
+            return fileSetName;
         } catch (IOException e) {
             e.printStackTrace();
-            return 1;
+            return null;
         }
     }
 }
