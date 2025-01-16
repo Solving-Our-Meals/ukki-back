@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ohgiraffers.ukki.admin.notice.model.dto.AdminNoticeDTO;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/notices")
@@ -32,7 +34,7 @@ public class AdminNoticeController {
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+                    .body("공지사항 카테고리를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -48,7 +50,7 @@ public class AdminNoticeController {
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+                    .body("회원 공지사항을 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -63,7 +65,7 @@ public class AdminNoticeController {
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+                    .body("가게 공지사항을 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -78,7 +80,59 @@ public class AdminNoticeController {
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+                    .body("공지사항 정보를 불러오는 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @PutMapping("/info/{noticeNo}")
+    public ResponseEntity<?> editNoticeInfo(@PathVariable int noticeNo, @RequestBody AdminNoticeDTO adminNoticeDTO) {
+        try {
+            adminNoticeDTO.setNoticeNo(noticeNo);
+
+            adminNoticeService.editNoticeInfo(adminNoticeDTO);
+
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "수정에 성공했습니다.");
+
+            return ResponseEntity.ok(responseMap);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("공지사항 수정 중 에러가 발생했습니다.");
+        }
+    }
+
+    @DeleteMapping("/info/{noticeNo}")
+    public ResponseEntity<?> deleteNotice(@PathVariable int noticeNo) {
+        try{
+            adminNoticeService.deleteNotice(noticeNo);
+
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "삭제에 성공했습니다.");
+
+            return ResponseEntity.ok(responseMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("공지사항 삭제 중 에러가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/regist")
+    public ResponseEntity<?> registNotice(@RequestBody AdminNoticeDTO adminNoticeDTO) {
+        try{
+            adminNoticeService.registNotice(adminNoticeDTO);
+
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "등록에 성공했습니다.");
+
+            return ResponseEntity.ok(responseMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("공지사항 등록 중 에러가 발생했습니다.");
         }
     }
 }

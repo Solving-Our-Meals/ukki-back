@@ -15,4 +15,10 @@ public interface AdminNoticeMapper {
     List<AdminNoticeCategoryDTO> searchNoticeCategory();
 
     AdminNoticeDTO searchNoticeInfo(int noticeNo);
+
+    void editNoticeInfo(AdminNoticeDTO adminNoticeDTO);
+
+    void deleteNotice(int noticeNo);
+
+    void registNotice(AdminNoticeDTO adminNoticeDTO);
 }
