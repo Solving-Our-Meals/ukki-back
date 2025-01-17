@@ -78,6 +78,28 @@
         reviewNo DESC;
     </select>
 
+    <select id="findUserReviewDetailByReviewNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
+        SELECT
+        u.USER_PROFILE AS userProfile,
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
+        r.REVIEW_DATE AS reviewDate,
+        r.REVIEW_CONTENT AS reviewText,
+        r.REVIEW_SCOPE AS star
+        FROM
+        TBL_REVIEW r
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = r.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON s.STORE_NO = r.STORE_NO
+        WHERE
+        r.REVIEW_NO = #{reviewNo};
+    </select>
+
+
     <delete id="deleteReviewById" parameterType="int">
         DELETE FROM TBL_REVIEW
         WHERE REVIEW_NO = #{reviewNo}

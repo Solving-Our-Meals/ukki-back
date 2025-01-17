@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.user.model.dto;
 import java.util.Date;
 
 public class MypageReviewDTO {
+    private String userProfile;
     private String userId;
     private int userNo;
     private int storeNo;
@@ -14,7 +15,8 @@ public class MypageReviewDTO {
 
     public MypageReviewDTO() {}
 
-    public MypageReviewDTO(String userId, int userNo, int storeNo, int reviewNo, String storeName, Date reviewDate, String reviewText, String star) {
+    public MypageReviewDTO(String userProfile, String userId, int userNo, int storeNo, int reviewNo, String storeName, Date reviewDate, String reviewText, String star) {
+        this.userProfile = userProfile;
         this.userId = userId;
         this.userNo = userNo;
         this.storeNo = storeNo;
@@ -23,6 +25,14 @@ public class MypageReviewDTO {
         this.reviewDate = reviewDate;
         this.reviewText = reviewText;
         this.star = star;
+    }
+
+    public String getUserProfile() {
+        return userProfile;
+    }
+
+    public void setUserProfile(String userProfile) {
+        this.userProfile = userProfile;
     }
 
     public String getUserId() {
@@ -92,7 +102,8 @@ public class MypageReviewDTO {
     @Override
     public String toString() {
         return "MypageReviewDTO{" +
-                "userId='" + userId + '\'' +
+                "userProfile='" + userProfile + '\'' +
+                ", userId='" + userId + '\'' +
                 ", userNo=" + userNo +
                 ", storeNo=" + storeNo +
                 ", reviewNo=" + reviewNo +

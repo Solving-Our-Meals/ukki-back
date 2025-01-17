@@ -103,6 +103,31 @@ public class MypageController {
         return ResponseEntity.ok(reservations);
     }
 
+    @GetMapping("/review/{reviewNo}")
+    public ResponseEntity<MypageReviewDTO> getUserReviewDetail(@PathVariable Long reviewNo, HttpServletRequest request) {
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        MypageReviewDTO reviewDetail = mypageService.getUserReviewDetailFromToken(jwtToken, userId, reviewNo);
+
+        if (reviewDetail == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(reviewDetail);
+    }
+
+
+
     @DeleteMapping("/review/delete")
     public ResponseEntity<String> deleteReview(@RequestBody MypageReviewDTO mypageReviewDTO) {
         int reviewNo = mypageReviewDTO.getReviewNo();
