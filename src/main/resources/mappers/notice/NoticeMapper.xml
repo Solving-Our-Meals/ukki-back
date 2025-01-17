@@ -21,6 +21,7 @@
             <if test="searchWord != null">
                 AND (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
             </if>
+          ORDER BY DATE DESC
     </select>
 
     <select id="getBossNoticeList" parameterType="String" resultMap="getNoticeResultMap">
@@ -30,6 +31,7 @@
         <if test="searchWord != null">
             WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
         </if>
+        ORDER BY DATE DESC
     </select>
 
     <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">
@@ -39,4 +41,11 @@
          WHERE NOTICE_NO = #{ noticeNo }
     </select>
 
+    <select id="getRecentNotice" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+         ORDER BY NOTICE_NO DESC
+         LIMIT 1;
+    </select>
 </mapper>

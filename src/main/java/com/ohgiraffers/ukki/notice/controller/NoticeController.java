@@ -44,4 +44,10 @@ public class NoticeController {
         return noticeDTO;
     }
 
+    @GetMapping(value = "/boss/recentNotice")
+    public NoticeDTO getRecentNotice(@ModelAttribute NoticeDTO noticeDTO){
+        noticeDTO = noticeService.getRecentNotice();
+
+        return noticeDTO;
+    }
 }

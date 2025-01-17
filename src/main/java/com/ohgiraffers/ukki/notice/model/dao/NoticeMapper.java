@@ -12,4 +12,6 @@ public interface NoticeMapper {
     List<NoticeDTO> getBossNoticeList(String searchWord);
 
     NoticeDTO getSpecificNotice(long noticeNo);
+
+    NoticeDTO getRecentNotice();
 }

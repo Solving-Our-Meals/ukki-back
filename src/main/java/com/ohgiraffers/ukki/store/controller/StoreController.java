@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
 
 
     public StoreController(StoreService storeService){
@@ -332,16 +332,25 @@ public class StoreController {
 
             reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
 
+            // 컴퓨터가 특정 폴더를 찾아서 그 폴더가 없으면 새로 만드는 과정
+            // 파일 경로 설정
             String filePath = SHARED_FOLDER;
+            // 설정한 파일 경로를 사용해서 File 객체 생성
             File dir = new File(filePath);
+            // File 객체가 존재하는지 확인
             if(!dir.exists()){
+                // 디렉토리가 존재하지 않으면 모든 필요한 부모 디렉토리를 포함하여 디렉토리를 생성
                 dir.mkdirs();
             }
 
             // 파일명을 reviewContentDTO.getReviewImage()와 같은 값으로 저장
+            // singleFile 객체에서 원래 파일 이름 가져와서 originFileName이라는 변수에 저장
             String originFileName = singleFile.getOriginalFilename();
+            // 파일 이름에서 마지막 점(.) 이후의 문자열을 확장자로 추출하여 ext라는 변수에 저장
             String ext = originFileName.substring(originFileName.lastIndexOf('.'));
+            // 리뷰 이미지 가져와서 앞에서 추출한 확장자와 결합해서 savedName 변수에 저장
             String savedName = reviewContentDTO.getReviewImage() + ext;
+            // 파일 경로와 새로 저장할 파일 이름을 결합해서 최종 파일 경로를 설정
             String fullPath = filePath + "/" + savedName;
 
             try {
