@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StoreService {
@@ -113,4 +114,25 @@ public class StoreService {
     public ReviewContentDTO getReviewContent(long reviewNo) {
         return storeMapper.getReviewContent(reviewNo);
     }
+
+    public int getTotalReservations(int storeNo) {
+        return storeMapper.selectTotalReservations(storeNo);  // Fetch total reservations from DB
+    }
+
+    public int getTodayReservations(int storeNo) {
+        return storeMapper.selectTodayReservationCount(storeNo);  // Fetch today's reservation count
+    }
+
+    public List<Integer> getWeeklyReservations(int storeNo) {
+        return storeMapper.selectWeeklyReservationCount(storeNo);  // Fetch weekly reservation counts
+    }
+
+    public int getAvailableSlots(int storeNo, String reservationDate) {
+        return storeMapper.selectAvailableReservationPeople(storeNo, reservationDate);  // Fetch available slots
+    }
+
+    public List<Map<String, Object>> getReservationList(int storeNo) {
+        return storeMapper.selectReservationStatusByStore(storeNo);  // Fetch reservation list
+    }
+
 }
