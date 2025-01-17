@@ -31,4 +31,6 @@ public interface MypageMapper {
     MypageInfoDTO findUserProfileInfo(String userId);
 
     int updateUserInfo(MypageUpdateUserInfoDTO updateUserInfoDTO);
+
+    MypageReviewDTO findUserReviewDetailByReviewNo(Long reviewNo);
 }

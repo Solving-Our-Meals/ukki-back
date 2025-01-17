@@ -270,6 +270,29 @@ public class MypageService {
         }
     }
 
+    public MypageReviewDTO getUserReviewDetailFromToken(String jwtToken, String userId, Long reviewNo) {
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+        MypageReviewDTO reviewDetail = mypageMapper.findUserReviewDetailByReviewNo(reviewNo);
+
+        if (reviewDetail == null) {
+            throw new IllegalArgumentException("리뷰를 찾을 수 없습니다.");
+        }
+
+        return reviewDetail;
+    }
+
+
+
 /*    public boolean deleteUser(String userId) {
     }*/
 }

@@ -3,26 +3,38 @@ package com.ohgiraffers.ukki.user.model.dto;
 import java.util.Date;
 
 public class MypageReviewDTO {
+    private String userProfile;
     private String userId;
     private int userNo;
     private int storeNo;
-    private int reviewNo;
     private String storeName;
+    private int reviewNo;
     private Date reviewDate;
+    private String reviewPicture;
     private String reviewText;
     private String star;
 
     public MypageReviewDTO() {}
 
-    public MypageReviewDTO(String userId, int userNo, int storeNo, int reviewNo, String storeName, Date reviewDate, String reviewText, String star) {
+    public MypageReviewDTO(String userProfile, String userId, int userNo, int storeNo, String storeName, int reviewNo, Date reviewDate, String reviewPicture, String reviewText, String star) {
+        this.userProfile = userProfile;
         this.userId = userId;
         this.userNo = userNo;
         this.storeNo = storeNo;
-        this.reviewNo = reviewNo;
         this.storeName = storeName;
+        this.reviewNo = reviewNo;
         this.reviewDate = reviewDate;
+        this.reviewPicture = reviewPicture;
         this.reviewText = reviewText;
         this.star = star;
+    }
+
+    public String getUserProfile() {
+        return userProfile;
+    }
+
+    public void setUserProfile(String userProfile) {
+        this.userProfile = userProfile;
     }
 
     public String getUserId() {
@@ -49,14 +61,6 @@ public class MypageReviewDTO {
         this.storeNo = storeNo;
     }
 
-    public int getReviewNo() {
-        return reviewNo;
-    }
-
-    public void setReviewNo(int reviewNo) {
-        this.reviewNo = reviewNo;
-    }
-
     public String getStoreName() {
         return storeName;
     }
@@ -65,12 +69,28 @@ public class MypageReviewDTO {
         this.storeName = storeName;
     }
 
+    public int getReviewNo() {
+        return reviewNo;
+    }
+
+    public void setReviewNo(int reviewNo) {
+        this.reviewNo = reviewNo;
+    }
+
     public Date getReviewDate() {
         return reviewDate;
     }
 
     public void setReviewDate(Date reviewDate) {
         this.reviewDate = reviewDate;
+    }
+
+    public String getReviewPicture() {
+        return reviewPicture;
+    }
+
+    public void setReviewPicture(String reviewPicture) {
+        this.reviewPicture = reviewPicture;
     }
 
     public String getReviewText() {
@@ -92,12 +112,14 @@ public class MypageReviewDTO {
     @Override
     public String toString() {
         return "MypageReviewDTO{" +
-                "userId='" + userId + '\'' +
+                "userProfile='" + userProfile + '\'' +
+                ", userId='" + userId + '\'' +
                 ", userNo=" + userNo +
                 ", storeNo=" + storeNo +
-                ", reviewNo=" + reviewNo +
                 ", storeName='" + storeName + '\'' +
+                ", reviewNo=" + reviewNo +
                 ", reviewDate=" + reviewDate +
+                ", reviewPicture='" + reviewPicture + '\'' +
                 ", reviewText='" + reviewText + '\'' +
                 ", star='" + star + '\'' +
                 '}';
