@@ -3,23 +3,20 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.qr.model.dao.QrMapper">
-    <resultMap id="qrConfirm" type="com.ohgiraffers.ukki.qr.model.dto.QrConfirmDTO">
-        <id property="reservationNo" column="RES_NO"/>
-        <result property="storeNo" column="STORE_NO"/>
-    </resultMap>
 
-    <select id="qrConfirmation" resultMap="qrConfirm">
+    <select id="resStoreUserName">
         SELECT
-            RES_NO,
-            STORE_NO
-        FROM TBL_RESERVATION
+        c.USER_ID
+        FROM TBL_RESERVATION a
+        LEFT JOIN TBL_STORE b ON a.STORE_NO = b.STORE_NO
+        LEFT JOIN TBL_USER c ON b.USER_NO = c.USER_NO
         WHERE QR = #{qr}
     </select>
 
-    <update id="qrConfirmSuccess">
-        UPDATE TBL_RESERVATION
-        SET QR_CONFIRM = true,
-            QR = 'clear'
+    <update id="editQrConfirmRes">
+        UPDATE TBL_RESERVATION SET
+        QR_CONFIRM = true,
+        QR = 'expired'
         WHERE QR = #{qr}
     </update>
 </mapper>

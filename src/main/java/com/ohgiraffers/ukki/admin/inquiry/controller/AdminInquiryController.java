@@ -6,6 +6,7 @@ import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
 import com.ohgiraffers.ukki.common.InquiryState;
+import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -28,7 +29,8 @@ import java.util.*;
 @RequestMapping("/admin/inquiries")
 public class AdminInquiryController {
 
-    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
+//    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
+private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     private final AdminInquiryService adminInquiryService;
 
     @Autowired
@@ -171,6 +173,21 @@ public class AdminInquiryController {
     @DeleteMapping("/info/{inquiryNo}")
     public ResponseEntity<?> inquiryDelete(@PathVariable int inquiryNo){
         try {
+            InquiryInfoDTO inquiryDTO = adminInquiryService.inquiryInfo(inquiryNo);
+            String fileToDeleteInquiry =  inquiryDTO.getFile();
+
+            if(fileToDeleteInquiry != null) {
+                int dotIndex = fileToDeleteInquiry.lastIndexOf('.');
+                String extension = "";
+                if (dotIndex > 0 && dotIndex < fileToDeleteInquiry.length() - 1) {
+                    extension = fileToDeleteInquiry.substring(dotIndex + 1);
+                }
+                System.out.println(extension);
+
+                Path filePathInquiry = Paths.get(SHARED_FOLDER, fileToDeleteInquiry);
+                Files.deleteIfExists(filePathInquiry);
+            }
+
             adminInquiryService.inquiryDelete(inquiryNo);
 
             Map<String, String> response = new HashMap<>();

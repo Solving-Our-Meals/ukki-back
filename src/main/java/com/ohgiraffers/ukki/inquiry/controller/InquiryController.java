@@ -28,7 +28,8 @@ import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
 @RequestMapping("/inquiries")
 public class InquiryController {
 
-    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
+//    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
+private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     private final InquiryService inquiryService;
 
 

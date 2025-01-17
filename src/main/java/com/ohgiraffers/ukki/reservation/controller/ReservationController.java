@@ -109,15 +109,16 @@ public class ReservationController {
 //        System.out.println("userEmail = " + userEmail);
 
         // QR코드 만드는 함수 호출
-        QrController qrController = new QrController(qrService);
-//        System.out.println("여긴 왔니...?");
-        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
-//        System.out.println("어디까지 왔니1");
-        // QR코드 reservationInfoDTO에 넣기
+//        QrController qrController = new QrController(qrService);
+        System.out.println("여긴 왔니...?");
+//        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
+        String qrCode = qrService.qrCertificate();
+        System.out.println("어디까지 왔니1");
+//         QR코드 reservationInfoDTO에 넣기
         reservationInfoDTO.setQr(qrCode);
-//        System.out.println("어디까지 왔니2");
-//        System.out.println("reservationInfo : " + reservationInfoDTO);
-//        System.out.println("어디까지 왔니3");
+        System.out.println("어디까지 왔니2");
+        System.out.println("reservationInfo : " + reservationInfoDTO);
+        System.out.println("어디까지 왔니3");
 
         reservationService.insertReservation(reservationInfoDTO);
 
