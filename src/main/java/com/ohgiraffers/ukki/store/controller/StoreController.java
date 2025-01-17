@@ -366,6 +366,7 @@ public class StoreController {
     @DeleteMapping(value = "/{storeNo}/deletereview")
     public void deleteReview(@PathVariable("storeNo") long storeNo, @RequestParam("reviewNo") long reviewNo, @RequestParam("userNo") long userNo){
         System.out.println("리뷰 삭제 옴");
+        System.out.println("zz");
 
         // 삭제할 리뷰 정보 가져오기(리뷰 이미지 포함)
         ReviewContentDTO reviewContentDTO = storeService.getReviewContent(reviewNo);

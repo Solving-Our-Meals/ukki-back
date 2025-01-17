@@ -57,6 +57,7 @@
 
     <select id="findUserReviewByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
         SELECT
+        u.USER_NO AS userNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         s.STORE_NO AS storeNo,
@@ -74,7 +75,7 @@
         u.USER_ID = #{userId}
 
         ORDER BY
-        reviewDate DESC;
+        reviewNo DESC;
     </select>
 
     <delete id="deleteReviewById" parameterType="int">

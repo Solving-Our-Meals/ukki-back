@@ -5,6 +5,7 @@ import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
 import com.ohgiraffers.ukki.user.model.service.MypageService;
+import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -183,13 +183,15 @@ public class MypageController {
         }
     }
 
-    @PutMapping("/inquiry/{inquiryNo}")
+    @PutMapping(value = "/inquiry/{inquiryNo}", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, String>> updateInquiry(
             @PathVariable int inquiryNo,
             @RequestParam String title,       // 제목
             @RequestParam String text,        // 내용
             @RequestParam(required = false) MultipartFile file, // 파일 (선택사항)
             HttpServletRequest request) {
+
+        System.out.println(file);
 
         // JWT 토큰 검사
         String jwtToken = cookieService.getJWTCookie(request);
@@ -206,6 +208,8 @@ public class MypageController {
 
         // 사용자 문의 정보 가져오기
         List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
+
+        System.out.println("zz");
 
         // 수정할 문의 찾기
         MypageInquiryDTO inquiryToUpdate = inquiries.stream()
@@ -225,8 +229,11 @@ public class MypageController {
         // 파일 업로드 처리 (파일이 있을 때만)
         if (file != null && !file.isEmpty()) {
             try {
-                String filePath = mypageService.saveFile(file, userId); // 파일 저장
-                inquiryToUpdate.setFile(filePath); // 파일 경로 저장
+                boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
+                if (!updated) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -234,26 +241,8 @@ public class MypageController {
             }
         }
 
-        // 문의 업데이트
-        try {
-            boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
-
-            if (updated) {
-                return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "서버 오류 발생: " + e.getMessage()));
-        }
+        return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
     }
-
-
-
-
 
     @DeleteMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<Map<String, String>> deleteInquiry(
