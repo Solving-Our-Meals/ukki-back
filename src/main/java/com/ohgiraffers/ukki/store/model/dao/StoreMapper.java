@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface StoreMapper {
@@ -49,5 +50,15 @@ public interface StoreMapper {
     void insertOrUpdateSearch(@Param("storeName") String storeName);
 
     ReviewContentDTO getReviewContent(long reviewNo);
+
+    int selectTotalReservations(int storeNo);
+
+    int selectTodayReservationCount(int storeNo);
+
+    List<Integer> selectWeeklyReservationCount(int storeNo);
+
+    int selectAvailableReservationPeople(int storeNo, String reservationDate);
+
+    List<Map<String, Object>> selectReservationStatusByStore(int storeNo);
 }
 
