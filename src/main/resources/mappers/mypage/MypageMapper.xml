@@ -88,7 +88,8 @@
         r.REVIEW_NO AS reviewNo,
         r.REVIEW_DATE AS reviewDate,
         r.REVIEW_CONTENT AS reviewText,
-        r.REVIEW_SCOPE AS star
+        r.REVIEW_SCOPE AS star,
+        r.REVIEW_IMG AS reviewPicture
         FROM
         TBL_REVIEW r
         LEFT JOIN
@@ -98,6 +99,7 @@
         WHERE
         r.REVIEW_NO = #{reviewNo};
     </select>
+
 
 
     <delete id="deleteReviewById" parameterType="int">
