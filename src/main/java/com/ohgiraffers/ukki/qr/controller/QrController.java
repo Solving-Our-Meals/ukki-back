@@ -10,16 +10,21 @@ import com.ohgiraffers.ukki.qr.model.service.QrService;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -34,8 +39,8 @@ public class QrController {
     private final JwtService jwtService;
     private final CookieService cookieService;
 
-//    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
-    private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
+    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\qr";
+//    private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
     @Autowired
     public QrController(QrService qrService, JwtService jwtService, CookieService cookieService) {
@@ -69,6 +74,36 @@ public class QrController {
             return ResponseEntity.ok(data);
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"none\"}");
+        }
+    }
+
+    @GetMapping(value = "{qrName}/api/qrImage")
+    public ResponseEntity<Resource> getQrImage(@PathVariable String qrName){
+
+        try {
+
+            System.out.println("QR이미지 왔다");
+            System.out.println(qrName);
+            Path file = Paths.get(SHARED_FOLDER).resolve(qrName + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(qrName + ".jpg");
+            }
+
+            // 디버깅 확인
+//            System.out.println("프로필 파일 경로 : " + file);
+            Resource resource = new UrlResource(file.toUri());
+
+            System.out.println(resource);
+            System.out.println(file);
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; qrName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }
