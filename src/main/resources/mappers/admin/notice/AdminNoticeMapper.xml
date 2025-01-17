@@ -33,6 +33,7 @@
         <if test="word != null">
             AND CONCAT(a.NOTICE_TITLE, ' ', a.NOTICE_CONTENT, ' ', b.CATEGORY_NAME, ' ', a.DATE) LIKE CONCAT('%', #{ word }, '%')
         </if>
+        ORDER BY DATE DESC;
     </select>
 
     <select id="searchStoreNotice" resultMap="noticeResultMap">
@@ -45,6 +46,7 @@
                 AND CONCAT(a.NOTICE_TITLE, ' ', a.NOTICE_CONTENT, ' ', b.CATEGORY_NAME, ' ', a.DATE) LIKE CONCAT('%', #{ word }, '%')
             </if>
         </where>
+        ORDER BY DATE DESC;
     </select>
 
     <select id="searchNoticeInfo" resultMap="noticeResultMap">
@@ -54,4 +56,23 @@
         WHERE NOTICE_NO = #{ noticeNo }
     </select>
 
+    <update id="editNoticeInfo" parameterType="com.ohgiraffers.ukki.admin.notice.model.dto.AdminNoticeDTO">
+        UPDATE TBL_NOTICE
+        <set>
+            <if test="noticeTitle != null">NOTICE_TITLE = #{noticeTitle},</if>
+            <if test="noticeContent != null">NOTICE_CONTENT = #{noticeContent},</if>
+            <if test="categoryNo != null">CATEGORY_NO = #{categoryNo}</if>
+        </set>
+        WHERE NOTICE_NO = #{noticeNo}
+    </update>
+
+    <delete id="deleteNotice">
+        DELETE FROM TBL_NOTICE
+        WHERE NOTICE_NO = #{noticeNo}
+    </delete>
+
+    <insert id="registNotice" parameterType="com.ohgiraffers.ukki.admin.notice.model.dto.AdminNoticeDTO">
+        INSERT INTO TBL_NOTICE VALUES
+        (0, #{noticeTitle},#{noticeContent},#{date},#{categoryNo})
+    </insert>
 </mapper>

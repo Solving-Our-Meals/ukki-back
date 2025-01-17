@@ -33,4 +33,16 @@ public class AdminNoticeService {
     public AdminNoticeDTO searchNoticeInfo(int noticeNo) {
         return adminNoticeMapper.searchNoticeInfo(noticeNo);
     }
+
+    public void editNoticeInfo(AdminNoticeDTO adminNoticeDTO) {
+        adminNoticeMapper.editNoticeInfo(adminNoticeDTO);
+    }
+
+    public void deleteNotice(int noticeNo) {
+        adminNoticeMapper.deleteNotice(noticeNo);
+    }
+
+    public void registNotice(AdminNoticeDTO adminNoticeDTO) {
+        adminNoticeMapper.registNotice(adminNoticeDTO);
+    }
 }
