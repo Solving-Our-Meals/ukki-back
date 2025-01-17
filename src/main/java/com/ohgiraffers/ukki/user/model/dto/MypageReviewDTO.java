@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class MypageReviewDTO {
     private String userId;
+    private int userNo;
     private int storeNo;
     private int reviewNo;
     private String storeName;
@@ -13,12 +14,9 @@ public class MypageReviewDTO {
 
     public MypageReviewDTO() {}
 
-    public MypageReviewDTO (int reviewNo) {
-        this.reviewNo = reviewNo;
-    }
-
-    public MypageReviewDTO(String userId, int storeNo, int reviewNo, String storeName, Date reviewDate, String reviewText, String star) {
+    public MypageReviewDTO(String userId, int userNo, int storeNo, int reviewNo, String storeName, Date reviewDate, String reviewText, String star) {
         this.userId = userId;
+        this.userNo = userNo;
         this.storeNo = storeNo;
         this.reviewNo = reviewNo;
         this.storeName = storeName;
@@ -33,6 +31,14 @@ public class MypageReviewDTO {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(int userNo) {
+        this.userNo = userNo;
     }
 
     public int getStoreNo() {
@@ -87,6 +93,7 @@ public class MypageReviewDTO {
     public String toString() {
         return "MypageReviewDTO{" +
                 "userId='" + userId + '\'' +
+                ", userNo=" + userNo +
                 ", storeNo=" + storeNo +
                 ", reviewNo=" + reviewNo +
                 ", storeName='" + storeName + '\'' +

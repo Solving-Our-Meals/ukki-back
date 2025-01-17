@@ -13,8 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,17 +133,18 @@ public class MypageService {
         int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
         return result > 0;
     }
+    private static final String FILE_UPLOAD_DIR = "\\\\192.168.0.138\\ukki_nas\\inquiry";  // 네트워크 공유 경로
 
     public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
+            // 파일이 존재하는 경우에만 파일 경로 설정
             if (file != null && !file.isEmpty()) {
-                String filePath = saveFile(file, userId);
-
-                inquiryToUpdate.setFile(filePath);
+                String filePath = saveFile(file, userId);  // 서비스에서만 호출
+                inquiryToUpdate.setFile(filePath); // 파일 경로 저장
             }
 
+            // 문의 업데이트
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
-
             return updatedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,19 +152,39 @@ public class MypageService {
         }
     }
 
-    private static final String FILE_UPLOAD_DIR = "/path/to/your/upload/directory";  // 파일 경로
+    private String saveFile(MultipartFile file, String userId) throws IOException {
 
-    public String saveFile(MultipartFile file, String userId) throws IOException {
-        Path uploadPath = Paths.get(FILE_UPLOAD_DIR, userId);
-        if (!uploadPath.toFile().exists()) {
-            uploadPath.toFile().mkdirs();
+
+        // 파일 이름 가져오기
+        String fileName = file.getOriginalFilename();
+        System.out.println("업로드된 파일 이름: " + fileName);
+
+        // 네트워크 경로와 사용자 ID를 합쳐서 폴더 경로 설정
+        String networkPath = FILE_UPLOAD_DIR + File.separator + userId;
+        System.out.println("파일 저장 경로: " + networkPath);
+
+        // 디렉토리 생성
+        File directory = new File(networkPath);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw new IOException("디렉토리 생성 실패: " + networkPath);
+            }
         }
 
-        Path filePath = uploadPath.resolve(file.getOriginalFilename());
-        file.transferTo(filePath.toFile());
+        // 파일 저장 경로 설정
+        File targetFile = new File(directory, fileName);
+        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
 
-        return filePath.toString();
+        try {
+            file.transferTo(targetFile);  // 파일 저장
+            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
+            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("파일 저장 오류", e);  // 파일 저장 실패 시 예외 처리
+        }
     }
+
 
     public boolean deleteInquiry(int inquiryNo) {
         int result = mypageMapper.deleteInquiryById(inquiryNo);
@@ -209,7 +232,7 @@ public class MypageService {
         return userInfo;
     }
 
-    private final String profileImageDirectory = "/path/to/upload/directory"; // 업로드 디렉토리 경로
+    private final String profileImageDirectory = "\\\\192.168.0.138\\ukki_nas"; // 업로드 디렉토리 경로
 
     public boolean updateUserInfo(String userId, String userName, String userPass, MultipartFile profileImage) {
         try {
@@ -238,13 +261,12 @@ public class MypageService {
                 updateUserInfoDTO.setUserPass(encodedPassword);
             }
 
-            // 4. 매퍼를 통해 사용자 정보 업데이트
             int updatedRows = mypageMapper.updateUserInfo(updateUserInfoDTO);
 
-            return updatedRows > 0;  // 성공적으로 업데이트되었으면 true 반환
+            return updatedRows > 0;
         } catch (IOException e) {
             e.printStackTrace();
-            return false;  // 파일 저장 실패 시 false 반환
+            return false;
         }
     }
 
