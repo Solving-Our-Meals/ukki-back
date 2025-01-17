@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class QrService {
 
-    //    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\qr";
-    private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
+        private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\qr";
+//    private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
     @Autowired
     private JavaMailSender mailSender;

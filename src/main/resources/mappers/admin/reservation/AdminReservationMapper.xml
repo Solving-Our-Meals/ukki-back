@@ -212,7 +212,8 @@
         a.STORE_NO,
         c.STORE_NAME,
         a.RES_TIME,
-        a.QR_CONFIRM
+        a.QR_CONFIRM,
+        a.QR
         FROM TBL_RESERVATION a
         LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
         LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
@@ -228,7 +229,8 @@
         a.STORE_NO,
         c.STORE_NAME,
         a.RES_TIME,
-        a.QR_CONFIRM
+        a.QR_CONFIRM,
+        a.QR
         FROM TBL_END_RES a
         LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
         LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
