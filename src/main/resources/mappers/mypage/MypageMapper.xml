@@ -82,6 +82,7 @@
         SELECT
         u.USER_PROFILE AS userProfile,
         u.USER_ID AS userId,
+        u.USER_NAME AS userName,
         u.USER_NO AS userNo,
         s.STORE_NAME AS storeName,
         s.STORE_NO AS storeNo,
