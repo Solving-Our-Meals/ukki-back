@@ -9,14 +9,19 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -306,29 +311,26 @@ public class MypageController {
         }
     }
 
-    // 스프링 프레임워크 리소스 사용 !
-    @GetMapping("/file/download/{fileId}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String fileId, HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request);
+    // 스프링 프레임워크 리소스 사용 ! // 서비스까지 갈 필요 없는 구간이라 서비스 부분은 제거했습니다.
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
+        try {
+            // 파일 경로 설정 (파일 경로는 서버상의 경로로 지정)
+            Path path = Paths.get("C:/Temp/inquiry/").resolve(fileName);
+            Resource resource = new FileSystemResource(path);
 
-        if (jwtToken == null) {
-            throw new IllegalArgumentException("토큰이 일치하지 않음");
+            // 파일이 존재하는지 확인
+            if (!resource.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // 다운로드 응답 설정
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
-        if (userId == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-
-        Resource resource = mypageService.loadFile(fileId, userId);
-
-        if (resource == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
     }
 
     @PostMapping("/confirm")
