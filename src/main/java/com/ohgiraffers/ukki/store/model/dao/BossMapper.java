@@ -9,6 +9,9 @@ import java.util.List;
 @Mapper
 public interface BossMapper {
 
+    // 가게 정보 조회
+    StoreInfoDTO getStoreInfo(long userNo);
+
     List<ReservationDTO> selectReservationStatusByStore(int storeNo);
 
     List<ReservationDTO> selectReservationPeopleList(int storeNo);
@@ -24,4 +27,13 @@ public interface BossMapper {
     String getNextAvailableTime(int storeNo, String resDate, String currentTime);
 
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
+
+    // 최신 리뷰 조회
+    ReviewContentDTO getRecentReview(long storeNo);
+
+    // 리뷰 리스트 가져오기
+    ReviewDTO getReviewList(long storeNo);
+
+    // 리뷰 상세 조회
+    DetailReviewInfoDTO getReviewInfo(long reviewNo);
 }
