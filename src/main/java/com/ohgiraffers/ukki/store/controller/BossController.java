@@ -143,5 +143,15 @@ public class BossController {
         return detailReviewInfoDTO;
     }
 
+    // 리뷰 신고
+    @PostMapping("/reviewReport")
+    @ResponseBody
+    public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
+
+        System.out.println("..dhdhdhdhd.." + reportReviewDTO);
+
+        bossService.reportReview(reportReviewDTO);
+    }
+
 
 }

@@ -36,4 +36,7 @@ public interface BossMapper {
 
     // 리뷰 상세 조회
     DetailReviewInfoDTO getReviewInfo(long reviewNo);
+
+    // 리뷰 신고
+    void reportReview(ReportReviewDTO reportReviewDTO);
 }
