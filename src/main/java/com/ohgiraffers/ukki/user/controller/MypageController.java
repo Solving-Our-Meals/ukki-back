@@ -410,6 +410,30 @@ public class MypageController {
         }
     }
 
+    @PostMapping("/profile-image")
+    public ResponseEntity<String> uploadProfileImage(HttpServletRequest request,
+                                                     @RequestParam("profileImage") MultipartFile profileImage) {
+        try {
+            String jwtToken = cookieService.getJWTCookie(request);
+            if (jwtToken == null || !jwtService.validateToken(jwtToken)) {
+                return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.");
+            }
+
+            Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+            String userId = (String) userInfo.get("userId");
+
+            boolean result = mypageService.updateProfileImage(userId, profileImage);
+            if (result) {
+                return ResponseEntity.ok("프로필 이미지가 성공적으로 업데이트되었습니다.");
+            } else {
+                return ResponseEntity.status(500).body("프로필 이미지 업데이트에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("이미지 업로드 중 오류가 발생했습니다.");
+        }
+    }
+
 /*    @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request); // 쿠키에서 JWT 토큰을 가져옵니다.

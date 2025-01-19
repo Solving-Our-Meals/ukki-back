@@ -185,6 +185,17 @@
         WHERE USER_ID = #{userId}
     </update>
 
+    <update id="updateUserProfileImage" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageProfileImageDTO">
+        UPDATE TBL_USER
+        SET USER_PROFILE = #{file}
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <select id="findProfileImagePathByUserId" resultType="String">
+        SELECT USER_PROFILE
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
 
 
 </mapper>

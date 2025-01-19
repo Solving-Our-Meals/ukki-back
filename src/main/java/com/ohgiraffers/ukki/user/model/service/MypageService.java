@@ -284,6 +284,96 @@ public class MypageService {
 
         return reviewDetail;
     }
+    private static final String PROFILE_IMAGE_DIR = "C:\\Temp\\profile";
+//    private final String PROFILE_IMAGE_DIR = "\\\\192.168.0.138\\ukki_nas"; // 업로드 디렉토리 경로
+public boolean updateProfileImage(String userId, MultipartFile profileImage) {
+    try {
+        String existingFilePath = getExistingFilePath(userId);
+
+        // 기존 프로필 이미지가 있으면 삭제
+        if (existingFilePath != null && !existingFilePath.isEmpty()) {
+            File existingFile = new File(existingFilePath);
+            if (existingFile.exists()) {
+                boolean deleted = existingFile.delete();
+                if (deleted) {
+                    System.out.println("기존 파일 삭제 성공: " + existingFilePath);
+                } else {
+                    System.out.println("기존 파일 삭제 실패: " + existingFilePath);
+                }
+            }
+        }
+
+        // 새 프로필 이미지가 존재하면 저장
+        if (profileImage != null && !profileImage.isEmpty()) {
+            // 새 파일을 저장하고 경로 반환
+            String newFilePath = saveFileProfile(profileImage, userId);  // saveFile 대신 saveFileProfile 사용
+
+            // DB에 새 경로를 업데이트 (경로만 저장)
+            MypageProfileImageDTO profileImageDTO = new MypageProfileImageDTO();
+            profileImageDTO.setUserId(userId);
+            profileImageDTO.setFile(newFilePath);  // 경로만 업데이트
+
+            // DB 업데이트
+            int updatedRows = mypageMapper.updateUserProfileImage(profileImageDTO);
+            return updatedRows > 0;
+        }
+
+        return false;
+    } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
+    // 프로필은 메소드로 경로 가져옴
+    private String getExistingFilePath(String userId) {
+        String existingFilePath = mypageMapper.findProfileImagePathByUserId(userId);
+
+        // 만약 프로필 이미지 경로가 없으면 기본 경로를 리턴하거나 null을 반환
+        if (existingFilePath == null || existingFilePath.isEmpty()) {
+            return null;  // 기본값 또는 null 반환
+        }
+
+        return existingFilePath;
+    }
+
+    private String saveFileProfile(MultipartFile file, String userId) throws IOException {
+        // 파일 이름 가져오기 (프로필 이미지 이름을 userId를 포함한 형태로 저장)
+        String fileName = userId + "_profile_image.jpg";  // 프로필 이미지 파일명은 고정
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IOException("파일 이름이 잘못되었습니다.");
+        }
+        System.out.println("업로드된 파일 이름: " + fileName);
+
+        // 저장할 경로 설정
+        String networkPath = PROFILE_IMAGE_DIR + File.separator;
+        System.out.println("파일 저장 경로: " + networkPath);
+
+        // 디렉토리 생성
+        File directory = new File(networkPath);
+        if (!directory.exists()) {
+            boolean dirCreated = directory.mkdirs();
+            if (dirCreated) {
+                System.out.println("디렉토리 생성 성공: " + networkPath);
+            } else {
+                throw new IOException("디렉토리 생성 실패: " + networkPath);
+            }
+        }
+
+        // 파일 저장 경로 설정
+        File targetFile = new File(directory, fileName);
+        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
+
+        try {
+            file.transferTo(targetFile);  // 파일 저장
+            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
+            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("파일 저장 오류", e);
+        }
+    }
 
 
 
