@@ -434,7 +434,7 @@ public class MypageController {
         }
     }
 
-/*    @DeleteMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request); // 쿠키에서 JWT 토큰을 가져옵니다.
 
@@ -460,7 +460,7 @@ public class MypageController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 처리 중 오류가 발생했습니다.");
         }
-    }*/
+    }
 
 
 

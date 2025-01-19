@@ -9,6 +9,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -325,7 +326,6 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
     }
 }
 
-
     // 프로필은 메소드로 경로 가져옴
     private String getExistingFilePath(String userId) {
         String existingFilePath = mypageMapper.findProfileImagePathByUserId(userId);
@@ -375,8 +375,47 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
     }
 
+    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
+    public boolean deleteUser(String userId) {
+        try {
+            // 1. 프로필 이미지 삭제
+            String profileImagePath = getExistingFilePath(userId);
+            if (profileImagePath != null) {
+                boolean isFileDeleted = deleteFile(profileImagePath);
+                if (!isFileDeleted) {
+                    // 파일 삭제 실패시 처리
+                    return false;
+                }
+            }
 
+            // 2. 사용자 정보 삭제 (Mapper 호출)
+            int result = mypageMapper.deleteUserById(userId);
+            if (result == 0) {
+                // 사용자 삭제 실패
+                return false;
+            }
 
-/*    public boolean deleteUser(String userId) {
-    }*/
+            // 3. 성공적으로 처리된 경우
+            return true;
+        } catch (Exception e) {
+            // 예외 처리
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteFile(String filePath) {
+        try {
+            Path path = Paths.get(filePath); // 파일 경로
+            if (Files.exists(path)) {
+                Files.delete(path);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
