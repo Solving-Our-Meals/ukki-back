@@ -181,4 +181,42 @@ public class AuthController {
 
         return ResponseEntity.status(401).body("Unauthorized"); // 401 인증실패 (권한없음)
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        try {
+            // 1. 요청에서 JWT 토큰을 추출
+            String token = jwtFilter.getTokenFromCookies(request);
+
+            // 2. 토큰이 없거나 유효하지 않으면 인증 실패
+            if (token == null || !authService.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "ⓘ 인증되지 않은 사용자입니다."));
+            }
+
+            // 3. 토큰에서 사용자 정보 추출
+            Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
+            String userId = (String) userInfo.get("userId");
+
+            // 4. 사용자 정보가 존재하면 반환
+            if (userId != null) {
+                // 사용자 정보 조회 (예: userId로 데이터베이스에서 사용자 정보 조회)
+                AuthDTO authDTO = authService.findUserById(userId);
+
+                // 사용자 정보를 AuthDTO로 반환
+                return ResponseEntity.ok(authDTO);
+            }
+
+            // 5. 사용자 정보가 없으면 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "ⓘ 사용자 정보를 찾을 수 없습니다."));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "ⓘ 사용자 정보를 가져오는 데 실패했습니다."));
+        }
+    }
+
+
 }

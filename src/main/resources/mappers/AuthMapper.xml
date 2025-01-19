@@ -28,4 +28,17 @@
         FROM TBL_USER
         WHERE USER_ID = #{userId}
     </select>
+
+    <select id="findUserById" resultType="com.ohgiraffers.ukki.auth.model.dto.AuthDTO">
+        SELECT
+        USER_NO AS userNo,
+        USER_ID AS userId,
+        EMAIL,
+        USER_NAME AS userName,
+        USER_PROFILE AS userProfile,
+        USER_ROLE AS userRole,
+        NOSHOW
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
 </mapper>
