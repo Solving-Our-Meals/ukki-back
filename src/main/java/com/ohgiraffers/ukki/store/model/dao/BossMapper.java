@@ -3,7 +3,9 @@ package com.ohgiraffers.ukki.store.model.dao;
 import com.ohgiraffers.ukki.store.controller.ReservationDTO;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -36,4 +38,14 @@ public interface BossMapper {
 
     // 리뷰 상세 조회
     DetailReviewInfoDTO getReviewInfo(long reviewNo);
+
+    int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
+
+    // 예약 가능 인원 업데이트
+    void updateAvailableSlots(@Param("storeNo") long storeNo, @Param("newSlots") int newSlots);
+
+    // 7일간의 예약 정보 조회
+    List<ReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
+                                                       @Param("startDate") LocalDate startDate,
+                                                       @Param("endDate") LocalDate endDate);
 }

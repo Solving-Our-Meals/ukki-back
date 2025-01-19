@@ -120,4 +120,23 @@ public class ReservationService {
     public void increaseReservation(long userNo) {
         reservationMapper.increaseReservation(userNo);
     }
+
+    public List<String> getAvailableSlots(long storeNo, String reservationDate) {
+        // 해당 가게의 운영 시간 가져오기
+        OperationDTO operationDTO = storeService.getOperation(storeNo);
+
+        // 예약 가능한 시간 리스트 만들기
+        List<String> availableSlots = new ArrayList<>();
+        LocalTime startTime = LocalTime.of(8, 0);  // 08:00
+        LocalTime endTime = LocalTime.of(22, 30); // 22:30
+
+        // 운영 시간에 맞춰서 예약 가능한 시간 추가
+        for (LocalTime time = startTime; !time.isAfter(endTime); time = time.plusMinutes(30)) {
+            if (isStoreOpenOnDay(operationDTO, time)) {
+                availableSlots.add(time.toString());
+            }
+        }
+
+        return availableSlots;
+    }
 }

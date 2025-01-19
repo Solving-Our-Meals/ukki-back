@@ -37,20 +37,51 @@
         <result property="reportCount" column="REPORT_COUNT"/>
         <result property="resNo" column="RES_NO"/>
     </resultMap>
+    <resultMap id="reservationResultMap" type="com.ohgiraffers.ukki.store.controller.ReservationDTO">
+        <id property="reservationNo" column="RES_NO"/>
+        <result property="reservationDate" column="RES_DATE"/>
+        <result property="reservationTime" column="RES_TIME"/>
+        <result property="reservationPeople" column="RES_PEOPLE"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeNo" column="STORE_NO"/>
+    </resultMap>
+
+    <select id="selectReservationStatusByStore" parameterType="int" resultMap="reservationResultMap">
+        SELECT
+        RES_NO,
+        RES_DATE,
+        RES_TIME,
+        0 AS RES_PEOPLE, -- 만약 RES_PEOPLE이 TBL_RESERVATION에 없다면 0으로 반환
+        '' AS STORE_NAME, -- 만약 STORE_NAME이 없다면 빈 문자열 반환
+        STORE_NO
+        FROM TBL_RESERVATION
+        WHERE STORE_NO = #{storeNo}
+    </select>
 
     <!-- 가게 정보 조회 -->
     <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
         SELECT
-               *
-          FROM TBL_STORE
-         WHERE USER_NO = #{ userNo }
+        STORE_NO
+        , STORE_NAME
+        , STORE_DES
+        , STORE_ADDRESS
+        , LATITUDE
+        , LONGITUDE
+        , STORE_PROFILE
+        , STORE_MENU
+        , STORE_CATEGORY_NO
+        , USER_NO
+        , POS_NUMBER
+        FROM TBL_STORE
+        WHERE STORE_NO = #{storeNo}
     </select>
 
-    <!-- 가게별 예약 현황 조회 -->
-    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.controller.ReservationDTO">
-        SELECT * FROM TBL_RESERVATION
-        WHERE store_no = #{storeNo}
-    </select>
+<!--    &lt;!&ndash; 가게별 예약 현황 조회 &ndash;&gt;-->
+<!--    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.controller.ReservationDTO">-->
+<!--        SELECT * FROM TBL_RESERVATION-->
+<!--        WHERE store_no = #{storeNo}-->
+<!--    </select>-->
+
 
     <!-- 예약 인원 리스트 조회 -->
     <select id="selectReservationPeopleList" resultType="map">
@@ -175,4 +206,28 @@
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
          WHERE A.REVIEW_NO = #{reviewNo}
     </select>
+
+        <select id="findAvailableSlotsByStoreNo" resultType="int">
+            SELECT POS_NUMBER
+            FROM TBL_STORE
+            WHERE STORE_NO = #{storeNo}
+        </select>
+
+        <!-- 예약 가능 인원 업데이트 -->
+        <update id="updateAvailableSlots">
+            UPDATE TBL_STORE
+            SET POS_NUMBER = #{newSlots}
+            WHERE STORE_NO = #{storeNo}
+        </update>
+
+        <!-- 7일간의 예약 정보 조회 -->
+        <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+            SELECT r.RES_DATE AS resDate, r.RES_TIME AS resTime, u.USER_NAME AS userName
+            FROM TBL_RESERVATION r
+            JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+            WHERE r.STORE_NO = #{storeNo}
+            AND r.RES_DATE BETWEEN #{startDate} AND #{endDate}
+        </select>
+
+
 </mapper>
