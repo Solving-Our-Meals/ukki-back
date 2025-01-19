@@ -85,6 +85,33 @@ public class MypageController {
         return ResponseEntity.ok(reservations);
     }
 
+/*    @GetMapping("/reservation/{resNo}")
+    public ResponseEntity<MypageReservationDTO> getReservationDetail(@PathVariable Long resNo, HttpServletRequest request) {
+        // JWT 토큰 가져오기
+        String jwtToken = cookieService.getJWTCookie(request);
+
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
+
+        MypageReservationDTO reservationDetail = mypageService.getReservationDetail(resNo, userId);
+
+        if (reservationDetail == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null); // 예약 정보를 찾을 수 없을 경우
+        }
+
+        return ResponseEntity.ok(reservationDetail); // 예약 정보 반환
+    }*/
+
     @GetMapping("/review")
     public ResponseEntity<List<MypageReviewDTO>> getUseReview(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
@@ -461,7 +488,5 @@ public class MypageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 처리 중 오류가 발생했습니다.");
         }
     }
-
-
 
 }
