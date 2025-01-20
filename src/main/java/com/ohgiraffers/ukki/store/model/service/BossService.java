@@ -92,4 +92,20 @@ public class BossService {
     public void updateReportCount(long reviewNo) {
         bossMapper.updateReportCount(reviewNo);
     }
+
+    public List<InquiryDTO> getInquiryList(long userNo, String searchWord) {
+        return bossMapper.getInquiryList(userNo, searchWord);
+    }
+
+    public List<InquiryDTO> getReportList(long storeNo, String searchWord) {
+        return bossMapper.getReportList(storeNo, searchWord);
+    }
+
+    public List<InquiryDTO> getRecentInquiryList(long userNo) {
+        return bossMapper.getRecentInquiryList(userNo);
+    }
+
+    public List<InquiryDTO> getRecentReportList(long storeNo) {
+        return bossMapper.getRecentReportList(storeNo);
+    }
 }
