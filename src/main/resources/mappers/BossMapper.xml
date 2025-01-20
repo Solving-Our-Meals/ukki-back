@@ -296,6 +296,7 @@
         FROM TBL_RESERVATION R
         JOIN TBL_USER U ON R.USER_NO = U.USER_NO
         WHERE R.STORE_NO = #{storeNo} AND R.RES_DATE = #{reservationDate}
+    </select>
 
     <update id="updateReportCount" parameterType="long">
         UPDATE TBL_REVIEW
