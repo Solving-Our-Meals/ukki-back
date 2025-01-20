@@ -250,7 +250,6 @@ public class MypageController {
 
         System.out.println(file);
 
-        // JWT 토큰 검사
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -263,12 +262,10 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
-        // 사용자 문의 정보 가져오기
         List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
 
         System.out.println("zz");
 
-        // 수정할 문의 찾기
         MypageInquiryDTO inquiryToUpdate = inquiries.stream()
                 .filter(i -> i.getInquiryNo() == inquiryNo)
                 .findFirst()
@@ -279,11 +276,9 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
-        // 제목과 내용 수정
         inquiryToUpdate.setTitle(title);
         inquiryToUpdate.setText(text);
 
-        // 파일 업로드 처리 (파일이 있을 때만)
         if (file != null && !file.isEmpty()) {
             try {
                 boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);

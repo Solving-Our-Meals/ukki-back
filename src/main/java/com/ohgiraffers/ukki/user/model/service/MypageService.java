@@ -376,34 +376,78 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
     }
 
-    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
+/*    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
     public boolean deleteUser(String userId) {
         try {
-            // 1. 프로필 이미지 삭제
             String profileImagePath = getExistingFilePath(userId);
             if (profileImagePath != null) {
                 boolean isFileDeleted = deleteFile(profileImagePath);
                 if (!isFileDeleted) {
-                    // 파일 삭제 실패시 처리
                     return false;
                 }
             }
 
-            // 2. 사용자 정보 삭제 (Mapper 호출)
             int result = mypageMapper.deleteUserById(userId);
             if (result == 0) {
-                // 사용자 삭제 실패
                 return false;
             }
 
-            // 3. 성공적으로 처리된 경우
             return true;
         } catch (Exception e) {
             // 예외 처리
             e.printStackTrace();
             return false;
         }
+    }*/
+
+    @Transactional
+    public boolean deleteUser(String userId) {
+        try {
+            Long userNo = mypageMapper.getUserNoById(userId);
+            if (userNo == null) {
+                throw new RuntimeException("User not found for userId: " + userId);
+            }
+
+            // 프로필 이미지 삭제
+            String profileImagePath = getExistingFilePath(userId);
+            if (profileImagePath != null) {
+                boolean isFileDeleted = deleteFile(profileImagePath);
+                if (!isFileDeleted) {
+                    throw new RuntimeException("Failed to delete profile image");
+                }
+            }
+
+            // 리뷰 이미지 삭제
+            List<String> reviewImages = mypageMapper.getReviewImagesByUserId(userNo);
+            for (String reviewImagePath : reviewImages) {
+                boolean isFileDeleted = deleteFile(reviewImagePath);
+                if (!isFileDeleted) {
+                    throw new RuntimeException("Failed to delete review image: " + reviewImagePath);
+                }
+            }
+
+            // 리뷰 삭제
+            int reviewDeleteResult = mypageMapper.deleteReviewsByUserId(userNo);
+            if (reviewDeleteResult < 0) {
+                throw new RuntimeException("Failed to delete reviews");
+            }
+
+            // 사용자 삭제
+            int result = mypageMapper.deleteUserById(userId);
+            if (result == 0) {
+                throw new RuntimeException("Failed to delete user");
+            }
+
+            return true;
+        } catch (Exception e) {
+            // 예외 로그 출력
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting user: " + e.getMessage()); // 클라이언트로 에러 메시지 전달
+        }
     }
+
+
+
 
     public boolean deleteFile(String filePath) {
         try {
