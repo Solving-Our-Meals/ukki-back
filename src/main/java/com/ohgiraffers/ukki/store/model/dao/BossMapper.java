@@ -48,4 +48,8 @@ public interface BossMapper {
     List<ReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
                                                        @Param("startDate") LocalDate startDate,
                                                        @Param("endDate") LocalDate endDate);
+
+    // 리뷰 신고
+    void reportReview(ReportReviewDTO reportReviewDTO);
+
 }

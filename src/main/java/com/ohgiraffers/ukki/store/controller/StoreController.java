@@ -294,22 +294,22 @@ public class StoreController {
         paramMap.forEach((key, value) -> {
             switch (key) {
                 case "reviewDate":
-                    reviewContentDTO.setReviewDate(value);
+                    reviewContentDTO.setReviewDate(value.isEmpty() ? null : value);
                     break;
                 case "reviewContent":
-                    reviewContentDTO.setReviewContent(value);
+                    reviewContentDTO.setReviewContent(value.isEmpty() ? null : value);
                     break;
                 case "reviewScope":
-                    reviewContentDTO.setReviewScope(Integer.parseInt(value));
+                    reviewContentDTO.setReviewScope(value.isEmpty() ? null : Integer.parseInt(value));
                     break;
                 case "storeNo":
-                    reviewContentDTO.setStoreNo(Long.parseLong(value));
+                    reviewContentDTO.setStoreNo(value.isEmpty() ? null : Long.parseLong(value));
                     break;
                 case "userNo":
-                    reviewContentDTO.setUserNo(Long.parseLong(value));
+                    reviewContentDTO.setUserNo(value.isEmpty() ? null : Long.parseLong(value));
                     break;
                 case "resNo":
-                    reviewContentDTO.setResNo(Long.parseLong(value));
+                    reviewContentDTO.setResNo(value.isEmpty() ? null : Long.parseLong(value));
                     break;
             }
         });
@@ -363,7 +363,7 @@ public class StoreController {
             }
         } else {
             // 이미지가 없을 경우 기본 값을 설정
-            reviewContentDTO.setReviewImage("DEFAULT_REVIEW_IMG");
+            reviewContentDTO.setReviewImage(null);
         }
 
         storeService.createReview(reviewContentDTO);
@@ -391,7 +391,7 @@ public class StoreController {
         File pngFile = new File(pngFilePath);
         File jpgFile = new File(jpgFilePath);
 
-        if (!reviewContentDTO.getReviewImage().equals("DEFAULT_REVIEW_IMG")) {
+        if (reviewContentDTO.getReviewImage() != null) {
             if (pngFile.exists()) {
                 if (pngFile.delete()) {
                     System.out.println("PNG 이미지 파일 삭제 성공: " + pngFilePath);

@@ -80,4 +80,9 @@ public class BossService {
     public DetailReviewInfoDTO getReviewInfo(long reviewNo) {
         return bossMapper.getReviewInfo(reviewNo);
     }
+
+    // 리뷰 신고
+    public void reportReview(ReportReviewDTO reportReviewDTO) {
+        bossMapper.reportReview(reportReviewDTO);
+    }
 }

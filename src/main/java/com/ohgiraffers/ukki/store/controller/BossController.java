@@ -172,7 +172,16 @@ public class BossController {
         return detailReviewInfoDTO;
     }
 
+    // 리뷰 신고
+    @PostMapping("/reviewReport")
+    @ResponseBody
+    public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
+       System.out.println("..dhdhdhdhd.." + reportReviewDTO);
 
+        bossService.reportReview(reportReviewDTO);
+    }
+      
+                                                             
     // 예약 가능 인원 업데이트
     @PostMapping("/updateAvailableSlots")
     public ResponseEntity<String> updateAvailableSlots(@RequestParam long storeNo, @RequestParam int newSlots) {
@@ -215,3 +224,4 @@ public class BossController {
     }
 
 }
+

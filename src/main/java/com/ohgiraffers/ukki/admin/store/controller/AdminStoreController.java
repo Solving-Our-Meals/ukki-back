@@ -23,8 +23,8 @@ import java.util.*;
 @RequestMapping("/admin/stores")
 public class AdminStoreController {
 
-//    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
-private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
+//private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -116,7 +116,6 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     }
 
     @DeleteMapping("/info/{storeNo}/delete")
-    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> deleteStoreInfo(@PathVariable int storeNo){
         System.out.println("삭제하러 옴");
         Map<String, String> response = new HashMap<>();
@@ -159,6 +158,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteReviewWithStore(int storeNo) throws IOException {
         String[] reviewImgArray = adminStoreService.getReviewImgStoreNo(storeNo);
         for(int i = 0; i < reviewImgArray.length; i++){
@@ -310,6 +310,8 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             return ResponseEntity.ok().body("가게 정보가 성공적으로 수정되었습니다.");
 
         } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("가게 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
         }
@@ -359,7 +361,6 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     }
 
     @PostMapping("regist/store")
-    @Transactional
     public ResponseEntity<?> registStore(
             @RequestPart(value = "storeData", required = false) String storeDataJson,
             @RequestPart(value = "userData", required = false) String userDataJson,
