@@ -197,5 +197,8 @@
         WHERE USER_ID = #{userId}
     </select>
 
+    <delete id="deleteUserById" parameterType="String">
+        DELETE FROM TBL_USER WHERE USER_ID = #{userId}
+    </delete>
 
 </mapper>

@@ -37,4 +37,6 @@ public interface MypageMapper {
     int updateUserProfileImage(MypageProfileImageDTO mypageProfileImageDTO);
 
     String findProfileImagePathByUserId(String userId);
+
+    int deleteUserById(String userId);
 }
