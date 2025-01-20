@@ -69,14 +69,17 @@ public class BossService {
         return bossMapper.getResPosNum(storeResPosNumDTO);
     }
 
+    // 최신 리뷰 받아오기
     public ReviewContentDTO getRecentReview(long storeNo) {
         return bossMapper.getRecentReview(storeNo);
     }
 
+    // 리뷰 리스트 가져오기
     public ReviewDTO getReviewList(long storeNo) {
         return bossMapper.getReviewList(storeNo);
     }
 
+    // 리뷰 상세 조회
     public DetailReviewInfoDTO getReviewInfo(long reviewNo) {
         return bossMapper.getReviewInfo(reviewNo);
     }
@@ -84,5 +87,9 @@ public class BossService {
     // 리뷰 신고
     public void reportReview(ReportReviewDTO reportReviewDTO) {
         bossMapper.reportReview(reportReviewDTO);
+    }
+
+    public void updateReportCount(long reviewNo) {
+        bossMapper.updateReportCount(reviewNo);
     }
 }

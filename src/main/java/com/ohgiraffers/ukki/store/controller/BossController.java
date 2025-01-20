@@ -178,7 +178,12 @@ public class BossController {
     public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
        System.out.println("..dhdhdhdhd.." + reportReviewDTO);
 
-        bossService.reportReview(reportReviewDTO);
+       // 리뷰 신고 등록
+       bossService.reportReview(reportReviewDTO);
+
+        // 리뷰 신고 기록 +1
+        bossService.updateReportCount(reportReviewDTO.getReviewNo());
+
     }
       
                                                              

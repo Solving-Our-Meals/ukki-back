@@ -39,6 +39,9 @@ public interface BossMapper {
     // 리뷰 상세 조회
     DetailReviewInfoDTO getReviewInfo(long reviewNo);
 
+    // 리뷰 신고
+    void reportReview(ReportReviewDTO reportReviewDTO);
+
     int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
 
     // 예약 가능 인원 업데이트
@@ -49,7 +52,6 @@ public interface BossMapper {
                                                        @Param("startDate") LocalDate startDate,
                                                        @Param("endDate") LocalDate endDate);
 
-    // 리뷰 신고
-    void reportReview(ReportReviewDTO reportReviewDTO);
 
+    void updateReportCount(long reviewNo);
 }
