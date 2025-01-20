@@ -14,6 +14,11 @@ public class BossService {
     @Autowired
     private BossMapper bossMapper;
 
+    // 가게 정보 조회
+    public StoreInfoDTO getStoreInfo(long userNo) {
+        return bossMapper.getStoreInfo(userNo);
+    }
+
     // 가게 예약 현황 조회
     public List<ReservationDTO> getReservationStatus(int storeNo) {
         try {
@@ -82,5 +87,18 @@ public class BossService {
         }
     }
 
+    // 최신 리뷰 받아오기
+    public ReviewContentDTO getRecentReview(long storeNo) {
+        return bossMapper.getRecentReview(storeNo);
+    }
 
+    // 리뷰 리스트 가져오기
+    public ReviewDTO getReviewList(long storeNo) {
+        return bossMapper.getReviewList(storeNo);
+    }
+
+    // 리뷰 상세 조회
+    public DetailReviewInfoDTO getReviewInfo(long reviewNo) {
+        return bossMapper.getReviewInfo(reviewNo);
+    }
 }

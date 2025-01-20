@@ -19,6 +19,33 @@
         <result property="posNumber" column="POS_NUMBER"/>
     </resultMap>
 
+    <resultMap id="getReviewInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <collection property="reviewList" resultMap="reviewResultMap"/>
+    </resultMap>
+
+    <resultMap id="reviewResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        <id property="reviewNo" column="REVIEW_NO"/>
+        <result property="reviewContent" column="REVIEW_CONTENT"/>
+        <result property="reviewImage" column="REVIEW_IMG"/>
+        <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="reviewScope" column="REVIEW_SCOPE"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="reportCount" column="REPORT_COUNT"/>
+        <result property="resNo" column="RES_NO"/>
+    </resultMap>
+
+    <!-- 가게 정보 조회 -->
+    <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
+        SELECT
+               *
+          FROM TBL_STORE
+         WHERE USER_NO = #{ userNo }
+    </select>
+
     <!-- 가게별 예약 현황 조회 -->
     <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.controller.ReservationDTO">
         SELECT * FROM TBL_RESERVATION
@@ -98,6 +125,54 @@
         WHERE A.STORE_NO = #{storeNo};
     </select>
 
+    <select id="getRecentReview" parameterType="long" resultMap="reviewResultMap">
+        SELECT
+               *
+          FROM TBL_REVIEW
+         WHERE STORE_NO = #{ storeNo }
+         ORDER BY REVIEW_NO DESC
+         LIMIT 1
+    </select>
 
+    <select id="getReviewList" parameterType="long" resultMap="getReviewInfoResultMap">
+        SELECT
+               A.STORE_NO
+             , (SELECT
+                       COUNT(*)
+                  FROM TBL_REVIEW
+                 WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+             , A.RES_NO
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = #{storeNo}
+         ORDER BY REVIEW_NO DESC;
+    </select>
 
+    <!-- 리뷰 상세 조회 -->
+    <select id="getReviewInfo" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.DetailReviewInfoDTO">
+        SELECT
+               A.STORE_NO AS storeNo
+             , A.REVIEW_NO AS reviewNo
+             , A.REVIEW_CONTENT AS reviewContent
+             , A.REVIEW_IMG AS reviewImage
+             , A.REVIEW_DATE AS reviewDate
+             , A.REVIEW_SCOPE AS reviewScope
+             , A.USER_NO AS userNo
+             , B.USER_NAME AS userName
+             , B.USER_PROFILE AS userProfile
+             , A.REPORT_COUNT AS reportCount
+             , A.RES_NO AS resNo
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.REVIEW_NO = #{reviewNo}
+    </select>
 </mapper>

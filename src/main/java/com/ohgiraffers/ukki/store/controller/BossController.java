@@ -15,6 +15,16 @@ public class BossController {
     @Autowired
     private BossService bossService;
 
+    // 가게 정보 조회
+    @GetMapping("/getStoreInfo")
+    public ResponseEntity<StoreInfoDTO> getStoreInfo(@ModelAttribute StoreInfoDTO storeInfoDTO, @RequestParam("userNo") long userNo){
+
+        storeInfoDTO = bossService.getStoreInfo(userNo);
+        System.out.println("사장님 가게" + storeInfoDTO);
+
+        return ResponseEntity.ok(storeInfoDTO);
+    }
+
     // 예약 현황 조회
     @GetMapping("/reservation-status")
     public ResponseEntity<List<ReservationDTO>> getReservationStatus(@RequestParam int storeNo) {
@@ -98,4 +108,40 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    // 최신 리뷰 받아오기
+    @GetMapping("/recentReview")
+    public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
+
+        reviewContentDTO = bossService.getRecentReview(storeNo);
+
+        return reviewContentDTO;
+    }
+
+    // 리뷰 리스트 가져오기
+    @GetMapping("/reviewList")
+    public ReviewDTO getReviewList(@ModelAttribute ReviewDTO reviewDTO, @RequestParam("storeNo") long storeNo) {
+
+        reviewDTO = bossService.getReviewList(storeNo);
+
+        System.out.println("리뷰 리스트 가져옴" + reviewDTO);
+
+        return reviewDTO;
+    }
+
+    // 리뷰 정보 가져오기(상세조회)
+    @GetMapping("/getReviewInfo")
+    public DetailReviewInfoDTO getReviewInfo(@RequestParam("reviewNo") Long reviewNo) {
+//        if (reviewNo == null || reviewNo <= 0) {
+//            throw new IllegalArgumentException("유효한 reviewNo가 필요합니다.");
+//        }
+
+        DetailReviewInfoDTO detailReviewInfoDTO = bossService.getReviewInfo(reviewNo);
+
+        System.out.println("reviewContentDTO = " + detailReviewInfoDTO);
+
+        return detailReviewInfoDTO;
+    }
+
+
 }
