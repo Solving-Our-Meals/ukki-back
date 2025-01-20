@@ -54,4 +54,12 @@ public interface BossMapper {
 
 
     void updateReportCount(long reviewNo);
+
+    List<InquiryDTO> getInquiryList(long userNo, String searchWord);
+
+    List<InquiryDTO> getReportList(long storeNo, String searchWord);
+
+    List<InquiryDTO> getRecentInquiryList(long userNo);
+
+    List<InquiryDTO> getRecentReportList(long storeNo);
 }
