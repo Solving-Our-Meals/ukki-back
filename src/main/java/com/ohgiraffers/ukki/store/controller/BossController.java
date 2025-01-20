@@ -319,11 +319,11 @@ public class BossController {
     }
 
     @GetMapping(value = "getSpecificInquiry")
-    public InquiryDTO getSpecificInquiry(@RequestParam("inquiryNo") long inquiryNo){
+    public InquiryDTO getSpecificInquiry(@RequestParam("inquiryNo") long inquiryNo, @RequestParam("categoryNo") long categoryNo){
 
         InquiryDTO inquiryDTO;
         // 리뷰 신고일 경우
-        if(inquiryNo == 0){
+        if(categoryNo == 0){
             String table = "TBL_REVIEW_REPORT";
             inquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
         } else {
@@ -332,6 +332,19 @@ public class BossController {
         }
 
         return inquiryDTO;
+    }
+
+    @DeleteMapping("/deleteInquiry")
+    public void deleteInquiry(@RequestParam("inquiryNo") long inquiryNo, @RequestParam("categoryNo") long categoryNo, @RequestParam("reviewNo") long reviewNo){
+
+        if(categoryNo == 0){
+            // tbl_review_report에서 삭제
+            bossService.deleteReviewReport(inquiryNo);
+            // review에서 reportCount -1
+            bossService.decreaseReportCount(reviewNo);
+        } else {
+            bossService.deleteInquiry(inquiryNo);
+        }
     }
 
 

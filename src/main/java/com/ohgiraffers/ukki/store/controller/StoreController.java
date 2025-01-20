@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.store.controller;
 
 import com.ohgiraffers.ukki.store.model.dto.*;
+import com.ohgiraffers.ukki.store.model.service.BossService;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class StoreController {
 //    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
 
 
-    public StoreController(StoreService storeService){
+    public StoreController(StoreService storeService, BossService bossService){
         this.storeService = storeService;
     }
 
@@ -512,9 +513,7 @@ public class StoreController {
             return ResponseEntity.badRequest().body("유효하지 않은 검색어입니다.");
         }
     }
-
-
-    }
+}
 
 
 
