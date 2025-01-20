@@ -63,27 +63,39 @@ public class MypageController {
 
 
     @GetMapping("/reservation")
-    public ResponseEntity<List<MypageReservationDTO>> getUserReservation(HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request);
+    public ResponseEntity<List<MypageReservationDTO>> getUserReservation(
+            HttpServletRequest request,
+            @RequestParam(value = "search", required = false) String search) {
 
+        // JWT 토큰 처리
+        String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             throw new IllegalArgumentException("토큰이 일치하지 않음");
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
-
         if (userId == null) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        List<MypageReservationDTO> reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+        // 검색 쿼리가 있을 경우에 맞춰 필터링
+        List<MypageReservationDTO> reservations;
+        if (search != null && !search.isEmpty()) {
+            // 검색어가 있을 경우 해당 예약 목록을 검색 (예: 가게명 검색)
+            reservations = mypageService.getUserReservationFromTokenWithSearch(jwtToken, userId, search);
+        } else {
+            // 검색어가 없으면 기본 예약 목록 가져오기
+            reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+        }
 
+        // 예약이 없으면 No Content 반환
         if (reservations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(reservations);
     }
+
 
     @GetMapping("/reservation/{resNo}")
     public ResponseEntity<MypageReservationDetailDTO> getReservationDetail(@PathVariable int resNo, HttpServletRequest request) {
