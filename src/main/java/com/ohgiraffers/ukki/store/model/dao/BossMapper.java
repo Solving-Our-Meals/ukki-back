@@ -71,4 +71,7 @@ public interface BossMapper {
 
     List<InquiryDTO> getRecentReportList(long storeNo);
 
+//    InquiryDTO getReviewReportInfo(long inquiryNo);
+
+    InquiryDTO getInquiryInfo(long inquiryNo, String table);
 }

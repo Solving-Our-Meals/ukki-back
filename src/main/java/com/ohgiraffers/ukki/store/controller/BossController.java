@@ -318,6 +318,22 @@ public class BossController {
         return lastInquiry;
     }
 
+    @GetMapping(value = "getSpecificInquiry")
+    public InquiryDTO getSpecificInquiry(@RequestParam("inquiryNo") long inquiryNo){
+
+        InquiryDTO inquiryDTO;
+        // 리뷰 신고일 경우
+        if(inquiryNo == 0){
+            String table = "TBL_REVIEW_REPORT";
+            inquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
+        } else {
+            String table = "TBL_INQUIRY";
+            inquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
+        }
+
+        return inquiryDTO;
+    }
+
 
 
 }

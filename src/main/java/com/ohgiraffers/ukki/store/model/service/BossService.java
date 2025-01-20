@@ -125,5 +125,13 @@ public class BossService {
     public List<InquiryDTO> getRecentReportList(long storeNo) {
         return bossMapper.getRecentReportList(storeNo);
     }
+
+//    public InquiryDTO getReviewReportInfo(long inquiryNo) {
+//        return bossMapper.getReviewReportInfo(inquiryNo);
+//    }
+
+    public InquiryDTO getInquiryInfo(long inquiryNo, String table) {
+        return bossMapper.getInquiryInfo(inquiryNo, table);
+    }
 }
 
