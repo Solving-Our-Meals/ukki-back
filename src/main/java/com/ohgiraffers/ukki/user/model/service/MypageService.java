@@ -133,17 +133,29 @@ public class MypageService {
         int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
         return result > 0;
     }
-    private static final String FILE_UPLOAD_DIR = "\\\\192.168.0.138\\ukki_nas\\inquiry";  // 네트워크 공유 경로
+//    private static final String FILE_UPLOAD_DIR = "\\\\192.168.0.138\\ukki_nas\\inquiry";
+    private static final String FILE_UPLOAD_DIR = "C:\\Temp\\inquiry";
 
     public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
-            // 파일이 존재하는 경우에만 파일 경로 설정
-            if (file != null && !file.isEmpty()) {
-                String filePath = saveFile(file, userId);  // 서비스에서만 호출
-                inquiryToUpdate.setFile(filePath); // 파일 경로 저장
+            String existingFilePath = inquiryToUpdate.getFile();
+            if (existingFilePath != null && !existingFilePath.isEmpty()) {
+                File existingFile = new File(existingFilePath);
+                if (existingFile.exists()) {
+                    boolean deleted = existingFile.delete();
+                    if (deleted) {
+                        System.out.println("기존 파일 삭제 성공: " + existingFilePath);
+                    } else {
+                        System.out.println("기존 파일 삭제 실패: " + existingFilePath);
+                    }
+                }
             }
 
-            // 문의 업데이트
+            if (file != null && !file.isEmpty()) {
+                String filePath = saveFile(file, userId);
+                inquiryToUpdate.setFile(filePath);
+            }
+
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
             return updatedRows > 0;
         } catch (Exception e) {
@@ -152,15 +164,17 @@ public class MypageService {
         }
     }
 
+
     private String saveFile(MultipartFile file, String userId) throws IOException {
-
-
         // 파일 이름 가져오기
         String fileName = file.getOriginalFilename();
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IOException("파일 이름이 잘못되었습니다.");
+        }
         System.out.println("업로드된 파일 이름: " + fileName);
 
-        // 네트워크 경로와 사용자 ID를 합쳐서 폴더 경로 설정
-        String networkPath = FILE_UPLOAD_DIR + File.separator + userId;
+        // 로컬 경로 설정 (필요한 디렉터리를 사용자 폴더로 설정)
+        String networkPath = FILE_UPLOAD_DIR + File.separator;
         System.out.println("파일 저장 경로: " + networkPath);
 
         // 디렉토리 생성
@@ -190,26 +204,6 @@ public class MypageService {
         int result = mypageMapper.deleteInquiryById(inquiryNo);
 
         return result > 0;
-    }
-
-    private String getFilePathByFileId(String fileId, String userId) {
-        return "/path/to/files/" + userId + "/" + fileId;
-    }
-
-    public Resource loadFile(String fileId, String userId) {
-        String filePath = getFilePathByFileId(fileId, userId);
-
-        if (filePath == null) {
-            return null;
-        }
-
-        Path path = Paths.get(filePath);
-        Resource resource = new FileSystemResource(path);
-
-        if (!resource.exists()) {
-            return null;
-        }
-        return resource;
     }
 
     public boolean verifyPassword(String userId, String password) {
