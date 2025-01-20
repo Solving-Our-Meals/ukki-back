@@ -85,7 +85,7 @@
         , USER_NO
         , POS_NUMBER
         FROM TBL_STORE
-        WHERE STORE_NO = #{storeNo}
+        WHERE USER_NO = #{storeNo}
     </select>
 
 <!--    &lt;!&ndash; 가게별 예약 현황 조회 &ndash;&gt;-->
@@ -267,6 +267,12 @@
           , DEFAULT
         )
     </insert>
+
+    <update id="updateReportCount" parameterType="long">
+        UPDATE TBL_REVIEW
+           SET REPORT_COUNT = REPORT_COUNT + 1
+         WHERE REVIEW_NO = #{ reviewNo }
+    </update>
 
 
 </mapper>
