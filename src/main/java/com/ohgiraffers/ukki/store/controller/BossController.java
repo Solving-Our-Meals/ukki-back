@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.store.controller;
 
+import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
+
 @RestController
 @RequestMapping("/boss/mypage")
 public class BossController {
 
     @Autowired
     private BossService bossService;
+    @Autowired
+    private ReservationService reservationService;  // ReservationService 주입
+
 
     // 가게 정보 조회
     @GetMapping("/getStoreInfo")
@@ -55,15 +61,26 @@ public class BossController {
     }
 
     // 예약 가능 인원 조회
-    @GetMapping("/available-slots")
-    public ResponseEntity<AvailableSlotsDTO> getAvailableSlots(@RequestParam int storeNo, @RequestParam String reservationDate) {
-        try {
-            AvailableSlotsDTO availableSlots = bossService.getAvailableSlots(storeNo, reservationDate);
-            return ResponseEntity.ok(availableSlots);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+// 예시: 예약 가능 시간 조회 API
+//    @GetMapping("/available-slots")
+//    public ResponseEntity<List<String>> getAvailableSlots(
+//            @RequestParam("storeNo") long storeNo,
+//            @RequestParam("reservationDate") String reservationDate) {
+//
+//        try {
+//            List<String> availableSlots = reservationService.getAvailableSlots(storeNo, reservationDate);
+//
+//            // 데이터가 없을 경우 빈 배열 반환
+//            if (availableSlots == null) {
+//                availableSlots = new ArrayList<>();
+//            }
+//
+//            return ResponseEntity.ok(availableSlots);
+//        } catch (Exception e) {
+//            // 예외 발생 시 500 상태 코드와 함께 에러 메시지 반환
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonList("Error fetching available slots"));
+//        }
+//    }
 
     // 이번 주 예약 수 조회
     @GetMapping("/weekly-reservation-count")
@@ -109,6 +126,18 @@ public class BossController {
         }
     }
 
+    // 예약 가능 인원 업데이트
+    @PostMapping("/update-available-slots")
+    public ResponseEntity<String> updateAvailableSlots(@RequestParam int storeNo, @RequestParam int newSlots) {
+        try {
+            bossService.updateAvailableSlots(storeNo, newSlots);
+            return ResponseEntity.ok("Available slots updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating available slots");
+        }
+    }
+
+
     // 최신 리뷰 받아오기
     @GetMapping("/recentReview")
     public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
@@ -147,11 +176,52 @@ public class BossController {
     @PostMapping("/reviewReport")
     @ResponseBody
     public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
-
-        System.out.println("..dhdhdhdhd.." + reportReviewDTO);
+       System.out.println("..dhdhdhdhd.." + reportReviewDTO);
 
         bossService.reportReview(reportReviewDTO);
     }
+      
+                                                             
+    // 예약 가능 인원 업데이트
+    @PostMapping("/updateAvailableSlots")
+    public ResponseEntity<String> updateAvailableSlots(@RequestParam long storeNo, @RequestParam int newSlots) {
+        try {
+            if (newSlots < 0) {
+                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
+            }
 
+            bossService.updateAvailableSlots(storeNo, newSlots);
+            return ResponseEntity.ok("Available slots updated successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/mypage/getAvailableSlots")
+    public ResponseEntity<Map<String, Object>> getAvailableSlots(@RequestParam long storeNo) {
+        try {
+            int availableSlots = bossService.getAvailableSlots(storeNo);
+            Map<String, Object> response = new HashMap<>();
+            response.put("availableSlots", availableSlots);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to fetch available slots"));
+        }
+    }
+
+
+    @GetMapping("/getWeeklyReservations")
+    public ResponseEntity<List<ReservationInfoDTO>> getWeeklyReservations(@RequestParam long storeNo) {
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysLater = today.plusDays(7);
+
+        List<ReservationInfoDTO> reservations = bossService.getReservationsForPeriod(storeNo, today, sevenDaysLater);
+        return ResponseEntity.ok(reservations);
+    }
 
 }
+

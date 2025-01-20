@@ -1,5 +1,8 @@
 package com.ohgiraffers.ukki.store.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class ReservationDTO {
     private int reservationNo;
     private String reservationDate;
@@ -7,14 +10,25 @@ public class ReservationDTO {
     private int reservationPeople;
     private String storeName;
     private int storeNo;
+        private LocalDate resDate;
+        private LocalTime resTime;
+        private String userName;
 
-    public ReservationDTO(int reservationNo, String reservationDate, String reservationTime, int reservationPeople, String storeName, int storeNo) {
+
+    public ReservationDTO() {
+    }
+
+    public ReservationDTO(int reservationNo, String reservationDate, String reservationTime, int reservationPeople, String storeName, int storeNo, LocalDate resDate, LocalTime resTime, String userName) {
+
         this.reservationNo = reservationNo;
         this.reservationDate = reservationDate;
         this.reservationTime = reservationTime;
         this.reservationPeople = reservationPeople;
         this.storeName = storeName;
         this.storeNo = storeNo;
+        this.resDate = resDate;
+        this.resTime = resTime;
+        this.userName = userName;
     }
 
     public int getReservationNo() {
@@ -65,6 +79,30 @@ public class ReservationDTO {
         this.storeNo = storeNo;
     }
 
+    public LocalDate getResDate() {
+        return resDate;
+    }
+
+    public void setResDate(LocalDate resDate) {
+        this.resDate = resDate;
+    }
+
+    public LocalTime getResTime() {
+        return resTime;
+    }
+
+    public void setResTime(LocalTime resTime) {
+        this.resTime = resTime;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
         return "ReservationDTO{" +
@@ -74,6 +112,9 @@ public class ReservationDTO {
                 ", reservationPeople=" + reservationPeople +
                 ", storeName='" + storeName + '\'' +
                 ", storeNo=" + storeNo +
+                ", resDate=" + resDate +
+                ", resTime=" + resTime +
+                ", userName='" + userName + '\'' +
                 '}';
     }
 }
