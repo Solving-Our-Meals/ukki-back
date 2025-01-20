@@ -8,7 +8,9 @@ import com.ohgiraffers.ukki.common.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -138,15 +140,30 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
+            // 세션 무효화
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();  // 세션 종료
+            }
+
+            // 쿠키 삭제
             deleteCookie(request, response, "authToken");
             deleteCookie(request, response, "refreshToken");
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
+            // JSON 응답을 명시적으로 반환
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
         } catch (Exception e) {
+            // 서버 오류 발생 시, JSON 형식으로 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
+
+
+
 
     private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
         Cookie[] cookies = request.getCookies();

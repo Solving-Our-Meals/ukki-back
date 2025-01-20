@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .addFilterBefore(logoutFilter, JwtFilter.class) // 로그아웃 필터 추가 (JwtFilter 전)
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("http://localhost:3000/")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("authToken", "refreshToken")

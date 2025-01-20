@@ -199,10 +199,6 @@
         WHERE USER_ID = #{userId}
     </select>
 
-    <delete id="deleteUserById" parameterType="String">
-        DELETE FROM TBL_USER WHERE USER_ID = #{userId}
-    </delete>
-
     <select id="findReservationDetailByResNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDetailDTO">
         SELECT
         r.RES_NO AS resNo,
@@ -242,6 +238,51 @@
         WHERE
         er.RES_NO = #{resNo}
     </select>
+
+    <delete id="deleteUserById" parameterType="String">
+        DELETE FROM TBL_USER WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+    </delete>
+
+    <select id="getUserNoById" resultType="long">
+        SELECT USER_NO
+        FROM TBL_USER
+        WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="getReviewImagesByUserId" resultType="String">
+        SELECT REVIEW_IMG
+        FROM TBL_REVIEW r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE r.USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteReviewsByUserId" parameterType="long">
+        DELETE FROM TBL_REVIEW
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </delete>
+
+    <select id="getNoshowCountByUserNo" parameterType="long" resultType="int">
+        SELECT NOSHOW
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <select id="getEmailByUserNo" parameterType="long" resultType="String">
+        SELECT EMAIL
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <select id="getUserNoByIdForNoshow" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDeleteAccount">
+        SELECT USER_NO, EMAIL, NOSHOW
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <insert id="insertEmailIntoNoshow" parameterType="map">
+        INSERT INTO TBL_NOSHOW (EMAIL, NOSHOW)
+        VALUES (#{email}, #{noshow})
+    </insert>
 
 
 </mapper>
