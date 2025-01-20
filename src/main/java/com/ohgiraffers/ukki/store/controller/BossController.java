@@ -200,7 +200,11 @@ public class BossController {
     public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
        System.out.println("..dhdhdhdhd.." + reportReviewDTO);
 
-        bossService.reportReview(reportReviewDTO);
+       // 리뷰 신고 등록
+       bossService.reportReview(reportReviewDTO);
+
+        // 리뷰 신고 기록 +1
+        bossService.updateReportCount(reportReviewDTO.getReviewNo());
     }
       
                                                              
@@ -281,6 +285,42 @@ public class BossController {
 
 
 }
+
+    // 문의 내역 조회
+    @GetMapping(value = "/inquiryList")
+    public List<InquiryDTO> getInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo, @RequestParam(value = "searchWord" , required = false) String searchWord){
+
+        // INQUIRY 테이블에서 가져오기
+        List<InquiryDTO> inquiryList =  bossService.getInquiryList(userNo, searchWord);
+
+        // REVIEW_REPORT 테이블에서 가져오기
+        List<InquiryDTO> reportList = bossService.getReportList(storeNo, searchWord);
+
+        inquiryList.addAll(reportList);
+        inquiryList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+
+        System.out.println("inquiryList111111 = " + inquiryList);
+
+        return inquiryList;
+    }
+
+    // 최근 문의 내역 조회
+    @GetMapping(value = "/recentInquiry")
+    public InquiryDTO getRecentInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
+        List<InquiryDTO> RecentInquirytList =  bossService.getRecentInquiryList(userNo);
+
+        // REVIEW_REPORT 테이블에서 가져오기
+        List<InquiryDTO> RecentReportList = bossService.getRecentReportList(storeNo);
+
+        RecentInquirytList.addAll(RecentReportList);
+        RecentInquirytList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+
+        // 가장 마지막 요소 가져오기
+        InquiryDTO lastInquiry = RecentInquirytList.get(0);
+
+        return lastInquiry;
+    }
+
 
 }
 

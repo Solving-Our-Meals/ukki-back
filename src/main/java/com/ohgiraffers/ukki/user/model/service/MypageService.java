@@ -78,6 +78,34 @@ public class MypageService {
         return reservations;
     }
 
+    public List<MypageReservationDTO> getUserReservationFromTokenWithSearch(String jwtToken, String userId, String search) {
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+        // search 파라미터가 있을 경우 findUserReservationByUserIdWithSearch 호출
+        List<MypageReservationDTO> reservations;
+        if (search != null && !search.isEmpty()) {
+            reservations = mypageMapper.findUserReservationByUserIdWithSearch(userId, search); // selectList()를 사용합니다.
+        } else {
+            reservations = mypageMapper.findUserReservationByUserId(userId); // 기본 쿼리
+        }
+
+        if (reservations == null || reservations.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return reservations;
+    }
+
+
     public List<MypageReviewDTO> getUserReviewFromToken(String jwtToken, String userId) {
         if (!jwtService.validateToken(jwtToken)) {
             throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
@@ -376,32 +404,93 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
     }
 
-    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
+/*    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
     public boolean deleteUser(String userId) {
         try {
-            // 1. 프로필 이미지 삭제
             String profileImagePath = getExistingFilePath(userId);
             if (profileImagePath != null) {
                 boolean isFileDeleted = deleteFile(profileImagePath);
                 if (!isFileDeleted) {
-                    // 파일 삭제 실패시 처리
                     return false;
                 }
             }
 
-            // 2. 사용자 정보 삭제 (Mapper 호출)
             int result = mypageMapper.deleteUserById(userId);
             if (result == 0) {
-                // 사용자 삭제 실패
                 return false;
             }
 
-            // 3. 성공적으로 처리된 경우
             return true;
         } catch (Exception e) {
             // 예외 처리
             e.printStackTrace();
             return false;
+        }
+    }*/
+
+    @Transactional
+    public boolean deleteUser(String userId) {
+        try {
+            Long userNo = mypageMapper.getUserNoById(userId);
+            if (userNo == null) {
+                throw new RuntimeException("User not found for userId: " + userId);
+            }
+
+            MypageDeleteAccount mypageDeleteAccount = mypageMapper.getUserNoByIdForNoshow(userId);
+            if (mypageDeleteAccount == null) {
+                throw new RuntimeException("User not found for userId: " + userId);
+            }
+
+            if (mypageDeleteAccount.getNoshowCount() >= 1) {
+                String email = mypageDeleteAccount.getEmail();
+                int noshow = mypageDeleteAccount.getNoshowCount();
+                if (email != null) {
+                    int result = mypageMapper.insertEmailIntoNoshow(email, noshow);
+                    if (result == 0) {
+                        throw new RuntimeException("Failed to insert email into TBL_NOSHOW");
+                    }
+                } else {
+                    throw new RuntimeException("Email not found for userId: " + userId);
+                }
+            }
+
+            // 프로필 이미지 삭제
+            String profileImagePath = getExistingFilePath(userId);
+            if (profileImagePath != null) {
+                boolean isFileDeleted = deleteFile(profileImagePath);
+                if (!isFileDeleted) {
+                    throw new RuntimeException("프로필 이미지 제거 실패");
+                } else {
+                    System.out.println("프로필 사진 없음");
+                }
+            }
+
+            // 리뷰 이미지 삭제
+            List<String> reviewImages = mypageMapper.getReviewImagesByUserId(userNo);
+            for (String reviewImagePath : reviewImages) {
+                boolean isFileDeleted = deleteFile(reviewImagePath);
+                if (!isFileDeleted) {
+                    throw new RuntimeException("Failed to delete review image: " + reviewImagePath);
+                }
+            }
+
+            // 리뷰 삭제
+            int reviewDeleteResult = mypageMapper.deleteReviewsByUserId(userNo);
+            if (reviewDeleteResult < 0) {
+                throw new RuntimeException("Failed to delete reviews");
+            }
+
+            // 사용자 삭제
+            int result = mypageMapper.deleteUserById(userId);
+            if (result == 0) {
+                throw new RuntimeException("Failed to delete user");
+            }
+
+            return true;
+        } catch (Exception e) {
+            // 예외 로그 출력
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting user: " + e.getMessage()); // 클라이언트로 에러 메시지 전달
         }
     }
 
@@ -440,4 +529,20 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         return reservationDetail;
     }
 
+    public List<MypageReviewDTO> getUserReviewFromTokenWithSearch(String jwtToken, String userId, String search) {
+        // 토큰 검증 및 사용자 정보 추출
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+        // MyBatis Mapper 호출: search를 포함한 필터링된 리뷰 목록을 반환
+        return mypageMapper.findUserReviewByUserIdWithSearch(userId, search);
+    }
 }

@@ -73,14 +73,17 @@ public class BossService {
         return bossMapper.getResPosNum(storeResPosNumDTO);
     }
 
+    // 최신 리뷰 받아오기
     public ReviewContentDTO getRecentReview(long storeNo) {
         return bossMapper.getRecentReview(storeNo);
     }
 
+    // 리뷰 리스트 가져오기
     public ReviewDTO getReviewList(long storeNo) {
         return bossMapper.getReviewList(storeNo);
     }
 
+    // 리뷰 상세 조회
     public DetailReviewInfoDTO getReviewInfo(long reviewNo) {
         return bossMapper.getReviewInfo(reviewNo);
     }
@@ -89,6 +92,7 @@ public class BossService {
     public void reportReview(ReportReviewDTO reportReviewDTO) {
         bossMapper.reportReview(reportReviewDTO);
     }
+
 
     public List<ReservationDTO> getReservationListForTime(int storeNo, String reservationDate, String reservationTime) {
         if (reservationTime == null || reservationTime.isEmpty()) {
@@ -99,5 +103,25 @@ public class BossService {
 
 
     public void updateAvailableSlots(int storeNo, int newSlots) {
+
+    public void updateReportCount(long reviewNo) {
+        bossMapper.updateReportCount(reviewNo);
+    }
+
+    public List<InquiryDTO> getInquiryList(long userNo, String searchWord) {
+        return bossMapper.getInquiryList(userNo, searchWord);
+    }
+
+    public List<InquiryDTO> getReportList(long storeNo, String searchWord) {
+        return bossMapper.getReportList(storeNo, searchWord);
+    }
+
+    public List<InquiryDTO> getRecentInquiryList(long userNo) {
+        return bossMapper.getRecentInquiryList(userNo);
+    }
+
+    public List<InquiryDTO> getRecentReportList(long storeNo) {
+        return bossMapper.getRecentReportList(storeNo);
+
     }
 }

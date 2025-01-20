@@ -39,6 +39,9 @@ public interface BossMapper {
     // 리뷰 상세 조회
     DetailReviewInfoDTO getReviewInfo(long reviewNo);
 
+    // 리뷰 신고
+    void reportReview(ReportReviewDTO reportReviewDTO);
+
     int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
 
     // 예약 가능 인원 업데이트
@@ -49,8 +52,7 @@ public interface BossMapper {
                                                        @Param("startDate") LocalDate startDate,
                                                        @Param("endDate") LocalDate endDate);
 
-    // 리뷰 신고
-    void reportReview(ReportReviewDTO reportReviewDTO);
+
 
     List<ReservationDTO> getReservationsForDateAndTime(int storeNo, String reservationDate, String reservationTime);
     List<ReservationDTO> getReservationsForDate(int storeNo, String reservationDate);
@@ -58,4 +60,15 @@ public interface BossMapper {
     List<ReservationDTO> selectReservationList(long storeNo, String reservationDate, String reservationTime);
 
     void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots);
+
+    void updateReportCount(long reviewNo);
+
+    List<InquiryDTO> getInquiryList(long userNo, String searchWord);
+
+    List<InquiryDTO> getReportList(long storeNo, String searchWord);
+
+    List<InquiryDTO> getRecentInquiryList(long userNo);
+
+    List<InquiryDTO> getRecentReportList(long storeNo);
+
 }

@@ -41,4 +41,22 @@ public interface MypageMapper {
     int deleteUserById(String userId);
 
     MypageReservationDetailDTO findReservationDetailByResNo(int resNo);
+
+    Long getUserNoById(String userId);
+
+    List<String> getReviewImagesByUserId(Long userNo);
+
+    int deleteReviewsByUserId(Long userNo);
+
+    int getNoshowCountByUserNo(Long userNo);
+
+    String getEmailByUserNo(Long userNo);
+
+    MypageDeleteAccount getUserNoByIdForNoshow(String userId);
+
+    int insertEmailIntoNoshow(String email, int noshow);
+
+    List<MypageReservationDTO> findUserReservationByUserIdWithSearch(String userId, String search);
+
+    List<MypageReviewDTO> findUserReviewByUserIdWithSearch(String userId, String search);
 }

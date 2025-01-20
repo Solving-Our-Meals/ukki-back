@@ -63,27 +63,39 @@ public class MypageController {
 
 
     @GetMapping("/reservation")
-    public ResponseEntity<List<MypageReservationDTO>> getUserReservation(HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request);
+    public ResponseEntity<List<MypageReservationDTO>> getUserReservation(
+            HttpServletRequest request,
+            @RequestParam(value = "search", required = false) String search) {
 
+        // JWT 토큰 처리
+        String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             throw new IllegalArgumentException("토큰이 일치하지 않음");
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
-
         if (userId == null) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        List<MypageReservationDTO> reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+        // 검색 쿼리가 있을 경우에 맞춰 필터링
+        List<MypageReservationDTO> reservations;
+        if (search != null && !search.isEmpty()) {
+            // 검색어가 있을 경우 해당 예약 목록을 검색 (예: 가게명 검색)
+            reservations = mypageService.getUserReservationFromTokenWithSearch(jwtToken, userId, search);
+        } else {
+            // 검색어가 없으면 기본 예약 목록 가져오기
+            reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
+        }
 
+        // 예약이 없으면 No Content 반환
         if (reservations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(reservations);
     }
+
 
     @GetMapping("/reservation/{resNo}")
     public ResponseEntity<MypageReservationDetailDTO> getReservationDetail(@PathVariable int resNo, HttpServletRequest request) {
@@ -113,7 +125,10 @@ public class MypageController {
 
 
     @GetMapping("/review")
-    public ResponseEntity<List<MypageReviewDTO>> getUseReview(HttpServletRequest request) {
+    public ResponseEntity<List<MypageReviewDTO>> getUserReview(
+            HttpServletRequest request,
+            @RequestParam(value = "search", required = false) String search) {
+
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
@@ -126,14 +141,20 @@ public class MypageController {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        List<MypageReviewDTO> reservations = mypageService.getUserReviewFromToken(jwtToken, userId);
-
-        if (reservations.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        List<MypageReviewDTO> reviews;
+        if (search != null && !search.isEmpty()) {
+            reviews = mypageService.getUserReviewFromTokenWithSearch(jwtToken, userId, search);
+        } else {
+            reviews = mypageService.getUserReviewFromToken(jwtToken, userId);
         }
 
-        return ResponseEntity.ok(reservations);
+        if (reviews.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        System.out.println(reviews);
+        return ResponseEntity.ok(reviews);
     }
+
 
     @GetMapping("/review/{reviewNo}")
     public ResponseEntity<MypageReviewDTO> getUserReviewDetail(@PathVariable Long reviewNo, HttpServletRequest request) {
@@ -250,7 +271,6 @@ public class MypageController {
 
         System.out.println(file);
 
-        // JWT 토큰 검사
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -263,12 +283,10 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
-        // 사용자 문의 정보 가져오기
         List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
 
         System.out.println("zz");
 
-        // 수정할 문의 찾기
         MypageInquiryDTO inquiryToUpdate = inquiries.stream()
                 .filter(i -> i.getInquiryNo() == inquiryNo)
                 .findFirst()
@@ -279,11 +297,9 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
-        // 제목과 내용 수정
         inquiryToUpdate.setTitle(title);
         inquiryToUpdate.setText(text);
 
-        // 파일 업로드 처리 (파일이 있을 때만)
         if (file != null && !file.isEmpty()) {
             try {
                 boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
@@ -463,7 +479,7 @@ public class MypageController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request); // 쿠키에서 JWT 토큰을 가져옵니다.
+        String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 유효하지 않습니다.");

@@ -1,0 +1,15 @@
+target
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.gradle
+build
+!build/libs/*.jar
+*.log
+.DS_Store
+README.md
+.env*
+.idea
+.vscode
+*.iml

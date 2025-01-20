@@ -76,9 +76,13 @@
 
     <!-- 예약 시 유저 활동의 예약 횟수 + 1 -->
     <update id="increaseReservation" parameterType="long">
-        UPDATE TBL_USER_ACT_INFO
-           SET RES_COUNT = RES_COUNT + 1
-         WHERE USER_NO = #{ userNo }
+<!--        UPDATE TBL_USER_ACT_INFO-->
+<!--           SET RES_COUNT = RES_COUNT + 1-->
+<!--         WHERE USER_NO = #{ userNo }-->
+        INSERT INTO TBL_USER_ACT_INFO (USER_NO, RES_COUNT, REVIEW_COUNT, RANDOM_COUNT)
+        VALUES ( #{ userNo }, 1, 0, 0 )
+        ON DUPLICATE KEY UPDATE
+           RES_COUNT = RES_COUNT + 1
     </update>
 
 </mapper>
