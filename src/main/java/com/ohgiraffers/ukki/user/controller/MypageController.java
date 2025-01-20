@@ -458,7 +458,7 @@ public class MypageController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request); // 쿠키에서 JWT 토큰을 가져옵니다.
+        String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 유효하지 않습니다.");
