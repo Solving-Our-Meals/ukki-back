@@ -415,8 +415,9 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
 
             if (mypageDeleteAccount.getNoshowCount() >= 1) {
                 String email = mypageDeleteAccount.getEmail();
+                int noshow = mypageDeleteAccount.getNoshowCount();
                 if (email != null) {
-                    int result = mypageMapper.insertEmailIntoNoshow(email);
+                    int result = mypageMapper.insertEmailIntoNoshow(email, noshow);
                     if (result == 0) {
                         throw new RuntimeException("Failed to insert email into TBL_NOSHOW");
                     }
@@ -430,7 +431,9 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
             if (profileImagePath != null) {
                 boolean isFileDeleted = deleteFile(profileImagePath);
                 if (!isFileDeleted) {
-                    throw new RuntimeException("Failed to delete profile image");
+                    throw new RuntimeException("프로필 이미지 제거 실패");
+                } else {
+                    System.out.println("프로필 사진 없음");
                 }
             }
 
@@ -462,9 +465,6 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
             throw new RuntimeException("Error deleting user: " + e.getMessage()); // 클라이언트로 에러 메시지 전달
         }
     }
-
-
-
 
     public boolean deleteFile(String filePath) {
         try {

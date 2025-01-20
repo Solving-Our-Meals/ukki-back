@@ -273,9 +273,16 @@
         WHERE USER_NO = #{userNo, jdbcType=BIGINT}
     </select>
 
-    <insert id="getUserNoByIdForNoshow" parameterType="String">
+    <select id="getUserNoByIdForNoshow" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDeleteAccount">
+        SELECT USER_NO, EMAIL, NOSHOW
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <insert id="insertEmailIntoNoshow" parameterType="map">
         INSERT INTO TBL_NOSHOW (EMAIL, NOSHOW)
-        VALUES (#{email, jdbcType=VARCHAR}, #{noshow, jdbcType=BIGINT})
+        VALUES (#{email}, #{noshow})
     </insert>
+
 
 </mapper>

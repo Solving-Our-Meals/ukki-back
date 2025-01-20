@@ -52,7 +52,7 @@ public interface MypageMapper {
 
     String getEmailByUserNo(Long userNo);
 
-    int insertEmailIntoNoshow(String email);
-
     MypageDeleteAccount getUserNoByIdForNoshow(String userId);
+
+    int insertEmailIntoNoshow(String email, int noshow);
 }
