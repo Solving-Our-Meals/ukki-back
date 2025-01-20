@@ -127,13 +127,20 @@ public class BossController {
     }
 
     // 예약 가능 인원 업데이트
-    @PostMapping("/update-available-slots")
+    @PostMapping("/updateAvailableSlots")
     public ResponseEntity<String> updateAvailableSlots(@RequestParam int storeNo, @RequestParam int newSlots) {
         try {
+            if (newSlots < 0) {
+                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
+            }
+
+            // 매장 예약 가능 인원 업데이트
             bossService.updateAvailableSlots(storeNo, newSlots);
+
             return ResponseEntity.ok("Available slots updated successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating available slots");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
         }
     }
 
@@ -157,6 +164,21 @@ public class BossController {
 
         return reviewDTO;
     }
+
+    @GetMapping("/reservations-list")
+    public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
+            @RequestParam int storeNo,
+            @RequestParam String reservationDate,
+            @RequestParam(required = false) String reservationTime) {
+
+        try {
+            List<ReservationDTO> reservations = bossService.getReservationListForTime(storeNo, reservationDate, reservationTime);
+            return ResponseEntity.ok(reservations);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
     // 리뷰 정보 가져오기(상세조회)
     @GetMapping("/getReviewInfo")
@@ -187,20 +209,20 @@ public class BossController {
       
                                                              
     // 예약 가능 인원 업데이트
-    @PostMapping("/updateAvailableSlots")
-    public ResponseEntity<String> updateAvailableSlots(@RequestParam long storeNo, @RequestParam int newSlots) {
-        try {
-            if (newSlots < 0) {
-                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
-            }
-
-            bossService.updateAvailableSlots(storeNo, newSlots);
-            return ResponseEntity.ok("Available slots updated successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/updateAvailableSlots")
+//    public ResponseEntity<String> updateAvailableSlots(@RequestParam long storeNo, @RequestParam int newSlots) {
+//        try {
+//            if (newSlots < 0) {
+//                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
+//            }
+//
+//            bossService.updateAvailableSlots(storeNo, newSlots);
+//            return ResponseEntity.ok("Available slots updated successfully");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
+//        }
+//    }
 
 
     @GetMapping("/mypage/getAvailableSlots")
@@ -226,6 +248,43 @@ public class BossController {
         List<ReservationInfoDTO> reservations = bossService.getReservationsForPeriod(storeNo, today, sevenDaysLater);
         return ResponseEntity.ok(reservations);
     }
+    @GetMapping("/store/{storeNo}/reservation")
+    public ResponseEntity<Integer> getAvailableReservationPosNum(
+            @PathVariable int storeNo,
+            @RequestParam String reservationDate,
+            @RequestParam String reservationTime) {
+
+        Integer availablePosNum = reservationService.getAvailablePosNum(storeNo, reservationDate, reservationTime);
+
+        return ResponseEntity.ok(availablePosNum);
+    }
+    @PutMapping("/store/{storeNo}/reservation")
+    public ResponseEntity<String> updateReservationPosNum(
+            @PathVariable int storeNo,
+            @RequestParam String reservationDate,
+            @RequestParam String reservationTime,
+            @RequestParam int newPosNumber) {
+
+        reservationService.updateReservationPosNum(storeNo, reservationDate, reservationTime, newPosNumber);
+
+        return ResponseEntity.ok("Reservation pos number updated successfully");
+    }
+
+
+    @PostMapping("/store/{storeNo}/reservation")
+    public ResponseEntity<String> insertReservationPosNum(
+            @PathVariable int storeNo,
+            @RequestParam String reservationDate,
+            @RequestParam String reservationTime,
+            @RequestParam int newPosNumber) {
+
+        reservationService.updateReservationPosNum(storeNo, reservationDate, reservationTime, newPosNumber);
+
+        return ResponseEntity.ok("Reservation pos number updated successfully");
+
+
+
+}
 
     // 문의 내역 조회
     @GetMapping(value = "/inquiryList")

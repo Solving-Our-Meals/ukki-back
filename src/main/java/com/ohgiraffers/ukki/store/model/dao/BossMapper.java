@@ -53,6 +53,14 @@ public interface BossMapper {
                                                        @Param("endDate") LocalDate endDate);
 
 
+
+    List<ReservationDTO> getReservationsForDateAndTime(int storeNo, String reservationDate, String reservationTime);
+    List<ReservationDTO> getReservationsForDate(int storeNo, String reservationDate);
+
+    List<ReservationDTO> selectReservationList(long storeNo, String reservationDate, String reservationTime);
+
+    void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots);
+
     void updateReportCount(long reviewNo);
 
     List<InquiryDTO> getInquiryList(long userNo, String searchWord);
@@ -62,4 +70,5 @@ public interface BossMapper {
     List<InquiryDTO> getRecentInquiryList(long userNo);
 
     List<InquiryDTO> getRecentReportList(long storeNo);
+
 }

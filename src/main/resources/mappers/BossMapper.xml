@@ -46,17 +46,7 @@
         <result property="storeNo" column="STORE_NO"/>
     </resultMap>
 
-    <select id="selectReservationStatusByStore" parameterType="int" resultMap="reservationResultMap">
-        SELECT
-        RES_NO,
-        RES_DATE,
-        RES_TIME,
-        0 AS RES_PEOPLE, -- 만약 RES_PEOPLE이 TBL_RESERVATION에 없다면 0으로 반환
-        '' AS STORE_NAME, -- 만약 STORE_NAME이 없다면 빈 문자열 반환
-        STORE_NO
-        FROM TBL_RESERVATION
-        WHERE STORE_NO = #{storeNo}
-    </select>
+
 
     <resultMap id="reportReviewResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReportReviewDTO">
         <id property="reportNo" column="REPORT_NO"/>
@@ -70,6 +60,18 @@
         <result property="status" column="STATUS"/>
     </resultMap>
 
+
+    <select id="selectReservationStatusByStore" parameterType="int" resultMap="reservationResultMap">
+        SELECT
+        r.RES_NO,
+        r.RES_DATE,
+        r.RES_TIME,
+        u.USER_NAME AS userName,
+        STORE_NO
+        FROM TBL_RESERVATION r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE STORE_NO = #{storeNo}
+    </select>
     <!-- 가게 정보 조회 -->
     <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
         SELECT
@@ -150,24 +152,37 @@
         LIMIT 1
     </select>
 
+
+
+
     <!-- 요일별, 시간별 예약 가능 인원 조회 -->
     <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">
-        SELECT DISTINCT
-        A.OPER_TIME AS operTime,
-        IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)
-        - IFNULL((SELECT COUNT(1)
-        FROM TBL_RESERVATION A_2
-        WHERE A.STORE_NO = A_2.STORE_NO
-        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
-        ), 0) AS resPosNumber
-        FROM ${day} A
-        LEFT JOIN TBL_RES_POS_NUMBER B
-        ON A.STORE_NO = B.STORE_NO
-        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')
-        AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{date}
-        WHERE A.STORE_NO = #{storeNo};
+        SELECT COALESCE(RES_POS_NUMBER, 5) AS RES_POS_NUMBER
+        FROM TBL_RES_POS_NUMBER
+        WHERE STORE_NO = #{storeNo}
+        AND R_DATE = #{reservationDate}
+        AND R_OPER_TIME = #{reservationTime};
+
     </select>
 
+<!--    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">-->
+<!--        SELECT DISTINCT-->
+<!--        A.OPER_TIME-->
+<!--        , IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)-->
+<!--        - IFNULL((-->
+<!--        SELECT COUNT(1)-->
+<!--        FROM TBL_RESERVATION A_2-->
+<!--        WHERE A.STORE_NO = A_2.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')-->
+<!--        ),0) AS RES_POS_NUMBER-->
+<!--        FROM ${day} A-->
+<!--        LEFT-->
+<!--        JOIN TBL_RES_POS_NUMBER B-->
+<!--        ON A.STORE_NO = B.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')-->
+<!--        AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{date}-->
+<!--        WHERE A.STORE_NO = #{storeNo};-->
+<!--    </select>-->
     <select id="getRecentReview" parameterType="long" resultMap="reviewResultMap">
         SELECT
                *
@@ -268,6 +283,20 @@
         )
     </insert>
 
+
+    <select id="getReservationsForDateAndTime">
+        SELECT R.RES_NO, U.USER_NO, U.USER_NAME, R.RES_TIME
+        FROM TBL_RESERVATION R
+        JOIN TBL_USER U ON R.USER_NO = U.USER_NO
+        WHERE R.STORE_NO = #{storeNo} AND R.RES_DATE = #{reservationDate} AND R.RES_TIME = #{reservationTime}
+    </select>
+
+    <select id="getReservationsForDate">
+        SELECT R.RES_NO, U.USER_NO, U.USER_NAME, R.RES_TIME
+        FROM TBL_RESERVATION R
+        JOIN TBL_USER U ON R.USER_NO = U.USER_NO
+        WHERE R.STORE_NO = #{storeNo} AND R.RES_DATE = #{reservationDate}
+
     <update id="updateReportCount" parameterType="long">
         UPDATE TBL_REVIEW
            SET REPORT_COUNT = REPORT_COUNT + 1
@@ -360,6 +389,7 @@
         FROM TBL_REVIEW_REPORT A
         JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
         WHERE B.STORE_NO = #{ storeNo }
+
     </select>
 
 </mapper>
