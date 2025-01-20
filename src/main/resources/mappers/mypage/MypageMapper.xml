@@ -261,5 +261,21 @@
         WHERE USER_NO = #{userNo, jdbcType=BIGINT}
     </delete>
 
+    <select id="getNoshowCountByUserNo" parameterType="long" resultType="int">
+        SELECT NOSHOW
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <select id="getEmailByUserNo" parameterType="long" resultType="String">
+        SELECT EMAIL
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <insert id="getUserNoByIdForNoshow" parameterType="String">
+        INSERT INTO TBL_NOSHOW (EMAIL, NOSHOW)
+        VALUES (#{email, jdbcType=VARCHAR}, 1)
+    </insert>
 
 </mapper>

@@ -47,4 +47,12 @@ public interface MypageMapper {
     List<String> getReviewImagesByUserId(Long userNo);
 
     int deleteReviewsByUserId(Long userNo);
+
+    int getNoshowCountByUserNo(Long userNo);
+
+    String getEmailByUserNo(Long userNo);
+
+    int insertEmailIntoNoshow(String email);
+
+    MypageDeleteAccount getUserNoByIdForNoshow(String userId);
 }

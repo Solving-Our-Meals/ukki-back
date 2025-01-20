@@ -408,6 +408,23 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
                 throw new RuntimeException("User not found for userId: " + userId);
             }
 
+            MypageDeleteAccount mypageDeleteAccount = mypageMapper.getUserNoByIdForNoshow(userId);
+            if (mypageDeleteAccount == null) {
+                throw new RuntimeException("User not found for userId: " + userId);
+            }
+
+            if (mypageDeleteAccount.getNoshowCount() >= 1) {
+                String email = mypageDeleteAccount.getEmail();
+                if (email != null) {
+                    int result = mypageMapper.insertEmailIntoNoshow(email);
+                    if (result == 0) {
+                        throw new RuntimeException("Failed to insert email into TBL_NOSHOW");
+                    }
+                } else {
+                    throw new RuntimeException("Email not found for userId: " + userId);
+                }
+            }
+
             // 프로필 이미지 삭제
             String profileImagePath = getExistingFilePath(userId);
             if (profileImagePath != null) {
