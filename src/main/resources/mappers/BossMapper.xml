@@ -38,6 +38,18 @@
         <result property="resNo" column="RES_NO"/>
     </resultMap>
 
+    <resultMap id="reportReviewResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReportReviewDTO">
+        <id property="reportNo" column="REPORT_NO"/>
+        <result property="reportTitle" column="REPORT_TITLE"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="reportDate" column="REPORT_DATE"/>
+        <result property="reviewNo" column="REVIEW_NO"/>
+        <result property="answerTitle" column="ANS_CONTENT"/>
+        <result property="answerContent" column="ANS_TITLE"/>
+        <result property="answerDate" column="ANS_DATE"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
     <!-- 가게 정보 조회 -->
     <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
         SELECT
@@ -175,4 +187,31 @@
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
          WHERE A.REVIEW_NO = #{reviewNo}
     </select>
+
+    <!-- 리뷰 신고 -->
+    <insert id="reportReview" parameterType="com.ohgiraffers.ukki.store.model.dto.ReportReviewDTO">
+        INSERT INTO TBL_REVIEW_REPORT
+        (
+           REPORT_TITLE
+         , REPORT_CONTENT
+         , REPORT_DATE
+         , REVIEW_NO
+         , ANS_CONTENT
+         , ANS_TITLE
+         , ANS_DATE
+         , STATE
+        )
+        VALUES
+        (
+            #{ reportTitle }
+          , #{ reportContent }
+          , #{ reportDate }
+          , #{ reviewNo }
+          , DEFAULT
+          , DEFAULT
+          , NULL
+          , DEFAULT
+        )
+    </insert>
+
 </mapper>
