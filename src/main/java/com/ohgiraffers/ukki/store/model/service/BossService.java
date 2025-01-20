@@ -30,6 +30,7 @@ public class BossService {
     public List<ReservationDTO> getReservationPeopleList(int storeNo) {
         return bossMapper.selectReservationPeopleList(storeNo);
     }
+
     public List<ReservationDTO> getReservationList(long storeNo, String reservationDate, String reservationTime) {
         return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
     }
@@ -103,6 +104,7 @@ public class BossService {
 
 
     public void updateAvailableSlots(int storeNo, int newSlots) {
+    }
 
     public void updateReportCount(long reviewNo) {
         bossMapper.updateReportCount(reviewNo);
@@ -122,6 +124,6 @@ public class BossService {
 
     public List<InquiryDTO> getRecentReportList(long storeNo) {
         return bossMapper.getRecentReportList(storeNo);
-
     }
 }
+

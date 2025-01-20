@@ -145,26 +145,6 @@ public class BossController {
     }
 
 
-    // 최신 리뷰 받아오기
-    @GetMapping("/recentReview")
-    public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
-
-        reviewContentDTO = bossService.getRecentReview(storeNo);
-
-        return reviewContentDTO;
-    }
-
-    // 리뷰 리스트 가져오기
-    @GetMapping("/reviewList")
-    public ReviewDTO getReviewList(@ModelAttribute ReviewDTO reviewDTO, @RequestParam("storeNo") long storeNo) {
-
-        reviewDTO = bossService.getReviewList(storeNo);
-
-        System.out.println("리뷰 리스트 가져옴" + reviewDTO);
-
-        return reviewDTO;
-    }
-
     @GetMapping("/reservations-list")
     public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
             @RequestParam int storeNo,
@@ -180,33 +160,7 @@ public class BossController {
     }
 
 
-    // 리뷰 정보 가져오기(상세조회)
-    @GetMapping("/getReviewInfo")
-    public DetailReviewInfoDTO getReviewInfo(@RequestParam("reviewNo") Long reviewNo) {
-//        if (reviewNo == null || reviewNo <= 0) {
-//            throw new IllegalArgumentException("유효한 reviewNo가 필요합니다.");
-//        }
 
-        DetailReviewInfoDTO detailReviewInfoDTO = bossService.getReviewInfo(reviewNo);
-
-        System.out.println("reviewContentDTO = " + detailReviewInfoDTO);
-
-        return detailReviewInfoDTO;
-    }
-
-    // 리뷰 신고
-    @PostMapping("/reviewReport")
-    @ResponseBody
-    public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
-       System.out.println("..dhdhdhdhd.." + reportReviewDTO);
-
-       // 리뷰 신고 등록
-       bossService.reportReview(reportReviewDTO);
-
-        // 리뷰 신고 기록 +1
-        bossService.updateReportCount(reportReviewDTO.getReviewNo());
-    }
-      
                                                              
     // 예약 가능 인원 업데이트
 //    @PostMapping("/updateAvailableSlots")
@@ -282,10 +236,53 @@ public class BossController {
 
         return ResponseEntity.ok("Reservation pos number updated successfully");
 
-
-
 }
+    // 최신 리뷰 받아오기
+    @GetMapping("/recentReview")
+    public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
 
+        reviewContentDTO = bossService.getRecentReview(storeNo);
+
+        return reviewContentDTO;
+    }
+
+    // 리뷰 리스트 가져오기
+    @GetMapping("/reviewList")
+    public ReviewDTO getReviewList(@ModelAttribute ReviewDTO reviewDTO, @RequestParam("storeNo") long storeNo) {
+
+        reviewDTO = bossService.getReviewList(storeNo);
+
+        System.out.println("리뷰 리스트 가져옴" + reviewDTO);
+
+        return reviewDTO;
+    }
+
+    // 리뷰 정보 가져오기(상세조회)
+    @GetMapping("/getReviewInfo")
+    public DetailReviewInfoDTO getReviewInfo(@RequestParam("reviewNo") Long reviewNo) {
+//        if (reviewNo == null || reviewNo <= 0) {
+//            throw new IllegalArgumentException("유효한 reviewNo가 필요합니다.");
+//        }
+
+        DetailReviewInfoDTO detailReviewInfoDTO = bossService.getReviewInfo(reviewNo);
+
+        System.out.println("reviewContentDTO = " + detailReviewInfoDTO);
+
+        return detailReviewInfoDTO;
+    }
+
+    // 리뷰 신고
+    @PostMapping("/reviewReport")
+    @ResponseBody
+    public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
+        System.out.println("..dhdhdhdhd.." + reportReviewDTO);
+
+        // 리뷰 신고 등록
+        bossService.reportReview(reportReviewDTO);
+
+        // 리뷰 신고 기록 +1
+        bossService.updateReportCount(reportReviewDTO.getReviewNo());
+    }
     // 문의 내역 조회
     @GetMapping(value = "/inquiryList")
     public List<InquiryDTO> getInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo, @RequestParam(value = "searchWord" , required = false) String searchWord){
@@ -320,6 +317,7 @@ public class BossController {
 
         return lastInquiry;
     }
+
 
 
 }
