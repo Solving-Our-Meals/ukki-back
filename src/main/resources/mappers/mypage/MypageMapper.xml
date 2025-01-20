@@ -275,7 +275,7 @@
 
     <insert id="getUserNoByIdForNoshow" parameterType="String">
         INSERT INTO TBL_NOSHOW (EMAIL, NOSHOW)
-        VALUES (#{email, jdbcType=VARCHAR}, 1)
+        VALUES (#{email, jdbcType=VARCHAR}, #{noshow, jdbcType=BIGINT})
     </insert>
 
 </mapper>
