@@ -30,6 +30,9 @@ public class BossService {
     public List<ReservationDTO> getReservationPeopleList(int storeNo) {
         return bossMapper.selectReservationPeopleList(storeNo);
     }
+    public List<ReservationDTO> getReservationList(long storeNo, String reservationDate, String reservationTime) {
+        return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
+    }
 
     // 예약 가능 인원 조회
     public int getAvailableSlots(long storeNo) {
@@ -41,10 +44,11 @@ public class BossService {
     }
 
 
-    // 예약 가능 인원 업데이트
+    // 예약 인원 업데이트 로직
     @Transactional
-    public void updateAvailableSlots(long storeNo, int newSlots) {
-        bossMapper.updateAvailableSlots(storeNo, newSlots);
+    public void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots) {
+        // TBL_RES_POS_NUMBER 테이블에 업데이트
+        bossMapper.updateReservationSlots(storeNo, reservationDate, reservationTime, newSlots);
     }
 
     // 7일간의 예약 정보 조회
@@ -84,5 +88,16 @@ public class BossService {
     // 리뷰 신고
     public void reportReview(ReportReviewDTO reportReviewDTO) {
         bossMapper.reportReview(reportReviewDTO);
+    }
+
+    public List<ReservationDTO> getReservationListForTime(int storeNo, String reservationDate, String reservationTime) {
+        if (reservationTime == null || reservationTime.isEmpty()) {
+            return bossMapper.getReservationsForDate(storeNo, reservationDate);  // 시간 조건 없는 쿼리 호출
+        }
+        return bossMapper.getReservationsForDateAndTime(storeNo, reservationDate, reservationTime);  // 기존 쿼리
+    }
+
+
+    public void updateAvailableSlots(int storeNo, int newSlots) {
     }
 }

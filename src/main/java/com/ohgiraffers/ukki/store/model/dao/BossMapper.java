@@ -52,4 +52,10 @@ public interface BossMapper {
     // 리뷰 신고
     void reportReview(ReportReviewDTO reportReviewDTO);
 
+    List<ReservationDTO> getReservationsForDateAndTime(int storeNo, String reservationDate, String reservationTime);
+    List<ReservationDTO> getReservationsForDate(int storeNo, String reservationDate);
+
+    List<ReservationDTO> selectReservationList(long storeNo, String reservationDate, String reservationTime);
+
+    void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots);
 }

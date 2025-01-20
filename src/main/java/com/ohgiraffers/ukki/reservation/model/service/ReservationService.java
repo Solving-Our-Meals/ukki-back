@@ -7,6 +7,7 @@ import com.ohgiraffers.ukki.reservation.model.dto.StoreBannerDTO;
 import com.ohgiraffers.ukki.store.model.dto.OperationDTO;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,6 +17,7 @@ import java.util.List;
 import static java.time.DayOfWeek.*;
 
 @Service
+@Transactional
 public class ReservationService {
 
     private final ReservationMapper reservationMapper;
@@ -139,4 +141,22 @@ public class ReservationService {
 
         return availableSlots;
     }
+
+    public Integer getAvailablePosNum(int storeNo, String reservationDate, String reservationTime) {
+        // MyBatis 매퍼를 사용해 TBL_RES_POS_NUMBER 테이블에서 예약 가능한 인원 조회
+        Integer availablePosNum = reservationMapper.getAvailablePosNum(storeNo, reservationDate, reservationTime);
+
+        // 데이터가 없으면 기본값 5 반환
+        return availablePosNum != null ? availablePosNum : 5;
+    }
+
+
+    public void updateReservationPosNum(int storeNo, String reservationDate, String reservationTime, int newPosNumber) {
+        System.out.println("Updating reservation pos num: " + storeNo + ", " + reservationDate + ", " + reservationTime + ", " + newPosNumber);
+        reservationMapper.updateReservationPosNum(storeNo, reservationDate, reservationTime, newPosNumber);
+    }
+
+
+
+
 }
