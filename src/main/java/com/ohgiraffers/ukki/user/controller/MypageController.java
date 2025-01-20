@@ -125,7 +125,10 @@ public class MypageController {
 
 
     @GetMapping("/review")
-    public ResponseEntity<List<MypageReviewDTO>> getUseReview(HttpServletRequest request) {
+    public ResponseEntity<List<MypageReviewDTO>> getUserReview(
+            HttpServletRequest request,
+            @RequestParam(value = "search", required = false) String search) {
+
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
@@ -138,14 +141,20 @@ public class MypageController {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        List<MypageReviewDTO> reservations = mypageService.getUserReviewFromToken(jwtToken, userId);
-
-        if (reservations.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        List<MypageReviewDTO> reviews;
+        if (search != null && !search.isEmpty()) {
+            reviews = mypageService.getUserReviewFromTokenWithSearch(jwtToken, userId, search);
+        } else {
+            reviews = mypageService.getUserReviewFromToken(jwtToken, userId);
         }
 
-        return ResponseEntity.ok(reservations);
+        if (reviews.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        System.out.println(reviews);
+        return ResponseEntity.ok(reviews);
     }
+
 
     @GetMapping("/review/{reviewNo}")
     public ResponseEntity<MypageReviewDTO> getUserReviewDetail(@PathVariable Long reviewNo, HttpServletRequest request) {

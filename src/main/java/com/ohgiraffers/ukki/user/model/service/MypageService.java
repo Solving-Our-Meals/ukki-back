@@ -528,4 +528,21 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
 
         return reservationDetail;
     }
+
+    public List<MypageReviewDTO> getUserReviewFromTokenWithSearch(String jwtToken, String userId, String search) {
+        // 토큰 검증 및 사용자 정보 추출
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("엑토 일치하지 않음 -> DTO나 토큰 정보 확인바람");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+        // MyBatis Mapper 호출: search를 포함한 필터링된 리뷰 목록을 반환
+        return mypageMapper.findUserReviewByUserIdWithSearch(userId, search);
+    }
 }
