@@ -85,9 +85,8 @@ public class MypageController {
         return ResponseEntity.ok(reservations);
     }
 
-/*    @GetMapping("/reservation/{resNo}")
-    public ResponseEntity<MypageReservationDTO> getReservationDetail(@PathVariable Long resNo, HttpServletRequest request) {
-        // JWT 토큰 가져오기
+    @GetMapping("/reservation/{resNo}")
+    public ResponseEntity<MypageReservationDetailDTO> getReservationDetail(@PathVariable int resNo, HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
@@ -102,15 +101,16 @@ public class MypageController {
                     .body(null);
         }
 
-        MypageReservationDTO reservationDetail = mypageService.getReservationDetail(resNo, userId);
+        MypageReservationDetailDTO reservationDetail = mypageService.getReservationDetail(resNo, userId, jwtToken);
 
         if (reservationDetail == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null); // 예약 정보를 찾을 수 없을 경우
+                    .body(null);
         }
 
-        return ResponseEntity.ok(reservationDetail); // 예약 정보 반환
-    }*/
+        return ResponseEntity.ok(reservationDetail);
+    }
+
 
     @GetMapping("/review")
     public ResponseEntity<List<MypageReviewDTO>> getUseReview(HttpServletRequest request) {

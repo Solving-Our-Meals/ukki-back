@@ -203,4 +203,45 @@
         DELETE FROM TBL_USER WHERE USER_ID = #{userId}
     </delete>
 
+    <select id="findReservationDetailByResNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDetailDTO">
+        SELECT
+        r.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        u.USER_NAME AS userName,
+        s.STORE_NO AS storeNo,
+        s.STORE_NAME AS storeName,
+        r.RES_DATE AS date,
+        r.RES_TIME AS time,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        LEFT JOIN
+        TBL_USER u ON r.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        WHERE
+        r.RES_NO = #{resNo}
+
+        UNION
+
+        SELECT
+        er.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        u.USER_NAME AS userName,
+        s.STORE_NO AS storeNo,
+        s.STORE_NAME AS storeName,
+        er.RES_DATE AS date,
+        er.RES_TIME AS time,
+        er.QR
+        FROM
+        TBL_END_RES er
+        LEFT JOIN
+        TBL_USER u ON er.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        WHERE
+        er.RES_NO = #{resNo}
+    </select>
+
+
 </mapper>

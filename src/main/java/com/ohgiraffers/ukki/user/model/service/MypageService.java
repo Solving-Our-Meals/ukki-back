@@ -285,6 +285,7 @@ public class MypageService {
 
         return reviewDetail;
     }
+
     private static final String PROFILE_IMAGE_DIR = "C:\\Temp\\profile";
 //    private final String PROFILE_IMAGE_DIR = "\\\\192.168.0.138\\ukki_nas"; // 업로드 디렉토리 경로
 public boolean updateProfileImage(String userId, MultipartFile profileImage) {
@@ -418,6 +419,25 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
     }
 
-/*    public MypageReservationDTO getReservationDetail(Long resNo, String userId) {
-    }*/
+    public MypageReservationDetailDTO getReservationDetail(int resNo, String userId, String jwtToken) {
+        if (!jwtService.validateToken(jwtToken)) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음 -> DTO나 토큰 정보 확인");
+        }
+
+        Map<String, Object> userInfo = jwtService.getUserInfoFromToken(jwtToken);
+        String extractedUserId = (String) userInfo.get("userId");
+
+        if (!extractedUserId.equals(userId)) {
+            throw new IllegalArgumentException("사용자 정보가 일치하지 않음");
+        }
+
+        MypageReservationDetailDTO reservationDetail = mypageMapper.findReservationDetailByResNo(resNo);
+
+        if (reservationDetail == null) {
+            throw new IllegalArgumentException("예약을 찾을 수 없습니다.");
+        }
+
+        return reservationDetail;
+    }
+
 }

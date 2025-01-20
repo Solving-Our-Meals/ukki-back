@@ -39,4 +39,6 @@ public interface MypageMapper {
     String findProfileImagePathByUserId(String userId);
 
     int deleteUserById(String userId);
+
+    MypageReservationDetailDTO findReservationDetailByResNo(int resNo);
 }
