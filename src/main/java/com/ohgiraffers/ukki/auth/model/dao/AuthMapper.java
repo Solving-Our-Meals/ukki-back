@@ -12,4 +12,6 @@ public interface AuthMapper {
     int confirmUserId(String userId);
 
     ForJwtDTO findUserRoleAndUserNoById(String userId);
+
+    AuthDTO findUserById(String userId);
 }

@@ -4,6 +4,7 @@ import java.sql.Time;
 import java.util.Date;
 
 public class MypageReservationDTO {
+    private int resNo;
     private String userId;
     private String storeName;
     private Date date;
@@ -12,12 +13,21 @@ public class MypageReservationDTO {
 
     public MypageReservationDTO() {}
 
-    public MypageReservationDTO(String userId, String storeName, Date date, Time time, String qr) {
+    public MypageReservationDTO(int resNo, String userId, String storeName, Date date, Time time, String qr) {
+        this.resNo = resNo;
         this.userId = userId;
         this.storeName = storeName;
         this.date = date;
         this.time = time;
         this.qr = qr;
+    }
+
+    public int getResNo() {
+        return resNo;
+    }
+
+    public void setResNo(int resNo) {
+        this.resNo = resNo;
     }
 
     public String getUserId() {
@@ -63,7 +73,8 @@ public class MypageReservationDTO {
     @Override
     public String toString() {
         return "MypageReservationDTO{" +
-                "userId='" + userId + '\'' +
+                "resNo=" + resNo +
+                ", userId='" + userId + '\'' +
                 ", storeName='" + storeName + '\'' +
                 ", date=" + date +
                 ", time=" + time +

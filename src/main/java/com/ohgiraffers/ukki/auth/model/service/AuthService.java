@@ -86,4 +86,8 @@ public class AuthService {
     public Map<String, Object> getUserInfoFromRefreshToken(String refreshToken) {
         return jwtService.getUserInfoFromRefreshToken(refreshToken);
     }
+
+    public AuthDTO findUserById(String userId) {
+        return authMapper.findUserById(userId);
+    }
 }

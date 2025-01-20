@@ -418,4 +418,6 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
     }
 
+/*    public MypageReservationDTO getReservationDetail(Long resNo, String userId) {
+    }*/
 }

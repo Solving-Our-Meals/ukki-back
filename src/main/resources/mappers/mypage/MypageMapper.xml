@@ -20,6 +20,7 @@
 
     <select id="findUserReservationByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
         SELECT
+        r.RES_NO AS resNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         r.RES_DATE AS date,
@@ -37,6 +38,7 @@
         UNION
 
         SELECT
+        er.RES_NO AS resNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         er.RES_DATE AS date,
