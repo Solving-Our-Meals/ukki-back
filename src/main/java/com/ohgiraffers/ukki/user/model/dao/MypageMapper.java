@@ -55,4 +55,8 @@ public interface MypageMapper {
     MypageDeleteAccount getUserNoByIdForNoshow(String userId);
 
     int insertEmailIntoNoshow(String email, int noshow);
+
+    List<MypageReservationDTO> findUserReservationByUserIdWithSearch(String userId, String search);
+
+    List<MypageReviewDTO> findUserReviewByUserIdWithSearch(String userId, String search);
 }
