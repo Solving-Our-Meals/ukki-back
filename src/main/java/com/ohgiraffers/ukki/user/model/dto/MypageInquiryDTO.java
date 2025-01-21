@@ -19,23 +19,25 @@ public class MypageInquiryDTO {
     private String answerContent;
     private Date answerDate;
     private String file;
+    private String search;
 
     public MypageInquiryDTO() {}
 
-    public MypageInquiryDTO(String file, Date answerDate, String answerContent, String answerTitle, Date inquiryDate, String category, int categoryNo, String text, String title, InquiryState inquiryState, int inquiryNo, String userId, int userNo) {
-        this.file = file;
-        this.answerDate = answerDate;
-        this.answerContent = answerContent;
-        this.answerTitle = answerTitle;
-        this.inquiryDate = inquiryDate;
-        this.category = category;
-        this.categoryNo = categoryNo;
-        this.text = text;
-        this.title = title;
-        this.inquiryState = inquiryState;
-        this.inquiryNo = inquiryNo;
-        this.userId = userId;
+    public MypageInquiryDTO(int userNo, String userId, int inquiryNo, InquiryState inquiryState, String title, String text, int categoryNo, String category, Date inquiryDate, String answerTitle, String answerContent, Date answerDate, String file, String search) {
         this.userNo = userNo;
+        this.userId = userId;
+        this.inquiryNo = inquiryNo;
+        this.inquiryState = inquiryState;
+        this.title = title;
+        this.text = text;
+        this.categoryNo = categoryNo;
+        this.category = category;
+        this.inquiryDate = inquiryDate;
+        this.answerTitle = answerTitle;
+        this.answerContent = answerContent;
+        this.answerDate = answerDate;
+        this.file = file;
+        this.search = search;
     }
 
     public int getUserNo() {
@@ -142,6 +144,14 @@ public class MypageInquiryDTO {
         this.file = file;
     }
 
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
     @Override
     public String toString() {
         return "MypageInquiryDTO{" +
@@ -158,6 +168,7 @@ public class MypageInquiryDTO {
                 ", answerContent='" + answerContent + '\'' +
                 ", answerDate=" + answerDate +
                 ", file='" + file + '\'' +
+                ", search='" + search + '\'' +
                 '}';
     }
 }
