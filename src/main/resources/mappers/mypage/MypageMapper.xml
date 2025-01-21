@@ -57,6 +57,52 @@
         date DESC, time DESC;
     </select>
 
+    <select id="findUserReservationByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
+        SELECT
+        r.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        r.RES_DATE AS date,
+        r.RES_TIME AS time,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        LEFT JOIN
+        TBL_USER u ON r.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
+
+        UNION
+
+        SELECT
+        er.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        er.RES_DATE AS date,
+        er.RES_TIME AS time,
+        er.QR
+        FROM
+        TBL_END_RES er
+        LEFT JOIN
+        TBL_USER u ON er.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
+
+        ORDER BY
+        date DESC, time DESC;
+    </select>
+
+
     <select id="findUserReviewByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
         SELECT
         u.USER_NO AS userNo,
@@ -80,6 +126,32 @@
         reviewNo DESC;
     </select>
 
+    <select id="findUserReviewByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
+        SELECT
+        u.USER_NO AS userNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
+        r.REVIEW_DATE AS reviewDate,
+        r.REVIEW_CONTENT AS reviewText,
+        r.REVIEW_SCOPE AS star
+        FROM
+        TBL_REVIEW r
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = r.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON s.STORE_NO = r.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
+        ORDER BY
+        reviewNo DESC;
+    </select>
+
+
     <select id="findUserReviewDetailByReviewNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
         SELECT
         u.USER_PROFILE AS userProfile,
@@ -102,8 +174,6 @@
         WHERE
         r.REVIEW_NO = #{reviewNo};
     </select>
-
-
 
     <delete id="deleteReviewById" parameterType="int">
         DELETE FROM TBL_REVIEW
@@ -131,6 +201,34 @@
         LEFT JOIN TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
         WHERE
         u.USER_ID = #{userId}
+        ORDER BY
+        i.INQ_NO DESC;
+    </select>
+
+    <select id="findUserInquiryByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        i.INQ_NO AS inquiryNo,
+        i.INQ_TITLE AS title,
+        i.INQ_CONTENT AS text,
+        i.INQ_DATE AS inquiryDate,
+        i.ANS_TITLE AS answerTitle,
+        i.ANS_CONTENT AS answerContent,
+        i.ANS_DATE AS answerDate,
+        i.FILE AS file,
+        i.STATE AS inquiryState,
+        c.CATEGORY_NO AS categoryNo,
+        c.CATEGORY_NAME AS category
+        FROM
+        TBL_INQUIRY i
+        LEFT JOIN TBL_USER u ON u.USER_NO = i.USER_NO
+        LEFT JOIN TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND i.INQ_TITLE LIKE CONCAT('%', #{search}, '%')
+        </if>
         ORDER BY
         i.INQ_NO DESC;
     </select>
