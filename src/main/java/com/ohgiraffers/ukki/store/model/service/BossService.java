@@ -121,6 +121,7 @@ public class BossService {
     }
 
 
+
     public void updateAvailableSlots(int storeNo, LocalDate date, String reservationTime, int resPosNumber) {
         try {
             // StoreResPosNumDTO 객체를 생성하여 필요한 값을 세팅합니다.
@@ -148,6 +149,39 @@ public class BossService {
 
 
 
+
+//    public InquiryDTO getReviewReportInfo(long inquiryNo) {
+//        return bossMapper.getReviewReportInfo(inquiryNo);
+//    }
+
+    public InquiryDTO getInquiryInfo(long inquiryNo, String table) {
+        return bossMapper.getInquiryInfo(inquiryNo, table);
+    }
+
+    public void deleteReviewReport(long inquiryNo) {
+        bossMapper.deleteReviewReport(inquiryNo);
+    }
+
+    public void deleteInquiry(long inquiryNo) {
+        bossMapper.deleteInquiry(inquiryNo);
+    }
+
+    public void decreaseReportCount(long reviewNo) {
+        bossMapper.decreaseReportCount(reviewNo);
+    }
+
+
+    public void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo) {
+        bossMapper.updateReviewReport(inquiryDTO, inquiryNo);
+    }
+
+    public void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo) {
+        bossMapper.updateInquiry(inquiryDTO, inquiryNo);
+    }
+
+    public String getFileName(long inquiryNo) {
+        return bossMapper.getFileName(inquiryNo);
+    }
 
 }
 

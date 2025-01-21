@@ -359,43 +359,121 @@
     <!-- 최근 내역 가져오기 -->
     <select id="getRecentInquiryList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
         SELECT
-        INQ_NO AS inquiryNo
-        , INQ_TITLE AS inquiryTitle
-        , INQ_CONTENT AS inquiryContent
-        , INQ_DATE AS inquiryDate
-        , null AS reviewNo
-        , CATEGORY_NO AS categoryNo
-        , USER_NO AS userNo
-        , ANS_TITLE AS answerTitle
-        , ANS_CONTENT AS answerContent
-        , ANS_DATE AS answerDate
-        , STATE AS state
-        , FILE AS file
-        , true AS isInquiry
-        FROM TBL_INQUIRY
-        WHERE USER_NO = #{ userNo }
+               INQ_NO AS inquiryNo
+             , INQ_TITLE AS inquiryTitle
+             , INQ_CONTENT AS inquiryContent
+             , INQ_DATE AS inquiryDate
+             , null AS reviewNo
+             , CATEGORY_NO AS categoryNo
+             , USER_NO AS userNo
+             , ANS_TITLE AS answerTitle
+             , ANS_CONTENT AS answerContent
+             , ANS_DATE AS answerDate
+             , STATE AS state
+             , FILE AS file
+             , true AS isInquiry
+          FROM TBL_INQUIRY
+         WHERE USER_NO = #{ userNo }
     </select>
 
     <!-- 최근 리뷰 신고 내역 -->
     <select id="getRecentReportList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
         SELECT
-        A.REPORT_NO AS inquiryNo,
-        A.REPORT_TITLE AS inquiryTitle,
-        A.REPORT_CONTENT AS inquiryContent,
-        A.REPORT_DATE AS inquiryDate,
-        B.REVIEW_NO AS reviewNo,
-        NULL AS categoryNo,
-        NULL AS userNo,
-        A.ANS_TITLE AS answerTitle,
-        A.ANS_CONTENT AS answerContent,
-        A.ANS_DATE AS answerDate,
-        A.STATE AS state,
-        NULL AS file,
-        false AS isInquiry
-        FROM TBL_REVIEW_REPORT A
-        JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
-        WHERE B.STORE_NO = #{ storeNo }
+               A.REPORT_NO AS inquiryNo,
+               A.REPORT_TITLE AS inquiryTitle,
+               A.REPORT_CONTENT AS inquiryContent,
+               A.REPORT_DATE AS inquiryDate,
+               B.REVIEW_NO AS reviewNo,
+               NULL AS categoryNo,
+               NULL AS userNo,
+               A.ANS_TITLE AS answerTitle,
+               A.ANS_CONTENT AS answerContent,
+               A.ANS_DATE AS answerDate,
+               A.STATE AS state,
+               NULL AS file,
+               false AS isInquiry
+          FROM TBL_REVIEW_REPORT A
+          JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
+         WHERE B.STORE_NO = #{ storeNo }
+    </select>
 
+    <select id="getInquiryInfo" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        <choose>
+            <when test="table == 'TBL_REVIEW_REPORT'">
+                SELECT
+                       REPORT_NO AS inquiryNo,
+                       REPORT_TITLE AS inquiryTitle,
+                       REPORT_CONTENT AS inquiryContent,
+                       REPORT_DATE AS inquiryDate,
+                       REVIEW_NO AS reviewNo,
+                       NULL AS categoryNo,
+                       NULL AS userNo,
+                       ANS_TITLE AS answerTitle,
+                       ANS_CONTENT AS answerContent,
+                       ANS_DATE AS answerDate,
+                       STATE AS state,
+                       NULL AS file,
+                       false AS isInquiry
+                  FROM ${ table }
+                 WHERE REPORT_NO = #{ inquiryNo }
+            </when>
+            <otherwise>
+                SELECT
+                       INQ_NO AS inquiryNo
+                     , INQ_TITLE AS inquiryTitle
+                     , INQ_CONTENT AS inquiryContent
+                     , INQ_DATE AS inquiryDate
+                     , NULL AS reviewNo
+                     , CATEGORY_NO AS categoryNo
+                     , USER_NO AS userNo
+                     , ANS_TITLE AS answerTitle
+                     , ANS_CONTENT AS answerContent
+                     , ANS_DATE AS answerDate
+                     , STATE AS state
+                     , FILE AS file
+                     , true AS isInquiry
+                  FROM ${ table }
+                 WHERE INQ_NO = #{ inquiryNo }
+            </otherwise>
+        </choose>
+    </select>
+
+    <delete id="deleteReviewReport" parameterType="long">
+        DELETE FROM TBL_REVIEW_REPORT WHERE REPORT_NO = #{ inquiryNo }
+    </delete>
+
+    <update id="decreaseReportCount" parameterType="long">
+        UPDATE TBL_REVIEW
+        SET REPORT_COUNT = REPORT_COUNT - 1
+        WHERE REVIEW_NO = #{ reviewNo }
+    </update>
+
+    <delete id="deleteInquiry" parameterType="long">
+        DELETE FROM TBL_INQUIRY WHERE INQ_NO = #{ inquiryNo }
+    </delete>
+
+    <update id="updateReviewReport" parameterType="map">
+        UPDATE TBL_REVIEW_REPORT
+           SET REPORT_TITLE = #{ inquiryDTO.inquiryTitle },
+               REPORT_CONTENT = #{ inquiryDTO.inquiryContent },
+               REPORT_DATE = #{ inquiryDTO.inquiryDate }
+         WHERE REPORT_NO = #{ inquiryNo }
+    </update>
+
+    <update id="updateInquiry" parameterType="map">
+        UPDATE TBL_INQUIRY
+           SET INQ_TITLE = #{ inquiryDTO.inquiryTitle },
+               INQ_CONTENT = #{ inquiryDTO.inquiryContent },
+               INQ_DATE = #{ inquiryDTO.inquiryDate },
+               FILE = #{ inquiryDTO.file }
+         WHERE INQ_NO = #{ inquiryNo }
+    </update>
+
+    <select id="getFileName" parameterType="long" resultType="String">
+        SELECT
+               FILE
+          FROM TBL_INQUIRY
+         WHERE INQ_NO = #{ inquiryNo }
     </select>
 
 </mapper>

@@ -71,5 +71,23 @@ public interface BossMapper {
 
     List<InquiryDTO> getRecentReportList(long storeNo);
 
+
     void insertAvailableSlots(StoreResPosNumDTO storeResPosNum);
+
+//    InquiryDTO getReviewReportInfo(long inquiryNo);
+
+    InquiryDTO getInquiryInfo(long inquiryNo, String table);
+
+    void deleteReviewReport(long inquiryNo);
+
+    void deleteInquiry(long inquiryNo);
+
+    void decreaseReportCount(long reviewNo);
+
+    void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo);
+
+    void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo);
+
+    String getFileName(long inquiryNo);
+
 }
