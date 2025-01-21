@@ -11,10 +11,11 @@ public class MypageReservationDTO {
     private Time time;
     private String qr;
     private String search;
+    private int replyNo;
 
     public MypageReservationDTO() {}
 
-    public MypageReservationDTO(int resNo, String userId, String storeName, Date date, Time time, String qr, String search) {
+    public MypageReservationDTO(int resNo, String userId, String storeName, Date date, Time time, String qr, String search, int replyNo) {
         this.resNo = resNo;
         this.userId = userId;
         this.storeName = storeName;
@@ -22,6 +23,7 @@ public class MypageReservationDTO {
         this.time = time;
         this.qr = qr;
         this.search = search;
+        this.replyNo = replyNo;
     }
 
     public int getResNo() {
@@ -80,6 +82,14 @@ public class MypageReservationDTO {
         this.search = search;
     }
 
+    public int getReplyNo() {
+        return replyNo;
+    }
+
+    public void setReplyNo(int replyNo) {
+        this.replyNo = replyNo;
+    }
+
     @Override
     public String toString() {
         return "MypageReservationDTO{" +
@@ -90,6 +100,7 @@ public class MypageReservationDTO {
                 ", time=" + time +
                 ", qr='" + qr + '\'' +
                 ", search='" + search + '\'' +
+                ", replyNo=" + replyNo +
                 '}';
     }
 }
