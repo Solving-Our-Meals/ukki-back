@@ -45,21 +45,21 @@ public interface BossMapper {
     int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
 
     // 예약 가능 인원 업데이트
-    void updateAvailableSlots(@Param("storeNo") long storeNo, @Param("newSlots") int newSlots);
+    void updateAvailableSlots(StoreResPosNumDTO storeResPosNum);
+
 
     // 7일간의 예약 정보 조회
     List<ReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
                                                        @Param("startDate") LocalDate startDate,
                                                        @Param("endDate") LocalDate endDate);
 
+    StoreResPosNumDTO getResPosNumByStoreAndDate(@Param("storeNo") int storeNo, @Param("date") LocalDate date, @Param("reservationTime") String reservationTime);
 
 
     List<ReservationDTO> getReservationsForDateAndTime(int storeNo, String reservationDate, String reservationTime);
     List<ReservationDTO> getReservationsForDate(int storeNo, String reservationDate);
 
     List<ReservationDTO> selectReservationList(long storeNo, String reservationDate, String reservationTime);
-
-    void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots);
 
     void updateReportCount(long reviewNo);
 
@@ -71,4 +71,5 @@ public interface BossMapper {
 
     List<InquiryDTO> getRecentReportList(long storeNo);
 
+    void insertAvailableSlots(StoreResPosNumDTO storeResPosNum);
 }

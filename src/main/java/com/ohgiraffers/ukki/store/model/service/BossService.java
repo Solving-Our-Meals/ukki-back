@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 @Service
 public class BossService {
@@ -45,12 +46,6 @@ public class BossService {
     }
 
 
-    // 예약 인원 업데이트 로직
-    @Transactional
-    public void updateReservationSlots(long storeNo, String reservationDate, String reservationTime, int newSlots) {
-        // TBL_RES_POS_NUMBER 테이블에 업데이트
-        bossMapper.updateReservationSlots(storeNo, reservationDate, reservationTime, newSlots);
-    }
 
     // 7일간의 예약 정보 조회
     public List<ReservationInfoDTO> getReservationsForPeriod(long storeNo, LocalDate startDate, LocalDate endDate) {
@@ -103,8 +98,7 @@ public class BossService {
     }
 
 
-    public void updateAvailableSlots(int storeNo, int newSlots) {
-    }
+
 
     public void updateReportCount(long reviewNo) {
         bossMapper.updateReportCount(reviewNo);
@@ -125,5 +119,35 @@ public class BossService {
     public List<InquiryDTO> getRecentReportList(long storeNo) {
         return bossMapper.getRecentReportList(storeNo);
     }
+
+
+    public void updateAvailableSlots(int storeNo, LocalDate date, String reservationTime, int resPosNumber) {
+        try {
+            // StoreResPosNumDTO 객체를 생성하여 필요한 값을 세팅합니다.
+            StoreResPosNumDTO storeResPosNum = new StoreResPosNumDTO();
+            storeResPosNum.setStoreNo(storeNo);
+            storeResPosNum.setrDate(date);  // 예약 날짜 (LocalDate 타입으로 설정)
+            storeResPosNum.setResPosNumber(resPosNumber);  // 예약 가능한 인원 수 설정
+            storeResPosNum.setrOperTime(LocalTime.parse(reservationTime)); // 예약 시간
+
+            // 1. 예약 정보가 존재하는지 확인
+            StoreResPosNumDTO existingSlot = bossMapper.getResPosNumByStoreAndDate(storeNo, date, reservationTime);
+
+            if (existingSlot != null) {
+                // 2. 예약 정보가 있으면 업데이트
+                bossMapper.updateAvailableSlots(storeResPosNum);
+            } else {
+                // 3. 예약 정보가 없으면 삽입
+                bossMapper.insertAvailableSlots(storeResPosNum);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update or insert available slots", e);
+        }
+    }
+
+
+
+
 }
 
