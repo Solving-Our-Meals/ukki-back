@@ -67,7 +67,6 @@ public class MypageController {
             HttpServletRequest request,
             @RequestParam(value = "search", required = false) String search) {
 
-        // JWT 토큰 처리
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             throw new IllegalArgumentException("토큰이 일치하지 않음");
@@ -78,17 +77,13 @@ public class MypageController {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        // 검색 쿼리가 있을 경우에 맞춰 필터링
         List<MypageReservationDTO> reservations;
         if (search != null && !search.isEmpty()) {
-            // 검색어가 있을 경우 해당 예약 목록을 검색 (예: 가게명 검색)
             reservations = mypageService.getUserReservationFromTokenWithSearch(jwtToken, userId, search);
         } else {
-            // 검색어가 없으면 기본 예약 목록 가져오기
             reservations = mypageService.getUserReservationFromToken(jwtToken, userId);
         }
 
-        // 예약이 없으면 No Content 반환
         if (reservations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -195,7 +190,9 @@ public class MypageController {
     }
 
     @GetMapping("/inquiry")
-    public ResponseEntity<List<MypageInquiryDTO>> getUseInquiry(HttpServletRequest request) {
+    public ResponseEntity<List<MypageInquiryDTO>> getUseInquiry(
+            HttpServletRequest request,
+            @RequestParam(value = "search", required = false) String search) {
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
@@ -208,7 +205,12 @@ public class MypageController {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
 
-        List<MypageInquiryDTO> inquiry = mypageService.getUserInquiryFromToken(jwtToken, userId);
+        List<MypageInquiryDTO> inquiry;
+        if (search != null && !search.isEmpty()) {
+            inquiry = mypageService.getUserInquiryFromTokenWithSerach(jwtToken, userId, search);
+        } else {
+            inquiry = mypageService.getUserInquiryFromToken(jwtToken, userId);
+        }
 
         if (inquiry.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -216,6 +218,7 @@ public class MypageController {
 
         return ResponseEntity.ok(inquiry);
     }
+
 
     @PutMapping("/inquiry/{inquiryNo}/status")
     public ResponseEntity<Map<String, String>> updateInquiryStatusToRead(
