@@ -1,62 +1,80 @@
 package com.ohgiraffers.ukki.store.model.dto;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class StoreResPosNumDTO {
 
-    private long storeNo;
-    private String date;
-    private String day; // 요일
-    private List<DayResPosNumDTO> listDayResPosNumDTO;
+    private Long rInfo;  // 예약 정보 번호
 
-    public StoreResPosNumDTO(){}
+    private int storeNo;  // 가게 번호
+    private LocalDate rDate;  // 예약 날짜
+    private String rDay;
+    private LocalTime rOperTime;  // 예약 시간
+    private int resPosNumber;  // 예약 가능한 인원 수
 
-    public StoreResPosNumDTO(long storeNo, String date, String day, List<DayResPosNumDTO> listDayResPosNumDTO) {
-        this.storeNo = storeNo;
-        this.date = date;
-        this.day = day;
-        this.listDayResPosNumDTO = listDayResPosNumDTO;
+    public StoreResPosNumDTO() {
     }
 
-    public long getStoreNo() {
+    public StoreResPosNumDTO(Long rInfo, int storeNo, LocalDate rDate, String rDay, LocalTime rOperTime, int resPosNumber) {
+        this.rInfo = rInfo;
+        this.storeNo = storeNo;
+        this.rDate = rDate;
+        this.rDay = rDay;
+        this.rOperTime = rOperTime;
+        this.resPosNumber = resPosNumber;
+    }
+
+
+    public String getrDay() {
+        return rDay;
+    }
+
+    public void setrDay(String rDay) {
+        this.rDay = rDay;
+    }
+
+    public Long getrInfo() {
+        return rInfo;
+    }
+
+    public void setrInfo(Long rInfo) {
+        this.rInfo = rInfo;
+    }
+
+    public int getStoreNo() {
         return storeNo;
     }
 
-    public void setStoreNo(long storeNo) {
+    public void setStoreNo(int storeNo) {
         this.storeNo = storeNo;
     }
 
-    public String getDate() {
-        return date;
+    public LocalDate getrDate() {
+        return rDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setrDate(LocalDate rDate) {
+        this.rDate = rDate;
     }
 
-    public String getDay() {
-        return day;
+    public LocalTime getrOperTime() {
+        return rOperTime;
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public void setrOperTime(LocalTime rOperTime) {
+        this.rOperTime = rOperTime;
     }
 
-    public List<DayResPosNumDTO> getListDayResPosNumDTO() {
-        return listDayResPosNumDTO;
+    public int getResPosNumber() {
+        return resPosNumber;
     }
 
-    public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNumDTO) {
-        this.listDayResPosNumDTO = listDayResPosNumDTO;
+    public void setResPosNumber(int resPosNumber) {
+        this.resPosNumber = resPosNumber;
     }
 
-    @Override
-    public String toString() {
-        return "StoreResPosNumDTO{" +
-                "storeNo=" + storeNo +
-                ", date='" + date + '\'' +
-                ", day='" + day + '\'' +
-                ", listDayResPosNumDTO=" + listDayResPosNumDTO +
-                '}';
+    public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNum) {
     }
 }

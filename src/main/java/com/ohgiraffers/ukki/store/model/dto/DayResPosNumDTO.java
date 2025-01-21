@@ -2,14 +2,14 @@ package com.ohgiraffers.ukki.store.model.dto;
 
 public class DayResPosNumDTO {
 
-    private String operTime;
-    private int resPosNum;
+    private String operTime;  // 예약 가능한 시간대
+    private int resPosNumber; // 예약 가능한 인원 수
 
-    public DayResPosNumDTO(){};
+    public DayResPosNumDTO() {}
 
-    public DayResPosNumDTO(String operTime, int resPosNum) {
+    public DayResPosNumDTO(String operTime, int resPosNumber) {
         this.operTime = operTime;
-        this.resPosNum = resPosNum;
+        this.resPosNumber = resPosNumber;
     }
 
     public String getOperTime() {
@@ -20,19 +20,11 @@ public class DayResPosNumDTO {
         this.operTime = operTime;
     }
 
-    public int getResPosNum() {
-        return resPosNum;
+    public int getResPosNumber() {
+        return resPosNumber;
     }
 
-    public void setResPosNum(int resPosNum) {
-        this.resPosNum = resPosNum;
-    }
-
-    @Override
-    public String toString() {
-        return "DayResPosNumDTO{" +
-                "operTime='" + operTime + '\'' +
-                ", resPosNum=" + resPosNum +
-                '}';
+    public void setResPosNumber(int resPosNumber) {
+        this.resPosNumber = resPosNumber;
     }
 }

@@ -444,13 +444,13 @@ public class StoreController {
     public ResponseEntity<StoreResPosNumDTO> getResPosNumber(@PathVariable("storeNo") long storeNum, @RequestParam("storeNo") long storeNo, @RequestParam("day") String day, @RequestParam("date") String date, @ModelAttribute  StoreResPosNumDTO storeResPosNumDTO) {
 
         switch (day) {
-            case "0" : storeResPosNumDTO.setDay("TBL_SUNDAY"); break;
-            case "1" : storeResPosNumDTO.setDay("TBL_MONDAY"); break;
-            case "2" : storeResPosNumDTO.setDay("TBL_TUESDAY"); break;
-            case "3" : storeResPosNumDTO.setDay("TBL_WEDNESDAY"); break;
-            case "4" : storeResPosNumDTO.setDay("TBL_THURSDAY"); break;
-            case "5" : storeResPosNumDTO.setDay("TBL_FRIDAY"); break;
-            case "6" : storeResPosNumDTO.setDay("TBL_SATURDAY"); break;
+            case "0" : storeResPosNumDTO.setrDay("TBL_SUNDAY"); break;
+            case "1" : storeResPosNumDTO.setrDay("TBL_MONDAY"); break;
+            case "2" : storeResPosNumDTO.setrDay("TBL_TUESDAY"); break;
+            case "3" : storeResPosNumDTO.setrDay("TBL_WEDNESDAY"); break;
+            case "4" : storeResPosNumDTO.setrDay("TBL_THURSDAY"); break;
+            case "5" : storeResPosNumDTO.setrDay("TBL_FRIDAY"); break;
+            case "6" : storeResPosNumDTO.setrDay("TBL_SATURDAY"); break;
         }
 
         List<DayResPosNumDTO> listDayResPosNum= storeService.getResPosNum(storeResPosNumDTO);

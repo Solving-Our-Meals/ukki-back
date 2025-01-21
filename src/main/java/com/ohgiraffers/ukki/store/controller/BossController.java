@@ -39,17 +39,17 @@ public class BossController {
     @Autowired
     private BossService bossService;
     @Autowired
-    private ReservationService reservationService;  // ReservationService 주입
+
+    private ReservationService reservationService;
+
 
     private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
+
 
     // 가게 정보 조회
     @GetMapping("/getStoreInfo")
     public ResponseEntity<StoreInfoDTO> getStoreInfo(@ModelAttribute StoreInfoDTO storeInfoDTO, @RequestParam("userNo") long userNo){
-
         storeInfoDTO = bossService.getStoreInfo(userNo);
-        System.out.println("사장님 가게" + storeInfoDTO);
-
         return ResponseEntity.ok(storeInfoDTO);
     }
 
@@ -57,19 +57,15 @@ public class BossController {
     @GetMapping("/reservation-status")
     public ResponseEntity<List<ReservationDTO>> getReservationStatus(@RequestParam int storeNo) {
         try {
-            // 로그 추가
-            System.out.println("storeNo: " + storeNo);
             List<ReservationDTO> reservations = bossService.getReservationStatus(storeNo);
             if (reservations.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(reservations);
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 
     // 예약 인원 리스트 조회
     @GetMapping("/reservation-people-list")
@@ -81,28 +77,6 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-    // 예약 가능 인원 조회
-// 예시: 예약 가능 시간 조회 API
-//    @GetMapping("/available-slots")
-//    public ResponseEntity<List<String>> getAvailableSlots(
-//            @RequestParam("storeNo") long storeNo,
-//            @RequestParam("reservationDate") String reservationDate) {
-//
-//        try {
-//            List<String> availableSlots = reservationService.getAvailableSlots(storeNo, reservationDate);
-//
-//            // 데이터가 없을 경우 빈 배열 반환
-//            if (availableSlots == null) {
-//                availableSlots = new ArrayList<>();
-//            }
-//
-//            return ResponseEntity.ok(availableSlots);
-//        } catch (Exception e) {
-//            // 예외 발생 시 500 상태 코드와 함께 에러 메시지 반환
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonList("Error fetching available slots"));
-//        }
-//    }
 
     // 이번 주 예약 수 조회
     @GetMapping("/weekly-reservation-count")
@@ -137,8 +111,8 @@ public class BossController {
         }
     }
 
-    // 요일별, 시간별 예약 가능 인원 조회
-    @PostMapping("/res-pos-num")
+    // 예약 가능 인원 조회
+    @PostMapping("/getResPosNum")
     public ResponseEntity<List<DayResPosNumDTO>> getResPosNum(@RequestBody StoreResPosNumDTO storeResPosNumDTO) {
         try {
             List<DayResPosNumDTO> result = bossService.getResPosNum(storeResPosNumDTO);
@@ -150,23 +124,34 @@ public class BossController {
 
     // 예약 가능 인원 업데이트
     @PostMapping("/updateAvailableSlots")
-    public ResponseEntity<String> updateAvailableSlots(@RequestParam int storeNo, @RequestParam int newSlots) {
+    public ResponseEntity<String> updateAvailableSlots(
+            @RequestParam int storeNo,
+            @RequestParam String reservationDate,
+            @RequestParam String reservationTime,
+            @RequestParam int resPosNumber) {
+
+        // 예약 날짜를 LocalDate로 변환
+        LocalDate date = LocalDate.parse(reservationDate); // String을 LocalDate로 변환
+
+        // 유효성 검사: 예약 가능한 인원 수는 음수일 수 없습니다.
+        if (resPosNumber < 0) {
+            return ResponseEntity.badRequest().body("Slot number cannot be negative");
+        }
+
         try {
-            if (newSlots < 0) {
-                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
-            }
-
-            // 매장 예약 가능 인원 업데이트
-            bossService.updateAvailableSlots(storeNo, newSlots);
-
+            // 변환된 LocalDate와 다른 파라미터를 서비스로 전달
+            bossService.updateAvailableSlots(storeNo, date, reservationTime, resPosNumber);
             return ResponseEntity.ok("Available slots updated successfully");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update available slots: " + e.getMessage());
         }
     }
 
 
+
+
+    // 예약 리스트 조회
     @GetMapping("/reservations-list")
     public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
             @RequestParam int storeNo,
@@ -181,27 +166,7 @@ public class BossController {
         }
     }
 
-
-
-                                                             
-    // 예약 가능 인원 업데이트
-//    @PostMapping("/updateAvailableSlots")
-//    public ResponseEntity<String> updateAvailableSlots(@RequestParam long storeNo, @RequestParam int newSlots) {
-//        try {
-//            if (newSlots < 0) {
-//                return ResponseEntity.badRequest().body("Slot 수는 0보다 작을 수 없습니다.");
-//            }
-//
-//            bossService.updateAvailableSlots(storeNo, newSlots);
-//            return ResponseEntity.ok("Available slots updated successfully");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update available slots: " + e.getMessage());
-//        }
-//    }
-
-
-    @GetMapping("/mypage/getAvailableSlots")
+    @GetMapping("/getAvailableSlots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@RequestParam long storeNo) {
         try {
             int availableSlots = bossService.getAvailableSlots(storeNo);
@@ -215,86 +180,21 @@ public class BossController {
         }
     }
 
-
-    @GetMapping("/getWeeklyReservations")
-    public ResponseEntity<List<ReservationInfoDTO>> getWeeklyReservations(@RequestParam long storeNo) {
-        LocalDate today = LocalDate.now();
-        LocalDate sevenDaysLater = today.plusDays(7);
-
-        List<ReservationInfoDTO> reservations = bossService.getReservationsForPeriod(storeNo, today, sevenDaysLater);
-        return ResponseEntity.ok(reservations);
-    }
-    @GetMapping("/store/{storeNo}/reservation")
-    public ResponseEntity<Integer> getAvailableReservationPosNum(
-            @PathVariable int storeNo,
-            @RequestParam String reservationDate,
-            @RequestParam String reservationTime) {
-
-        Integer availablePosNum = reservationService.getAvailablePosNum(storeNo, reservationDate, reservationTime);
-
-        return ResponseEntity.ok(availablePosNum);
-    }
-    @PutMapping("/store/{storeNo}/reservation")
-    public ResponseEntity<String> updateReservationPosNum(
-            @PathVariable int storeNo,
-            @RequestParam String reservationDate,
-            @RequestParam String reservationTime,
-            @RequestParam int newPosNumber) {
-
-        reservationService.updateReservationPosNum(storeNo, reservationDate, reservationTime, newPosNumber);
-
-        return ResponseEntity.ok("Reservation pos number updated successfully");
-    }
-
-
-    @PostMapping("/store/{storeNo}/reservation")
-    public ResponseEntity<String> insertReservationPosNum(
-            @PathVariable int storeNo,
-            @RequestParam String reservationDate,
-            @RequestParam String reservationTime,
-            @RequestParam int newPosNumber) {
-
-        reservationService.updateReservationPosNum(storeNo, reservationDate, reservationTime, newPosNumber);
-
-        return ResponseEntity.ok("Reservation pos number updated successfully");
-
-}
     // 최신 리뷰 받아오기
     @GetMapping("/recentReview")
     public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
-
-        reviewContentDTO = bossService.getRecentReview(storeNo);
-
-        return reviewContentDTO;
+        return bossService.getRecentReview(storeNo);
     }
 
     // 리뷰 리스트 가져오기
     @GetMapping("/reviewList")
-    public ReviewDTO getReviewList(@ModelAttribute ReviewDTO reviewDTO, @RequestParam("storeNo") long storeNo) {
-
-        reviewDTO = bossService.getReviewList(storeNo);
-
-        System.out.println("리뷰 리스트 가져옴" + reviewDTO);
-
-        return reviewDTO;
-    }
-
-    // 리뷰 정보 가져오기(상세조회)
-    @GetMapping("/getReviewInfo")
-    public DetailReviewInfoDTO getReviewInfo(@RequestParam("reviewNo") Long reviewNo) {
-//        if (reviewNo == null || reviewNo <= 0) {
-//            throw new IllegalArgumentException("유효한 reviewNo가 필요합니다.");
-//        }
-
-        DetailReviewInfoDTO detailReviewInfoDTO = bossService.getReviewInfo(reviewNo);
-
-        System.out.println("reviewContentDTO = " + detailReviewInfoDTO);
-
-        return detailReviewInfoDTO;
+    public List<ReviewDTO> getReviewList(@RequestParam("storeNo") long storeNo) {
+        return (List<ReviewDTO>) bossService.getReviewList(storeNo);
     }
 
     // 리뷰 신고
-    @PostMapping("/reviewReport")
+
+     @PostMapping("/reviewReport")
     @ResponseBody
     public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
         System.out.println("..dhdhdhdhd.." + reportReviewDTO);
@@ -319,23 +219,17 @@ public class BossController {
         inquiryList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
 
         return inquiryList;
+
     }
 
     // 최근 문의 내역 조회
-    @GetMapping(value = "/recentInquiry")
-    public InquiryDTO getRecentInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
-        List<InquiryDTO> RecentInquirytList =  bossService.getRecentInquiryList(userNo);
-
-        // REVIEW_REPORT 테이블에서 가져오기
-        List<InquiryDTO> RecentReportList = bossService.getRecentReportList(storeNo);
-
-        RecentInquirytList.addAll(RecentReportList);
-        RecentInquirytList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
-
-        // 가장 마지막 요소 가져오기
-        InquiryDTO lastInquiry = RecentInquirytList.get(0);
-
-        return lastInquiry;
+    @GetMapping("/recentInquiry")
+    public InquiryDTO getRecentInquiry(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
+        List<InquiryDTO> recentInquiries = bossService.getRecentInquiryList(userNo);
+        List<InquiryDTO> recentReports = bossService.getRecentReportList(storeNo);
+        recentInquiries.addAll(recentReports);
+        recentInquiries.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+        return recentInquiries.isEmpty() ? null : recentInquiries.get(0);
     }
 
     @GetMapping(value = "getSpecificInquiry")
@@ -514,5 +408,5 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 인코딩 오류시 500
         }
     }
-}
 
+}
