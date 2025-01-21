@@ -433,4 +433,18 @@
         </choose>
     </select>
 
+    <delete id="deleteReviewReport" parameterType="long">
+        DELETE FROM TBL_REVIEW_REPORT WHERE REPORT_NO = #{ inquiryNo }
+    </delete>
+
+    <update id="decreaseReportCount" parameterType="long">
+        UPDATE TBL_REVIEW
+        SET REPORT_COUNT = REPORT_COUNT - 1
+        WHERE REVIEW_NO = #{ reviewNo }
+    </update>
+
+    <delete id="deleteInquiry" parameterType="long">
+        DELETE FROM TBL_INQUIRY WHERE INQ_NO = #{ inquiryNo }
+    </delete>
+
 </mapper>

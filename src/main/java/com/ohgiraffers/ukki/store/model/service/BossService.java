@@ -133,5 +133,17 @@ public class BossService {
     public InquiryDTO getInquiryInfo(long inquiryNo, String table) {
         return bossMapper.getInquiryInfo(inquiryNo, table);
     }
+
+    public void deleteReviewReport(long inquiryNo) {
+        bossMapper.deleteReviewReport(inquiryNo);
+    }
+
+    public void deleteInquiry(long inquiryNo) {
+        bossMapper.deleteInquiry(inquiryNo);
+    }
+
+    public void decreaseReportCount(long reviewNo) {
+        bossMapper.decreaseReportCount(reviewNo);
+    }
 }
 

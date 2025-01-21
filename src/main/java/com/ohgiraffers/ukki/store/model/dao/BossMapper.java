@@ -74,4 +74,10 @@ public interface BossMapper {
 //    InquiryDTO getReviewReportInfo(long inquiryNo);
 
     InquiryDTO getInquiryInfo(long inquiryNo, String table);
+
+    void deleteReviewReport(long inquiryNo);
+
+    void deleteInquiry(long inquiryNo);
+
+    void decreaseReportCount(long reviewNo);
 }
