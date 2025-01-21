@@ -230,6 +230,16 @@ public class MypageService {
 
 
     public boolean deleteInquiry(int inquiryNo) {
+
+        MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
+
+        if (inquiry != null && inquiry.getFile() != null && !inquiry.getFile().isEmpty()) {
+            boolean fileDeleted = deleteFile(inquiry.getFile());
+            if (!fileDeleted) {
+                return false;
+            }
+        }
+
         int result = mypageMapper.deleteInquiryById(inquiryNo);
 
         return result > 0;

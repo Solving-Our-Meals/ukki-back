@@ -61,4 +61,6 @@ public interface MypageMapper {
     List<MypageReviewDTO> findUserReviewByUserIdWithSearch(String userId, String search);
 
     List<MypageInquiryDTO> findUserInquiryByUserIdWithSearch(String userId, String search);
+
+    MypageInquiryDTO findInquiryById(int inquiryNo);
 }

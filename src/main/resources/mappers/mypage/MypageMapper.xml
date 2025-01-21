@@ -247,6 +247,16 @@
         WHERE INQ_NO = #{inquiryNo}
     </update>
 
+    <select id="findInquiryById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        FILE
+        FROM
+        TBL_INQUIRY
+        WHERE
+        INQ_NO = #{inquiryNo}
+    </select>
+
+
     <delete id="deleteInquiryById" parameterType="int">
         DELETE FROM TBL_INQUIRY
         WHERE INQ_NO = #{inquiryNo}
