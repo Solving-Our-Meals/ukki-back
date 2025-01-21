@@ -39,12 +39,9 @@ public class BossController {
     @Autowired
     private BossService bossService;
     @Autowired
-
     private ReservationService reservationService;
 
-
     private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
-
 
     // 가게 정보 조회
     @GetMapping("/getStoreInfo")
@@ -183,18 +180,38 @@ public class BossController {
     // 최신 리뷰 받아오기
     @GetMapping("/recentReview")
     public ReviewContentDTO getRecentReview(@ModelAttribute ReviewContentDTO reviewContentDTO, @RequestParam("storeNo") long storeNo){
-        return bossService.getRecentReview(storeNo);
+        reviewContentDTO = bossService.getRecentReview(storeNo);
+
+        return reviewContentDTO;
     }
 
     // 리뷰 리스트 가져오기
     @GetMapping("/reviewList")
-    public List<ReviewDTO> getReviewList(@RequestParam("storeNo") long storeNo) {
-        return (List<ReviewDTO>) bossService.getReviewList(storeNo);
+    public ReviewDTO getReviewList(@ModelAttribute ReviewDTO reviewDTO, @RequestParam("storeNo") long storeNo) {
+
+        reviewDTO = bossService.getReviewList(storeNo);
+
+        System.out.println("리뷰 리스트 가져옴" + reviewDTO);
+
+        return reviewDTO;
+    }
+
+    // 리뷰 정보 가져오기(상세조회)
+    @GetMapping("/getReviewInfo")
+    public DetailReviewInfoDTO getReviewInfo(@RequestParam("reviewNo") Long reviewNo) {
+//        if (reviewNo == null || reviewNo <= 0) {
+//            throw new IllegalArgumentException("유효한 reviewNo가 필요합니다.");
+//        }
+
+        DetailReviewInfoDTO detailReviewInfoDTO = bossService.getReviewInfo(reviewNo);
+
+        System.out.println("reviewContentDTO = " + detailReviewInfoDTO);
+
+        return detailReviewInfoDTO;
     }
 
     // 리뷰 신고
-
-     @PostMapping("/reviewReport")
+    @PostMapping("/reviewReport")
     @ResponseBody
     public void reportReview(@RequestParam("storeNo") long storeNo, @RequestBody ReportReviewDTO reportReviewDTO){
         System.out.println("..dhdhdhdhd.." + reportReviewDTO);
@@ -205,6 +222,7 @@ public class BossController {
         // 리뷰 신고 기록 +1
         bossService.updateReportCount(reportReviewDTO.getReviewNo());
     }
+
     // 문의 내역 조회
     @GetMapping(value = "/inquiryList")
     public List<InquiryDTO> getInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo, @RequestParam(value = "searchWord" , required = false) String searchWord){
@@ -223,13 +241,20 @@ public class BossController {
     }
 
     // 최근 문의 내역 조회
-    @GetMapping("/recentInquiry")
-    public InquiryDTO getRecentInquiry(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
-        List<InquiryDTO> recentInquiries = bossService.getRecentInquiryList(userNo);
-        List<InquiryDTO> recentReports = bossService.getRecentReportList(storeNo);
-        recentInquiries.addAll(recentReports);
-        recentInquiries.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
-        return recentInquiries.isEmpty() ? null : recentInquiries.get(0);
+    @GetMapping(value = "/recentInquiry")
+    public InquiryDTO getRecentInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
+        List<InquiryDTO> RecentInquirytList =  bossService.getRecentInquiryList(userNo);
+
+        // REVIEW_REPORT 테이블에서 가져오기
+        List<InquiryDTO> RecentReportList = bossService.getRecentReportList(storeNo);
+
+        RecentInquirytList.addAll(RecentReportList);
+        RecentInquirytList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+
+        // 가장 마지막 요소 가져오기
+        InquiryDTO lastInquiry = RecentInquirytList.get(0);
+
+        return lastInquiry;
     }
 
     @GetMapping(value = "getSpecificInquiry")
@@ -408,5 +433,4 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 인코딩 오류시 500
         }
     }
-
 }
