@@ -447,4 +447,28 @@
         DELETE FROM TBL_INQUIRY WHERE INQ_NO = #{ inquiryNo }
     </delete>
 
+    <update id="updateReviewReport" parameterType="map">
+        UPDATE TBL_REVIEW_REPORT
+           SET REPORT_TITLE = #{ inquiryDTO.inquiryTitle },
+               REPORT_CONTENT = #{ inquiryDTO.inquiryContent },
+               REPORT_DATE = #{ inquiryDTO.inquiryDate }
+         WHERE REPORT_NO = #{ inquiryNo }
+    </update>
+
+    <update id="updateInquiry" parameterType="map">
+        UPDATE TBL_INQUIRY
+           SET INQ_TITLE = #{ inquiryDTO.inquiryTitle },
+               INQ_CONTENT = #{ inquiryDTO.inquiryContent },
+               INQ_DATE = #{ inquiryDTO.inquiryDate },
+               FILE = #{ inquiryDTO.file }
+         WHERE INQ_NO = #{ inquiryNo }
+    </update>
+
+    <select id="getFileName" parameterType="long" resultType="String">
+        SELECT
+               FILE
+          FROM TBL_INQUIRY
+         WHERE INQ_NO = #{ inquiryNo }
+    </select>
+
 </mapper>

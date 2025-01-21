@@ -145,5 +145,18 @@ public class BossService {
     public void decreaseReportCount(long reviewNo) {
         bossMapper.decreaseReportCount(reviewNo);
     }
+
+
+    public void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo) {
+        bossMapper.updateReviewReport(inquiryDTO, inquiryNo);
+    }
+
+    public void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo) {
+        bossMapper.updateInquiry(inquiryDTO, inquiryNo);
+    }
+
+    public String getFileName(long inquiryNo) {
+        return bossMapper.getFileName(inquiryNo);
+    }
 }
 
