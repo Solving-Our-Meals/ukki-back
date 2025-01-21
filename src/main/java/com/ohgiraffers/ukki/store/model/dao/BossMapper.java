@@ -80,4 +80,10 @@ public interface BossMapper {
     void deleteInquiry(long inquiryNo);
 
     void decreaseReportCount(long reviewNo);
+
+    void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo);
+
+    void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo);
+
+    String getFileName(long inquiryNo);
 }
