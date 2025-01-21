@@ -27,6 +27,7 @@
         r.RES_DATE AS date,
         r.RES_TIME AS time,
         r.QR,
+        r.QR_CONFIRM AS qrConfirm,
         rev.REVIEW_NO AS replyNo,
         0 AS reservation_type
         FROM
@@ -47,6 +48,7 @@
         er.RES_DATE AS date,
         er.RES_TIME AS time,
         er.QR,
+        er.QR_CONFIRM AS qrConfirm,
         rev.REVIEW_NO AS replyNo,
         1 AS reservation_type
         FROM
@@ -64,9 +66,6 @@
     </select>
 
 
-
-
-
     <select id="findUserReservationByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
         SELECT
         r.RES_NO AS resNo,
@@ -75,6 +74,8 @@
         r.RES_DATE AS date,
         r.RES_TIME AS time,
         r.QR,
+        r.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
         0 AS reservation_type
         FROM
         TBL_RESERVATION r
@@ -82,6 +83,7 @@
         TBL_USER u ON r.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON r.RES_NO = rev.RES_NO
         WHERE
         u.USER_ID = #{userId}
         <if test="search != null and search != ''">
@@ -97,6 +99,8 @@
         er.RES_DATE AS date,
         er.RES_TIME AS time,
         er.QR,
+        er.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
         1 AS reservation_type
         FROM
         TBL_END_RES er
@@ -104,6 +108,7 @@
         TBL_USER u ON er.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON er.RES_NO = rev.RES_NO
         WHERE
         u.USER_ID = #{userId}
         <if test="search != null and search != ''">
