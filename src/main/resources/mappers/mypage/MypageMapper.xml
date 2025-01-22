@@ -421,6 +421,7 @@
 
     <select id="findReservationQRById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationQRDTO">
         SELECT
+        r.USER_NO AS userNo,
         r.RES_NO AS resNo,
         r.QR
         FROM
@@ -429,5 +430,10 @@
         r.RES_NO = #{resNo}
     </select>
 
+    <update id="countReservation">
+        UPDATE TBL_USER_ACT_INFO
+        SET RES_COUNT = RES_COUNT - 1
+        WHERE USER_NO = #{userNo}
+    </update>
 
 </mapper>
