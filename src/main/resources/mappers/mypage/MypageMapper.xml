@@ -409,5 +409,9 @@
         VALUES (#{email}, #{noshow})
     </insert>
 
+    <delete id="deleteUserAct" parameterType="java.lang.Long">
+        DELETE FROM TBL_USER_ACT_INFO
+        WHERE USER_NO = #{userNo}
+    </delete>
 
 </mapper>

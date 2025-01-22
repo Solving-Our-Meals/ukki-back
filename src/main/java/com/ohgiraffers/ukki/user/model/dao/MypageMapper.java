@@ -63,4 +63,6 @@ public interface MypageMapper {
     List<MypageInquiryDTO> findUserInquiryByUserIdWithSearch(String userId, String search);
 
     MypageInquiryDTO findInquiryById(int inquiryNo);
+
+    int deleteUserAct(Long userNo);
 }
