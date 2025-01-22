@@ -7,32 +7,24 @@ import java.util.List;
 public class StoreResPosNumDTO {
 
     private Long rInfo;  // 예약 정보 번호
-
-    private int storeNo;  // 가게 번호
+    private long storeNo;  // 가게 번호
     private LocalDate rDate;  // 예약 날짜
     private String rDay;
     private LocalTime rOperTime;  // 예약 시간
     private int resPosNumber;  // 예약 가능한 인원 수
 
+    private List<DayResPosNumDTO> resPosNumList;
+
     public StoreResPosNumDTO() {
     }
 
-    public StoreResPosNumDTO(Long rInfo, int storeNo, LocalDate rDate, String rDay, LocalTime rOperTime, int resPosNumber) {
+    public StoreResPosNumDTO(Long rInfo, long storeNo, LocalDate rDate, String rDay, LocalTime rOperTime, int resPosNumber) {
         this.rInfo = rInfo;
         this.storeNo = storeNo;
         this.rDate = rDate;
         this.rDay = rDay;
         this.rOperTime = rOperTime;
         this.resPosNumber = resPosNumber;
-    }
-
-
-    public String getrDay() {
-        return rDay;
-    }
-
-    public void setrDay(String rDay) {
-        this.rDay = rDay;
     }
 
     public Long getrInfo() {
@@ -43,11 +35,11 @@ public class StoreResPosNumDTO {
         this.rInfo = rInfo;
     }
 
-    public int getStoreNo() {
+    public long getStoreNo() {
         return storeNo;
     }
 
-    public void setStoreNo(int storeNo) {
+    public void setStoreNo(long storeNo) {
         this.storeNo = storeNo;
     }
 
@@ -57,6 +49,14 @@ public class StoreResPosNumDTO {
 
     public void setrDate(LocalDate rDate) {
         this.rDate = rDate;
+    }
+
+    public String getrDay() {
+        return rDay;
+    }
+
+    public void setrDay(String rDay) {
+        this.rDay = rDay;
     }
 
     public LocalTime getrOperTime() {
@@ -76,5 +76,26 @@ public class StoreResPosNumDTO {
     }
 
     public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNum) {
+    }
+
+    // Getter, Setter를 추가하여 MyBatis 매핑을 반듯하게
+    public List<DayResPosNumDTO> getResPosNumList() {
+        return resPosNumList;
+    }
+
+    public void setResPosNumList(List<DayResPosNumDTO> resPosNumList) {
+        this.resPosNumList = resPosNumList;
+    }
+
+        @Override
+    public String toString() {
+        return "StoreResPosNumDTO{" +
+                "rInfo=" + rInfo +
+                ", storeNo=" + storeNo +
+                ", rDate=" + rDate +
+                ", rDay='" + rDay + '\'' +
+                ", rOperTime=" + rOperTime +
+                ", resPosNumber=" + resPosNumber +
+                '}';
     }
 }
