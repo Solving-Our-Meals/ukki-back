@@ -466,29 +466,48 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
 
             // 프로필 이미지 삭제
             String profileImagePath = getExistingFilePath(userId);
-            if (profileImagePath != null) {
+            if (profileImagePath != null && !profileImagePath.isEmpty()) {
                 boolean isFileDeleted = deleteFile(profileImagePath);
                 if (!isFileDeleted) {
                     throw new RuntimeException("프로필 이미지 제거 실패");
                 } else {
                     System.out.println("프로필 사진 없음");
                 }
+            } else {
+                System.out.println("프로필 이미지가 존재하지 않습니다. 건너뜁니다.");
             }
 
             // 리뷰 이미지 삭제
             List<String> reviewImages = mypageMapper.getReviewImagesByUserId(userNo);
-            for (String reviewImagePath : reviewImages) {
-                boolean isFileDeleted = deleteFile(reviewImagePath);
-                if (!isFileDeleted) {
-                    throw new RuntimeException("Failed to delete review image: " + reviewImagePath);
+            if (reviewImages != null && !reviewImages.isEmpty()) {
+                for (String reviewImagePath : reviewImages) {
+                    boolean isFileDeleted = deleteFile(reviewImagePath);
+                    if (!isFileDeleted) {
+                        System.out.println("Failed to delete review image: " + reviewImagePath);
+                        continue;
+                    }
                 }
+            } else {
+                System.out.println("리뷰 이미지가 존재하지 않습니다. 건너뜁니다.");
             }
+
 
             // 리뷰 삭제
             int reviewDeleteResult = mypageMapper.deleteReviewsByUserId(userNo);
-            if (reviewDeleteResult < 0) {
-                throw new RuntimeException("Failed to delete reviews");
+            if (reviewDeleteResult < 1) {
+                System.out.println("삭제할 리뷰가 없거나 삭제에 실패했습니다. 건너뜁니다.");
+            } else {
+                System.out.println("리뷰 삭제 성공");
             }
+
+            // 유저 활동 삭제
+            int userAct = mypageMapper.deleteUserAct(userNo);
+            if (userAct < 1) {
+                System.out.println("삭제할 유저 활동이 없거나 삭제에 실패했습니다. 건너뜁니다.");
+            } else {
+                System.out.println("유저 활동 삭제 성공");
+            }
+
 
             // 사용자 삭제
             int result = mypageMapper.deleteUserById(userId);
