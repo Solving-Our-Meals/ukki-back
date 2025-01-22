@@ -661,11 +661,12 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
                 File file = new File(qrFilePath);
 
                 if (file.exists()) {
-                    System.out.println("file exist");
+                    System.out.println("파일 있어요.");
                     file.delete();
                 } else {
-                    System.out.println("file is null");
+                    System.out.println("안됨");
                 }
+            }
 
             int deletedRows = mypageMapper.deleteReservation(resNo);
             return deletedRows > 0; // 삭제된 행이 있으면 true 반환
