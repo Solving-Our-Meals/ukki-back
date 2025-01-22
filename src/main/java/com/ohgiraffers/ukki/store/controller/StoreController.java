@@ -462,13 +462,13 @@ public class StoreController {
         System.out.println("예약 가능 인원이요~~~");
 
         switch (day) {
-            case "0" : storeResPosNumDTO.setrDay("TBL_SUNDAY"); break;
-            case "1" : storeResPosNumDTO.setrDay("TBL_MONDAY"); break;
-            case "2" : storeResPosNumDTO.setrDay("TBL_TUESDAY"); break;
-            case "3" : storeResPosNumDTO.setrDay("TBL_WEDNESDAY"); break;
-            case "4" : storeResPosNumDTO.setrDay("TBL_THURSDAY"); break;
-            case "5" : storeResPosNumDTO.setrDay("TBL_FRIDAY"); break;
-            case "6" : storeResPosNumDTO.setrDay("TBL_SATURDAY"); break;
+            case "0" : storeResPosNumDTO.setRDay("TBL_SUNDAY"); break;
+            case "1" : storeResPosNumDTO.setRDay("TBL_MONDAY"); break;
+            case "2" : storeResPosNumDTO.setRDay("TBL_TUESDAY"); break;
+            case "3" : storeResPosNumDTO.setRDay("TBL_WEDNESDAY"); break;
+            case "4" : storeResPosNumDTO.setRDay("TBL_THURSDAY"); break;
+            case "5" : storeResPosNumDTO.setRDay("TBL_FRIDAY"); break;
+            case "6" : storeResPosNumDTO.setRDay("TBL_SATURDAY"); break;
         }
 
         storeResPosNumDTO.setStoreNo(storeNo);
