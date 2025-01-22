@@ -272,7 +272,6 @@ public class MypageService {
         }
     }
 
-
 /*    public boolean deleteInquiry(int inquiryNo) {
 
         MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
@@ -648,8 +647,26 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         return mypageMapper.findUserInquiryByUserIdWithSearch(userId, search);
     }
 
+
+    private static final String QR_FILE_PATH = "\\\\192.168.0.138\\ukki_nas\\qr\\";
+
     public boolean deleteReservation(Long resNo) {
         try {
+            MypageReservationQRDTO reservationQR = mypageMapper.findReservationQRById(resNo);
+            System.out.println(reservationQR);
+
+            if (reservationQR != null && reservationQR.getQr() != null && !reservationQR.getQr().isEmpty()) {
+                String qrFilePath = QR_FILE_PATH + reservationQR.getQr() + ".png";
+
+                File file = new File(qrFilePath);
+
+                if (file.exists()) {
+                    System.out.println("file exist");
+                    file.delete();
+                } else {
+                    System.out.println("file is null");
+                }
+
             int deletedRows = mypageMapper.deleteReservation(resNo);
             return deletedRows > 0; // 삭제된 행이 있으면 true 반환
         } catch (Exception e) {
@@ -657,4 +674,6 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
             return false;
         }
     }
+
+
 }

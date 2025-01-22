@@ -419,4 +419,15 @@
         WHERE RES_NO = #{resNo}
     </delete>
 
+    <select id="findReservationQRById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationQRDTO">
+        SELECT
+        r.RES_NO AS resNo,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        WHERE
+        r.RES_NO = #{resNo}
+    </select>
+
+
 </mapper>
