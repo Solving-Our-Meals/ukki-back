@@ -663,12 +663,18 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
                     System.out.println("파일 있어요.");
                     file.delete();
                 } else {
-                    System.out.println("안됨");
+                    System.out.println("파일 없어요.");
                 }
             }
 
             int deletedRows = mypageMapper.deleteReservation(resNo);
-            return deletedRows > 0; // 삭제된 행이 있으면 true 반환
+            if (deletedRows > 0) {
+                Long userNo = reservationQR.getUserNo();
+                int updatedCount = mypageMapper.countReservation(userNo);
+
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
 
 
     public StoreController(StoreService storeService, BossService bossService){
@@ -212,6 +212,19 @@ public class StoreController {
 
 //        System.out.println("리뷰 조회 매퍼 옴.");
         reviewDTO = storeService.getReviewListByScope(storeNo);
+        System.out.println("reviewDTO : " + reviewDTO);
+
+        mv.addObject("review 정보", reviewDTO);
+
+        return reviewDTO;
+    }
+
+    @GetMapping(value = "/{storeNo}/reviewSecondScope", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ReviewDTO getReviewInfoByLowScope(@PathVariable("storeNo") long storeNo, ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
+
+//        System.out.println("리뷰 조회 매퍼 옴.");
+        reviewDTO = storeService.getReviewListByLowScope(storeNo);
         System.out.println("reviewDTO : " + reviewDTO);
 
         mv.addObject("review 정보", reviewDTO);
