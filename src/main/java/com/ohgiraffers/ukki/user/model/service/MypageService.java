@@ -647,7 +647,6 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         return mypageMapper.findUserInquiryByUserIdWithSearch(userId, search);
     }
 
-
     private static final String QR_FILE_PATH = "\\\\192.168.0.138\\ukki_nas\\qr\\";
 
     public boolean deleteReservation(Long resNo) {
@@ -675,6 +674,5 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
             return false;
         }
     }
-
 
 }
