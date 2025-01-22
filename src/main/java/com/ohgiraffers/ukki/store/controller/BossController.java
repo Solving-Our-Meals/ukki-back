@@ -21,6 +21,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import java.io.UnsupportedEncodingException;
@@ -52,9 +54,12 @@ public class BossController {
 
     // 예약 현황 조회
     @GetMapping("/reservation-status")
-    public ResponseEntity<List<ReservationDTO>> getReservationStatus(@RequestParam int storeNo) {
+    public ResponseEntity<List<ReservationDTO>> getReservationStatus(
+            @RequestParam long storeNo,
+            @RequestParam LocalDate reservationDate,
+            @RequestParam LocalTime reservationTime) {
         try {
-            List<ReservationDTO> reservations = bossService.getReservationStatus(storeNo);
+            List<ReservationDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
             if (reservations.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
@@ -64,9 +69,12 @@ public class BossController {
         }
     }
 
+
+
+
     // 예약 인원 리스트 조회
     @GetMapping("/reservation-people-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationPeopleList(@RequestParam int storeNo) {
+    public ResponseEntity<List<ReservationDTO>> getReservationPeopleList(@RequestParam long storeNo) {
         try {
             List<ReservationDTO> reservations = bossService.getReservationPeopleList(storeNo);
             return ResponseEntity.ok(reservations);
@@ -77,7 +85,7 @@ public class BossController {
 
     // 이번 주 예약 수 조회
     @GetMapping("/weekly-reservation-count")
-    public ResponseEntity<WeeklyReservationCountDTO> getWeeklyReservationCount(@RequestParam int storeNo) {
+    public ResponseEntity<WeeklyReservationCountDTO> getWeeklyReservationCount(@RequestParam long storeNo) {
         try {
             WeeklyReservationCountDTO count = bossService.getWeeklyReservationCount(storeNo);
             return ResponseEntity.ok(count);
@@ -88,7 +96,7 @@ public class BossController {
 
     // 오늘 예약 수 조회
     @GetMapping("/today-reservation-count")
-    public ResponseEntity<Integer> getTodayReservationCount(@RequestParam int storeNo) {
+    public ResponseEntity<Integer> getTodayReservationCount(@RequestParam long storeNo) {
         try {
             int count = bossService.getTodayReservationCount(storeNo);
             return ResponseEntity.ok(count);
@@ -99,7 +107,7 @@ public class BossController {
 
     // 다음 예약 가능한 시간 조회
     @GetMapping("/next-available-time")
-    public ResponseEntity<String> getNextAvailableTime(@RequestParam int storeNo, @RequestParam String resDate, @RequestParam String currentTime) {
+    public ResponseEntity<String> getNextAvailableTime(@RequestParam long storeNo, @RequestParam String resDate, @RequestParam String currentTime) {
         try {
             String nextTime = bossService.getNextAvailableTime(storeNo, resDate, currentTime);
             return ResponseEntity.ok(nextTime);
@@ -119,41 +127,74 @@ public class BossController {
         }
     }
 
-    // 예약 가능 인원 업데이트
-    @PostMapping("/updateAvailableSlots")
-    public ResponseEntity<String> updateAvailableSlots(
-            @RequestParam int storeNo,
-            @RequestParam String reservationDate,
-            @RequestParam String reservationTime,
-            @RequestParam int resPosNumber) {
 
-        // 예약 날짜를 LocalDate로 변환
-        LocalDate date = LocalDate.parse(reservationDate); // String을 LocalDate로 변환
+    @PostMapping("/insertAvailableSlots")
+    public ResponseEntity<String> insertAvailableSlots(@RequestBody StoreResPosNumDTO storeResPosNumDTO) {
+        Long storeNo = storeResPosNumDTO.getStoreNo();
+        LocalDate reservationDate = storeResPosNumDTO.getReservationDate();
+        LocalTime reservationTime = storeResPosNumDTO.getReservationTime();
+        int resPosNumber = storeResPosNumDTO.getResPosNumber();
 
-        // 유효성 검사: 예약 가능한 인원 수는 음수일 수 없습니다.
-        if (resPosNumber < 0) {
-            return ResponseEntity.badRequest().body("Slot number cannot be negative");
+        // 디버깅: resPosNumber 값 확인
+        System.out.println("서버에서 받은 예약 가능한 인원 수: " + resPosNumber);
+
+        // storeNo가 없는 경우 처리
+        if (storeNo == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Missing required parameter: storeNo");
         }
 
         try {
-            // 변환된 LocalDate와 다른 파라미터를 서비스로 전달
-            bossService.updateAvailableSlots(storeNo, date, reservationTime, resPosNumber);
-            return ResponseEntity.ok("Available slots updated successfully");
+            // 서비스 호출
+            bossService.insertAvailableSlots(storeNo, reservationDate, reservationTime, resPosNumber);
+            return ResponseEntity.ok("Available slots inserted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update available slots: " + e.getMessage());
+                    .body("Failed to insert available slots: " + e.getMessage());
         }
     }
 
 
 
 
-    // 예약 리스트 조회
+    // 예약 가능 인원 업데이트
+    @PostMapping("/updateAvailableSlots")
+    public ResponseEntity<String> updateAvailableSlots(
+            @RequestParam long storeNo,
+            @RequestParam LocalDate reservationDate,
+            @RequestParam LocalTime reservationTime,
+            @RequestParam int resPosNumber) {
+
+        System.out.println("Store No: " + storeNo);
+        System.out.println("Reservation Date: " + reservationDate);
+        System.out.println("Reservation Time: " + reservationTime);
+        System.out.println("Reservation Number: " + resPosNumber);
+
+        // Validate reservation number
+        if (resPosNumber < 0) {
+            return ResponseEntity.badRequest().body("Slot number cannot be negative");
+        }
+
+        try {
+            // Call service to update available slots
+            bossService.updateAvailableSlots(storeNo, reservationDate, reservationTime, resPosNumber);
+            return ResponseEntity.ok("Available slots updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update available slots: " + e.getMessage());
+        }
+
+    }
+
+
+
+
+        // 예약 리스트 조회
     @GetMapping("/reservations-list")
     public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
-            @RequestParam int storeNo,
-            @RequestParam String reservationDate,
-            @RequestParam(required = false) String reservationTime) {
+            @RequestParam long storeNo,
+            @RequestParam LocalDate reservationDate,
+            @RequestParam(required = false) LocalTime reservationTime) {
 
         try {
             List<ReservationDTO> reservations = bossService.getReservationListForTime(storeNo, reservationDate, reservationTime);
@@ -162,6 +203,7 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     @GetMapping("/getAvailableSlots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@RequestParam long storeNo) {

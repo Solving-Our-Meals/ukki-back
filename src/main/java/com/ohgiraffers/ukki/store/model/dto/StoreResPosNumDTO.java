@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.store.model.dto;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -7,64 +8,75 @@ import java.util.List;
 public class StoreResPosNumDTO {
 
     private Long rInfo;  // 예약 정보 번호
-
-    private int storeNo;  // 가게 번호
-    private LocalDate rDate;  // 예약 날짜
+    private long storeNo;  // 가게 번호
+    private LocalDate reservationDate;  // 예약 날짜
     private String rDay;
-    private LocalTime rOperTime;  // 예약 시간
+    private LocalTime reservationTime;  // 예약 시간
     private int resPosNumber;  // 예약 가능한 인원 수
+    private List<DayResPosNumDTO> listDayResPosNumDTO;  // 추가된 필드: 예약 가능한 일별 인원 정보 리스트
 
     public StoreResPosNumDTO() {
     }
 
-    public StoreResPosNumDTO(Long rInfo, int storeNo, LocalDate rDate, String rDay, LocalTime rOperTime, int resPosNumber) {
+    public StoreResPosNumDTO(Long rInfo, long storeNo, LocalDate reservationDate, String rDay, LocalTime reservationTime, int resPosNumber, List<DayResPosNumDTO> listDayResPosNumDTO) {
         this.rInfo = rInfo;
         this.storeNo = storeNo;
-        this.rDate = rDate;
+        this.reservationDate = reservationDate;
         this.rDay = rDay;
-        this.rOperTime = rOperTime;
+        this.reservationTime = reservationTime;
         this.resPosNumber = resPosNumber;
+        this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
 
 
-    public String getrDay() {
-        return rDay;
+    public String getRDay() {
+        if (this.reservationDate != null) {
+            DayOfWeek dayOfWeek = this.reservationDate.getDayOfWeek();
+            return dayOfWeek.toString();  // 요일을 대문자로 반환 (예: MONDAY)
+        }
+        return null;
     }
 
-    public void setrDay(String rDay) {
-        this.rDay = rDay;
-    }
-
-    public Long getrInfo() {
+    public Long getRInfo() {
         return rInfo;
     }
 
-    public void setrInfo(Long rInfo) {
+    public void setRInfo(Long rInfo) {
         this.rInfo = rInfo;
     }
 
-    public int getStoreNo() {
+    public long getStoreNo() {
         return storeNo;
     }
 
-    public void setStoreNo(int storeNo) {
+    public void setStoreNo(long storeNo) {
         this.storeNo = storeNo;
     }
 
-    public LocalDate getrDate() {
-        return rDate;
+    public LocalDate getReservationDate() {
+        return reservationDate;
     }
 
-    public void setrDate(LocalDate rDate) {
-        this.rDate = rDate;
+    public void setReservationDate(LocalDate reservationDate) {
+        this.reservationDate = reservationDate;
+        // 예약 날짜가 설정될 때 자동으로 요일 계산
+        if (reservationDate != null) {
+            this.rDay = reservationDate.getDayOfWeek().toString();
+        }
     }
 
-    public LocalTime getrOperTime() {
-        return rOperTime;
+
+
+    public void setRDay(String rDay) {
+        this.rDay = rDay;
     }
 
-    public void setrOperTime(LocalTime rOperTime) {
-        this.rOperTime = rOperTime;
+    public LocalTime getReservationTime() {
+        return reservationTime;
+    }
+
+    public void setReservationTime(LocalTime reservationTime) {
+        this.reservationTime = reservationTime;
     }
 
     public int getResPosNumber() {
@@ -75,6 +87,11 @@ public class StoreResPosNumDTO {
         this.resPosNumber = resPosNumber;
     }
 
-    public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNum) {
+    public List<DayResPosNumDTO> getListDayResPosNumDTO() {
+        return listDayResPosNumDTO;
+    }
+
+    public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNumDTO) {
+        this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
 }

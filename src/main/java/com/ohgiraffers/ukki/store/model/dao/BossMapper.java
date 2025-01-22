@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Mapper
@@ -14,19 +15,19 @@ public interface BossMapper {
     // 가게 정보 조회
     StoreInfoDTO getStoreInfo(long userNo);
 
-    List<ReservationDTO> selectReservationStatusByStore(int storeNo);
+    List<ReservationDTO> selectReservationStatusByStore(long storeNo, LocalDate reservationDate,LocalTime reservationTime);
 
-    List<ReservationDTO> selectReservationPeopleList(int storeNo);
+    List<ReservationDTO> selectReservationPeopleList(long storeNo);
 
-    int selectAvailableReservationPeople(int storeNo, String reservationDate);
+    int selectAvailableReservationPeople(long storeNo, LocalDate reservationDate);
 
-    WeeklyReservationCountDTO selectWeeklyReservationCount(int storeNo);
+    WeeklyReservationCountDTO selectWeeklyReservationCount(long storeNo);
 
-    int selectTodayReservationCount(int storeNo);
+    int selectTodayReservationCount(long storeNo);
 
 
 
-    String getNextAvailableTime(int storeNo, String resDate, String currentTime);
+    String getNextAvailableTime(long storeNo, String resDate, String currentTime);
 
     List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO);
 
@@ -53,13 +54,13 @@ public interface BossMapper {
                                                        @Param("startDate") LocalDate startDate,
                                                        @Param("endDate") LocalDate endDate);
 
-    StoreResPosNumDTO getResPosNumByStoreAndDate(@Param("storeNo") int storeNo, @Param("date") LocalDate date, @Param("reservationTime") String reservationTime);
+    StoreResPosNumDTO getResPosNumByStoreAndDate(@Param("storeNo") long storeNo, @Param("reservationDate") LocalDate reservationDate, @Param("reservationTime") LocalTime reservationTime);
 
 
-    List<ReservationDTO> getReservationsForDateAndTime(int storeNo, String reservationDate, String reservationTime);
-    List<ReservationDTO> getReservationsForDate(int storeNo, String reservationDate);
+    List<ReservationDTO> getReservationsForDateAndTime(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
+    List<ReservationDTO> getReservationsForDate(long storeNo, LocalDate reservationDate);
 
-    List<ReservationDTO> selectReservationList(long storeNo, String reservationDate, String reservationTime);
+    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
 
     void updateReportCount(long reviewNo);
 
@@ -71,8 +72,6 @@ public interface BossMapper {
 
     List<InquiryDTO> getRecentReportList(long storeNo);
 
-
-    void insertAvailableSlots(StoreResPosNumDTO storeResPosNum);
 
 //    InquiryDTO getReviewReportInfo(long inquiryNo);
 
@@ -90,4 +89,5 @@ public interface BossMapper {
 
     String getFileName(long inquiryNo);
 
+    void insertAvailableSlots(StoreResPosNumDTO storeResPosNumDTO);
 }

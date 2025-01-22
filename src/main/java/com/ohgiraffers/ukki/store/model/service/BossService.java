@@ -23,16 +23,16 @@ public class BossService {
     }
 
     // 가게 예약 현황 조회
-    public List<ReservationDTO> getReservationStatus(int storeNo) {
-        return bossMapper.selectReservationStatusByStore(storeNo);
+    public List<ReservationDTO> getReservationStatus(long storeNo, LocalDate reservationDate,LocalTime reservationTime) {
+        return bossMapper.selectReservationStatusByStore(storeNo,reservationDate,reservationTime);
     }
 
     // 예약 인원 리스트 조회
-    public List<ReservationDTO> getReservationPeopleList(int storeNo) {
+    public List<ReservationDTO> getReservationPeopleList(long storeNo) {
         return bossMapper.selectReservationPeopleList(storeNo);
     }
 
-    public List<ReservationDTO> getReservationList(long storeNo, String reservationDate, String reservationTime) {
+    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
         return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
     }
 
@@ -53,15 +53,15 @@ public class BossService {
     }
 
     // 기타 로직은 동일
-    public WeeklyReservationCountDTO getWeeklyReservationCount(int storeNo) {
+    public WeeklyReservationCountDTO getWeeklyReservationCount(long storeNo) {
         return bossMapper.selectWeeklyReservationCount(storeNo);
     }
 
-    public int getTodayReservationCount(int storeNo) {
+    public int getTodayReservationCount(long storeNo) {
         return bossMapper.selectTodayReservationCount(storeNo);
     }
 
-    public String getNextAvailableTime(int storeNo, String resDate, String currentTime) {
+    public String getNextAvailableTime(long storeNo, String resDate, String currentTime) {
         return bossMapper.getNextAvailableTime(storeNo, resDate, currentTime);
     }
 
@@ -90,8 +90,8 @@ public class BossService {
     }
 
 
-    public List<ReservationDTO> getReservationListForTime(int storeNo, String reservationDate, String reservationTime) {
-        if (reservationTime == null || reservationTime.isEmpty()) {
+    public List<ReservationDTO> getReservationListForTime(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
+        if (reservationTime == null) {
             return bossMapper.getReservationsForDate(storeNo, reservationDate);  // 시간 조건 없는 쿼리 호출
         }
         return bossMapper.getReservationsForDateAndTime(storeNo, reservationDate, reservationTime);  // 기존 쿼리
@@ -121,24 +121,20 @@ public class BossService {
     }
 
 
-
-    public void updateAvailableSlots(int storeNo, LocalDate date, String reservationTime, int resPosNumber) {
+    @Transactional
+    public void updateAvailableSlots(long storeNo, LocalDate reservationDate, LocalTime reservationTime, int resPosNumber) {
         try {
-            // StoreResPosNumDTO 객체를 생성하여 필요한 값을 세팅합니다.
             StoreResPosNumDTO storeResPosNum = new StoreResPosNumDTO();
             storeResPosNum.setStoreNo(storeNo);
-            storeResPosNum.setrDate(date);  // 예약 날짜 (LocalDate 타입으로 설정)
-            storeResPosNum.setResPosNumber(resPosNumber);  // 예약 가능한 인원 수 설정
-            storeResPosNum.setrOperTime(LocalTime.parse(reservationTime)); // 예약 시간
+            storeResPosNum.setReservationDate(reservationDate);
+            storeResPosNum.setResPosNumber(resPosNumber);
+            storeResPosNum.setReservationTime(reservationTime);
 
-            // 1. 예약 정보가 존재하는지 확인
-            StoreResPosNumDTO existingSlot = bossMapper.getResPosNumByStoreAndDate(storeNo, date, reservationTime);
+            StoreResPosNumDTO existingSlot = bossMapper.getResPosNumByStoreAndDate(storeNo, reservationDate, reservationTime);
 
             if (existingSlot != null) {
-                // 2. 예약 정보가 있으면 업데이트
                 bossMapper.updateAvailableSlots(storeResPosNum);
             } else {
-                // 3. 예약 정보가 없으면 삽입
                 bossMapper.insertAvailableSlots(storeResPosNum);
             }
 
@@ -181,6 +177,17 @@ public class BossService {
 
     public String getFileName(long inquiryNo) {
         return bossMapper.getFileName(inquiryNo);
+    }
+
+    public void insertAvailableSlots(long storeNo, LocalDate reservationDate, LocalTime reservationTime, int resPosNumber) {
+        StoreResPosNumDTO storeResPosNumDTO = new StoreResPosNumDTO();
+        storeResPosNumDTO.setStoreNo(storeNo);
+        storeResPosNumDTO.setReservationDate(reservationDate);
+        storeResPosNumDTO.setReservationTime(reservationTime);
+        storeResPosNumDTO.setResPosNumber(resPosNumber);
+
+        // rDay가 자동으로 계산되어 설정됩니다.
+        bossMapper.insertAvailableSlots(storeResPosNumDTO);
     }
 
 }
