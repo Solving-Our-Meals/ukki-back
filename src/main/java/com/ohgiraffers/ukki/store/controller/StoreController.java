@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -212,6 +213,19 @@ public class StoreController {
 
 //        System.out.println("리뷰 조회 매퍼 옴.");
         reviewDTO = storeService.getReviewListByScope(storeNo);
+        System.out.println("reviewDTO : " + reviewDTO);
+
+        mv.addObject("review 정보", reviewDTO);
+
+        return reviewDTO;
+    }
+
+    @GetMapping(value = "/{storeNo}/reviewSecondScope", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ReviewDTO getReviewInfoByLowScope(@PathVariable("storeNo") long storeNo, ModelAndView mv, @ModelAttribute ReviewDTO reviewDTO, StoreInfoDTO storeInfoDTO, ReviewContentDTO reviewContentDTO){
+
+//        System.out.println("리뷰 조회 매퍼 옴.");
+        reviewDTO = storeService.getReviewListByLowScope(storeNo);
         System.out.println("reviewDTO : " + reviewDTO);
 
         mv.addObject("review 정보", reviewDTO);
@@ -416,9 +430,11 @@ public class StoreController {
 
     // 리뷰 작성하기 버튼 활성화를 위한 리뷰 작성 권환 확인용 -> 예약 tbl에서 해당 아이디, 가게번호 넘겨서 확인하기
     @GetMapping(value = "/{storeNo}/getreviewlist")
-    public ResponseEntity<List<ReservationInfoDTO>> getUserReviewList(@PathVariable("storeNo") long storeNum, @RequestParam("userId") String userId, @RequestParam("storeNo") long storeNo, Model model, @ModelAttribute List<ReservationInfoDTO> reservationList){
+    public ResponseEntity<List<ReservationInfoDTO>> getUserReviewList(@PathVariable("storeNo") long storeNum, @RequestParam("userId") String userId, @RequestParam("storeNo") long storeNo, Model model){
 //        System.out.println("리뷰 권한 넘어옴");
 //        System.out.println("userId : " + userId + " , storeNo : " + storeNo);
+
+        List<ReservationInfoDTO> reservationList = new ArrayList<>();
 
         reservationList = storeService.getUserReviewList(userId, storeNo);
 
@@ -441,7 +457,9 @@ public class StoreController {
 
     // 예약 가능 인원 조회
     @GetMapping(value = "/{storeNo}/resPosNumber")
-    public ResponseEntity<StoreResPosNumDTO> getResPosNumber(@PathVariable("storeNo") long storeNum, @RequestParam("storeNo") long storeNo, @RequestParam("day") String day, @RequestParam("date") String date, @ModelAttribute  StoreResPosNumDTO storeResPosNumDTO) {
+    public List<DayResPosNumDTO> getResPosNumber(@PathVariable("storeNo") long storeNum, @RequestParam("storeNo") long storeNo, @RequestParam("day") String day, @RequestParam("date") String date, @ModelAttribute StoreResPosNumDTO storeResPosNumDTO) {
+
+        System.out.println("예약 가능 인원이요~~~");
 
         switch (day) {
             case "0" : storeResPosNumDTO.setRDay("TBL_SUNDAY"); break;
@@ -453,12 +471,19 @@ public class StoreController {
             case "6" : storeResPosNumDTO.setRDay("TBL_SATURDAY"); break;
         }
 
+        storeResPosNumDTO.setStoreNo(storeNo);
+        storeResPosNumDTO.setrDate(LocalDate.parse(date));
+
+        System.out.println("예약 가능 ??? " + storeResPosNumDTO);
+
         List<DayResPosNumDTO> listDayResPosNum= storeService.getResPosNum(storeResPosNumDTO);
 
-        storeResPosNumDTO.setListDayResPosNumDTO(listDayResPosNum);
-        System.out.println("storeResPosNumDTO = " + storeResPosNumDTO);
+        System.out.println("listDayResPosNum = " + listDayResPosNum);
 
-        return ResponseEntity.ok(storeResPosNumDTO);
+//        storeResPosNumDTO.setListDayResPosNumDTO(listDayResPosNum);
+//        System.out.println("storeResPosNumDTO = " + storeResPosNumDTO);
+
+        return listDayResPosNum;
     }
 
 

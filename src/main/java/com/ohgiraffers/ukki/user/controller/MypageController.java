@@ -23,6 +23,7 @@ import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -505,6 +506,23 @@ public class MypageController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 처리 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 예약 취소 (삭제) -> POST 매핑은 예약 취소 내역이 남을 때 만들고 우리는 기획을 완전제거로 하여 딜리트 매핑
+    // 여긴 보안 뺌
+    @DeleteMapping("/reservation/{resNo}")
+    public ResponseEntity<Map<String, String>> cancelReservation(@PathVariable Long resNo) {
+        boolean isCancelled = mypageService.deleteReservation(resNo); // 예약 취소 로직
+
+        if (isCancelled) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "예약이 취소되었습니다.");
+            return ResponseEntity.ok(response);  // 200 OK와 함께 JSON 응답 반환
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "예약 취소에 실패했습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);  // 400 Bad Request와 함께 JSON 응답 반환
         }
     }
 

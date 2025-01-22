@@ -463,8 +463,8 @@
 
     <update id="decreaseReportCount" parameterType="long">
         UPDATE TBL_REVIEW
-        SET REPORT_COUNT = REPORT_COUNT - 1
-        WHERE REVIEW_NO = #{ reviewNo }
+           SET REPORT_COUNT = REPORT_COUNT - 1
+         WHERE REVIEW_NO = #{ reviewNo }
     </update>
 
     <delete id="deleteInquiry" parameterType="long">

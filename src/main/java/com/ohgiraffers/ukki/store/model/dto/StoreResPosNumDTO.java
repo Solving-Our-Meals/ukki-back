@@ -94,4 +94,27 @@ public class StoreResPosNumDTO {
     public void setListDayResPosNumDTO(List<DayResPosNumDTO> listDayResPosNumDTO) {
         this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
+
+
+    // Getter, Setter를 추가하여 MyBatis 매핑을 반듯하게
+    public List<DayResPosNumDTO> getResPosNumList() {
+        return resPosNumList;
+    }
+
+    public void setResPosNumList(List<DayResPosNumDTO> resPosNumList) {
+        this.resPosNumList = resPosNumList;
+    }
+
+        @Override
+    public String toString() {
+        return "StoreResPosNumDTO{" +
+                "rInfo=" + rInfo +
+                ", storeNo=" + storeNo +
+                ", rDate=" + rDate +
+                ", rDay='" + rDay + '\'' +
+                ", rOperTime=" + rOperTime +
+                ", resPosNumber=" + resPosNumber +
+                '}';
+    }
 }
+

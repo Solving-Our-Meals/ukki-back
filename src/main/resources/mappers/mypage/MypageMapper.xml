@@ -409,5 +409,31 @@
         VALUES (#{email}, #{noshow})
     </insert>
 
+    <delete id="deleteUserAct" parameterType="java.lang.Long">
+        DELETE FROM TBL_USER_ACT_INFO
+        WHERE USER_NO = #{userNo}
+    </delete>
+
+    <delete id="deleteReservation" parameterType="Long">
+        DELETE FROM TBL_RESERVATION
+        WHERE RES_NO = #{resNo}
+    </delete>
+
+    <select id="findReservationQRById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationQRDTO">
+        SELECT
+        r.USER_NO AS userNo,
+        r.RES_NO AS resNo,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        WHERE
+        r.RES_NO = #{resNo}
+    </select>
+
+    <update id="countReservation">
+        UPDATE TBL_USER_ACT_INFO
+        SET RES_COUNT = RES_COUNT - 1
+        WHERE USER_NO = #{userNo}
+    </update>
 
 </mapper>
