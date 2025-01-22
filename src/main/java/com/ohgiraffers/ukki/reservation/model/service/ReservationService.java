@@ -157,6 +157,7 @@ public class ReservationService {
     }
 
 
-
-
+    public ReservationInfoDTO checkExistReservation(ReservationInfoDTO reservationInfoDTO) {
+        return reservationMapper.checkExistReservation(reservationInfoDTO);
+    }
 }

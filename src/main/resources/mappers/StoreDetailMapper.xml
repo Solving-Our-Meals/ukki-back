@@ -226,7 +226,30 @@
           FROM TBL_REVIEW A
           JOIN TBL_USER B ON A.USER_NO = B.USER_NO
          WHERE A.STORE_NO = #{storeNo}
-        ORDER BY REVIEW_SCOPE DESC;
+        ORDER BY A.REVIEW_SCOPE DESC, A.REVIEW_DATE DESC;
+    </select>
+
+    <select id="getReviewListByLowScope" parameterType="long" resultMap="getReviewInfoResultMap">
+        SELECT
+               A.STORE_NO
+             , (SELECT
+                       COUNT(*)
+                  FROM TBL_REVIEW
+                 WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+             , A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_IMG
+             , A.REVIEW_DATE
+             , A.REVIEW_SCOPE
+             , A.USER_NO
+             , B.USER_NAME
+             , B.USER_PROFILE
+             , A.REPORT_COUNT
+             , A.RES_NO
+          FROM TBL_REVIEW A
+          JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+         WHERE A.STORE_NO = #{storeNo}
+         ORDER BY A.REVIEW_SCOPE, A.REVIEW_DATE DESC;
     </select>
 
 

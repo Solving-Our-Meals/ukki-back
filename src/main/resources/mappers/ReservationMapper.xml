@@ -47,6 +47,16 @@
          WHERE STORE_NO = #{ storeNo }
     </select>
 
+    <select id="checkExistReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO" resultMap="reservationInfoDTOResultMap">
+        SELECT
+               *
+          FROM TBL_RESERVATION
+         WHERE RES_DATE = #{ resDate }
+           AND RES_TIME = #{ resTile }
+           AND USER_NO = #{ userNo }
+           AND STORE_NO = #{ storeNo }
+    </select>
+
     <insert id="insertReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
         INSERT INTO TBL_RESERVATION
         (

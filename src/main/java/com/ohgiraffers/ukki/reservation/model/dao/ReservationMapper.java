@@ -26,4 +26,6 @@ public interface ReservationMapper {
 
     // 예약 가능한 인원 업데이트
     void updateReservationPosNum(int storeNo, String reservationDate, String reservationTime, int newPosNumber);
+
+    ReservationInfoDTO checkExistReservation(ReservationInfoDTO reservationInfoDTO);
 }
