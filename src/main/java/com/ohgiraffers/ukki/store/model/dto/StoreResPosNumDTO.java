@@ -15,8 +15,7 @@ public class StoreResPosNumDTO {
     private int resPosNumber;  // 예약 가능한 인원 수
     private List<DayResPosNumDTO> listDayResPosNumDTO;  // 추가된 필드: 예약 가능한 일별 인원 정보 리스트
 
-    public StoreResPosNumDTO() {
-    }
+    public StoreResPosNumDTO (){};
 
     public StoreResPosNumDTO(Long rInfo, long storeNo, LocalDate reservationDate, String rDay, LocalTime reservationTime, int resPosNumber, List<DayResPosNumDTO> listDayResPosNumDTO) {
         this.rInfo = rInfo;
@@ -28,20 +27,11 @@ public class StoreResPosNumDTO {
         this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
 
-
-    public String getRDay() {
-        if (this.reservationDate != null) {
-            DayOfWeek dayOfWeek = this.reservationDate.getDayOfWeek();
-            return dayOfWeek.toString();  // 요일을 대문자로 반환 (예: MONDAY)
-        }
-        return null;
-    }
-
-    public Long getRInfo() {
+    public Long getrInfo() {
         return rInfo;
     }
 
-    public void setRInfo(Long rInfo) {
+    public void setrInfo(Long rInfo) {
         this.rInfo = rInfo;
     }
 
@@ -57,17 +47,11 @@ public class StoreResPosNumDTO {
         return reservationDate;
     }
 
-    public void setReservationDate(LocalDate reservationDate) {
-        this.reservationDate = reservationDate;
-        // 예약 날짜가 설정될 때 자동으로 요일 계산
-        if (reservationDate != null) {
-            this.rDay = reservationDate.getDayOfWeek().toString();
-        }
+    public String getrDay() {
+        return rDay;
     }
 
-
-
-    public void setRDay(String rDay) {
+    public void setrDay(String rDay) {
         this.rDay = rDay;
     }
 
@@ -95,26 +79,35 @@ public class StoreResPosNumDTO {
         this.listDayResPosNumDTO = listDayResPosNumDTO;
     }
 
-
-    // Getter, Setter를 추가하여 MyBatis 매핑을 반듯하게
-    public List<DayResPosNumDTO> getResPosNumList() {
-        return resPosNumList;
+    public void setReservationDate(LocalDate reservationDate) {
+        this.reservationDate = reservationDate;
+        // 예약 날짜가 설정될 때 자동으로 요일 계산
+        if (reservationDate != null) {
+            this.rDay = reservationDate.getDayOfWeek().toString();
+        }
     }
 
-    public void setResPosNumList(List<DayResPosNumDTO> resPosNumList) {
-        this.resPosNumList = resPosNumList;
-    }
-
-        @Override
+    @Override
     public String toString() {
         return "StoreResPosNumDTO{" +
                 "rInfo=" + rInfo +
                 ", storeNo=" + storeNo +
-                ", rDate=" + rDate +
+                ", reservationDate=" + reservationDate +
                 ", rDay='" + rDay + '\'' +
-                ", rOperTime=" + rOperTime +
+                ", reservationTime=" + reservationTime +
                 ", resPosNumber=" + resPosNumber +
+                ", listDayResPosNumDTO=" + listDayResPosNumDTO +
                 '}';
     }
+
+    //    // Getter, Setter를 추가하여 MyBatis 매핑을 반듯하게
+//    public List<DayResPosNumDTO> getResPosNumList() {
+//        return resPosNumList;
+//    }
+//
+//    public void setResPosNumList(List<DayResPosNumDTO> resPosNumList) {
+//        this.resPosNumList = resPosNumList;
+//    }
+
 }
 

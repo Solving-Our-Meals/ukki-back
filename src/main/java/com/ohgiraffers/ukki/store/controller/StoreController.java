@@ -462,17 +462,17 @@ public class StoreController {
         System.out.println("예약 가능 인원이요~~~");
 
         switch (day) {
-            case "0" : storeResPosNumDTO.setRDay("TBL_SUNDAY"); break;
-            case "1" : storeResPosNumDTO.setRDay("TBL_MONDAY"); break;
-            case "2" : storeResPosNumDTO.setRDay("TBL_TUESDAY"); break;
-            case "3" : storeResPosNumDTO.setRDay("TBL_WEDNESDAY"); break;
-            case "4" : storeResPosNumDTO.setRDay("TBL_THURSDAY"); break;
-            case "5" : storeResPosNumDTO.setRDay("TBL_FRIDAY"); break;
-            case "6" : storeResPosNumDTO.setRDay("TBL_SATURDAY"); break;
+            case "0" : storeResPosNumDTO.setrDay("SUNDAY"); break;
+            case "1" : storeResPosNumDTO.setrDay("MONDAY"); break;
+            case "2" : storeResPosNumDTO.setrDay("TUESDAY"); break;
+            case "3" : storeResPosNumDTO.setrDay("WEDNESDAY"); break;
+            case "4" : storeResPosNumDTO.setrDay("THURSDAY"); break;
+            case "5" : storeResPosNumDTO.setrDay("FRIDAY"); break;
+            case "6" : storeResPosNumDTO.setrDay("SATURDAY"); break;
         }
 
         storeResPosNumDTO.setStoreNo(storeNo);
-        storeResPosNumDTO.setrDate(LocalDate.parse(date));
+        storeResPosNumDTO.setReservationDate(LocalDate.parse(date));
 
         System.out.println("예약 가능 ??? " + storeResPosNumDTO);
 

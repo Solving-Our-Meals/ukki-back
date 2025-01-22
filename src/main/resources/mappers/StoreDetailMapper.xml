@@ -362,13 +362,13 @@
                                    FROM TBL_RESERVATION A_2
                                   WHERE A.STORE_NO = A_2.STORE_NO
                                     AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
-                                    AND DATE_FORMAT(A_2.RES_TIME, '%Y-%m-%d') = #{rDate}
+                                    AND DATE_FORMAT(A_2.RES_TIME, '%Y-%m-%d') = #{reservationDate}
                                     ), 0) AS RES_POS_NUMBER
-          FROM ${rDay} A
+          FROM TBL_${rDay} A
           LEFT JOIN TBL_RES_POS_NUMBER B
             ON A.STORE_NO = B.STORE_NO
            AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')
-           AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{rDate}
+           AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{reservationDate}
          WHERE A.STORE_NO = #{storeNo};
     </select>
 
