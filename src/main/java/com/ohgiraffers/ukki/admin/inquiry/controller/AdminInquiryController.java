@@ -7,6 +7,7 @@ import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
 import com.ohgiraffers.ukki.common.InquiryState;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -29,13 +30,14 @@ import java.util.*;
 @RequestMapping("/admin/inquiries")
 public class AdminInquiryController {
 
-//    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
-private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
+    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
     private final AdminInquiryService adminInquiryService;
+    private final GoogleDriveService googleDriveService;
 
     @Autowired
-    public AdminInquiryController(AdminInquiryService adminInquiryService){
+    public AdminInquiryController(AdminInquiryService adminInquiryService, GoogleDriveService googleDriveService){
         this.adminInquiryService = adminInquiryService;
+        this.googleDriveService = googleDriveService;
     }
 
     @GetMapping("/processingInquiry")
@@ -147,11 +149,9 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     @PutMapping("/info/{inquiryNo}")
     public ResponseEntity<?> inquiryAnswer(@PathVariable int inquiryNo, @RequestBody AnswerDTO answer){
         try {
-            System.out.println("수정왔당");
             answer.setInquiryNo(inquiryNo);
-            LocalDate date = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String dateString = date.format(formatter);
+            // LocalDate 대신 직접 String으로 포맷팅
+            String dateString = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
             answer.setAnswerDate(dateString);
             answer.setState(InquiryState.COMPLETE);
 
@@ -162,9 +162,7 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
@@ -174,18 +172,13 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     public ResponseEntity<?> inquiryDelete(@PathVariable int inquiryNo){
         try {
             InquiryInfoDTO inquiryDTO = adminInquiryService.inquiryInfo(inquiryNo);
-            String fileToDeleteInquiry =  inquiryDTO.getFile();
+            String fileUrl = inquiryDTO.getFile();
 
-            if(fileToDeleteInquiry != null) {
-                int dotIndex = fileToDeleteInquiry.lastIndexOf('.');
-                String extension = "";
-                if (dotIndex > 0 && dotIndex < fileToDeleteInquiry.length() - 1) {
-                    extension = fileToDeleteInquiry.substring(dotIndex + 1);
-                }
-                System.out.println(extension);
-
-                Path filePathInquiry = Paths.get(SHARED_FOLDER, fileToDeleteInquiry);
-                Files.deleteIfExists(filePathInquiry);
+            if(fileUrl != null && !fileUrl.isEmpty()) {
+                // URL에서 fileId 추출 (https://drive.google.com/uc?id=FILE_ID 형식)
+                String fileId = fileUrl.substring(fileUrl.lastIndexOf("=") + 1);
+                // Google Drive에서 파일 삭제
+                googleDriveService.deleteFile(fileId);
             }
 
             adminInquiryService.inquiryDelete(inquiryNo);
@@ -195,11 +188,9 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+                    .body("문의 삭제 중 에러가 발생했습니다.");
         }
     }
 
@@ -208,9 +199,8 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     public ResponseEntity<?> reportAnswer(@PathVariable int reportNo, @RequestBody AnswerDTO answer){
         try {
             answer.setInquiryNo(reportNo);
-            LocalDate date = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String dateString = date.format(formatter);
+            // LocalDate 대신 직접 String으로 포맷팅
+            String dateString = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
             answer.setAnswerDate(dateString);
             answer.setState(InquiryState.COMPLETE);
 
@@ -221,9 +211,7 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
@@ -247,35 +235,15 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
         }
     }
 
-    @GetMapping("/files/{filename}")
-    public ResponseEntity<?> getFile(@PathVariable String filename) throws MalformedURLException {
+    @GetMapping("/files/{fileUrl}")
+    public ResponseEntity<?> getFile(@PathVariable String fileUrl) {
         try {
-            Path filePath = Paths.get(SHARED_FOLDER).resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-
-            String contentType = null;
-//        Files.probeContentType(Path) 메소드를 사용하여 지정된 파일의 MIME 타입을 알아내기.
-            try {
-                contentType = Files.probeContentType(filePath);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-//        파일 타입의 추론하지 못했을 때 "application/octet-stream" -> 일반적인 바이너리 데이터 타입으로 파일의 타입이 명확하지 않을 때 사용
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
-        }catch (Exception e){
-            // 에러 메시지 로그 출력
+            // 이미 완전한 URL이므로 그대로 반환
+            return ResponseEntity.ok().body(Collections.singletonMap("url", fileUrl));
+        } catch (Exception e) {
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+                    .body("파일 URL을 가져오는 중 에러가 발생했습니다.");
         }
     }
 
