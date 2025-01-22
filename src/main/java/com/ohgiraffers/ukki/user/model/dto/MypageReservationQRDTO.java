@@ -1,14 +1,24 @@
 package com.ohgiraffers.ukki.user.model.dto;
 
 public class MypageReservationQRDTO {
+    private Long userNo;
     private Long resNo;
     private String qr;
 
     public MypageReservationQRDTO() {}
 
-    public MypageReservationQRDTO(Long resNo, String qr) {
+    public MypageReservationQRDTO(Long userNo, Long resNo, String qr) {
+        this.userNo = userNo;
         this.resNo = resNo;
         this.qr = qr;
+    }
+
+    public Long getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(Long userNo) {
+        this.userNo = userNo;
     }
 
     public Long getResNo() {
@@ -30,7 +40,8 @@ public class MypageReservationQRDTO {
     @Override
     public String toString() {
         return "MypageReservationQRDTO{" +
-                "resNo=" + resNo +
+                "userNo=" + userNo +
+                ", resNo=" + resNo +
                 ", qr='" + qr + '\'' +
                 '}';
     }

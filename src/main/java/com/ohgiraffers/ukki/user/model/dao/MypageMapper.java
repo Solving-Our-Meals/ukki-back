@@ -69,4 +69,6 @@ public interface MypageMapper {
     int deleteReservation(Long resNo);
 
     MypageReservationQRDTO findReservationQRById(Long resNo);
+
+    int countReservation(Long userNo);
 }
