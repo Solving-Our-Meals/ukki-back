@@ -167,24 +167,35 @@ public class MypageService {
 
     public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
-            String existingFilePath = inquiryToUpdate.getFile();
-            if (existingFilePath != null && !existingFilePath.isEmpty()) {
+            // 1. 기존 파일 삭제
+            String existingFileName = inquiryToUpdate.getFile();  // 기존 파일명 가져오기
+            if (existingFileName != null && !existingFileName.isEmpty()) {
+                String existingFilePath = getInquiryFilePath(existingFileName);  // Inquiry 경로로 수정
+                System.out.println("기존 파일 경로: " + existingFilePath);  // 경로 출력하여 확인
+
                 File existingFile = new File(existingFilePath);
+
                 if (existingFile.exists()) {
-                    boolean deleted = existingFile.delete();
+                    boolean deleted = existingFile.delete();  // 파일 삭제
                     if (deleted) {
                         System.out.println("기존 파일 삭제 성공: " + existingFilePath);
                     } else {
                         System.out.println("기존 파일 삭제 실패: " + existingFilePath);
+                        System.out.println("파일 삭제 실패. 파일의 삭제 권한 또는 경로를 확인하세요.");
                     }
+                } else {
+                    System.out.println("기존 파일이 존재하지 않습니다: " + existingFilePath);
                 }
             }
 
+            // 2. 새 파일 저장
             if (file != null && !file.isEmpty()) {
-                String filePath = saveFile(file, userId);
-                inquiryToUpdate.setFile(filePath);
+                String newFileName = file.getOriginalFilename();  // 파일명 그대로 사용
+                String newFilePath = saveInquiryFile(file, newFileName);  // Inquiry 저장
+                inquiryToUpdate.setFile(newFileName);  // DB에는 파일명만 저장
             }
 
+            // 3. DB 업데이트
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
             return updatedRows > 0;
         } catch (Exception e) {
@@ -193,6 +204,39 @@ public class MypageService {
         }
     }
 
+    // 인쿼리용 파일 경로 생성
+    private String getInquiryFilePath(String fileName) {
+        // inquiry 파일 저장 디렉토리와 파일명을 결합하여 전체 경로를 반환
+        return "C:\\Temp\\inquiry\\" + fileName;
+    }
+
+    // 인쿼리용 파일을 저장하는 메소드
+    private String saveInquiryFile(MultipartFile file, String fileName) throws IOException {
+        // 로컬 경로 설정 (인쿼리 폴더로 저장)
+        String networkPath = "C:\\Temp\\inquiry\\";  // inquiry 폴더로 설정
+        System.out.println("파일 저장 경로: " + networkPath);
+
+        // 디렉토리 생성
+        File directory = new File(networkPath);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw new IOException("디렉토리 생성 실패: " + networkPath);
+            }
+        }
+
+        // 파일 저장 경로 설정
+        File targetFile = new File(directory, fileName);
+        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
+
+        try {
+            file.transferTo(targetFile);  // 파일 저장
+            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
+            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("파일 저장 오류", e);  // 파일 저장 실패 시 예외 처리
+        }
+    }
 
     private String saveFile(MultipartFile file, String userId) throws IOException {
         // 파일 이름 가져오기
@@ -229,6 +273,22 @@ public class MypageService {
     }
 
 
+/*    public boolean deleteInquiry(int inquiryNo) {
+
+        MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
+
+        if (inquiry != null && inquiry.getFile() != null && !inquiry.getFile().isEmpty()) {
+            boolean fileDeleted = deleteFile(inquiry.getFile());
+            if (!fileDeleted) {
+                return false;
+            }
+        }
+
+        int result = mypageMapper.deleteInquiryById(inquiryNo);
+
+        return result > 0;
+    }*/
+
     public boolean deleteInquiry(int inquiryNo) {
 
         MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
@@ -244,6 +304,7 @@ public class MypageService {
 
         return result > 0;
     }
+
 
     public boolean verifyPassword(String userId, String password) {
         String storedPassword = mypageMapper.findPasswordByUserId(userId);
@@ -272,7 +333,7 @@ public class MypageService {
             MypageUpdateUserInfoDTO updateUserInfoDTO = new MypageUpdateUserInfoDTO();
             updateUserInfoDTO.setUserId(userId);
 
-            // 1. 프로필 이미지 처리
+            // 1.
             if (profileImage != null && !profileImage.isEmpty()) {
                 // 파일을 저장할 경로 생성
                 String filename = userId + "_" + profileImage.getOriginalFilename();
@@ -345,13 +406,12 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
 
         // 새 프로필 이미지가 존재하면 저장
         if (profileImage != null && !profileImage.isEmpty()) {
-            // 새 파일을 저장하고 경로 반환
             String newFilePath = saveFileProfile(profileImage, userId);  // saveFile 대신 saveFileProfile 사용
 
             // DB에 새 경로를 업데이트 (경로만 저장)
             MypageProfileImageDTO profileImageDTO = new MypageProfileImageDTO();
             profileImageDTO.setUserId(userId);
-            profileImageDTO.setFile(newFilePath);  // 경로만 업데이트
+            profileImageDTO.setFile(newFilePath);
 
             // DB 업데이트
             int updatedRows = mypageMapper.updateUserProfileImage(profileImageDTO);
@@ -371,7 +431,7 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
 
         // 만약 프로필 이미지 경로가 없으면 기본 경로를 리턴하거나 null을 반환
         if (existingFilePath == null || existingFilePath.isEmpty()) {
-            return null;  // 기본값 또는 null 반환
+            return null;
         }
 
         return existingFilePath;
@@ -586,5 +646,15 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         }
 
         return mypageMapper.findUserInquiryByUserIdWithSearch(userId, search);
+    }
+
+    public boolean deleteReservation(Long resNo) {
+        try {
+            int deletedRows = mypageMapper.deleteReservation(resNo);
+            return deletedRows > 0; // 삭제된 행이 있으면 true 반환
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -65,4 +65,6 @@ public interface MypageMapper {
     MypageInquiryDTO findInquiryById(int inquiryNo);
 
     int deleteUserAct(Long userNo);
+
+    int deleteReservation(Long resNo);
 }
