@@ -272,7 +272,6 @@ public class MypageService {
         }
     }
 
-
 /*    public boolean deleteInquiry(int inquiryNo) {
 
         MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
@@ -649,12 +648,13 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
     }
 
     public boolean deleteReservation(Long resNo) {
-        try {
-            int deletedRows = mypageMapper.deleteReservation(resNo);
+        try { int deletedRows = mypageMapper.deleteReservation(resNo);
             return deletedRows > 0; // 삭제된 행이 있으면 true 반환
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
+
 }
