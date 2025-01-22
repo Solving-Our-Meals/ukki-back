@@ -338,21 +338,37 @@
 
     <!-- 요일별, 시간별 예약 가능 인원 조회 -->
     <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultMap="resPosNumByDay">
+<!--        SELECT DISTINCT-->
+<!--               A.OPER_TIME-->
+<!--             , IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)-->
+<!--                    - IFNULL((-->
+<!--                                SELECT COUNT(1)-->
+<!--                                  FROM TBL_RESERVATION A_2-->
+<!--                                 WHERE A.STORE_NO = A_2.STORE_NO-->
+<!--                                   AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')-->
+<!--                            ),0) AS RES_POS_NUMBER-->
+<!--          FROM ${rDay} A-->
+<!--          LEFT-->
+<!--          JOIN TBL_RES_POS_NUMBER B-->
+<!--            ON A.STORE_NO = B.STORE_NO-->
+<!--           AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')-->
+<!--           AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{rDate}-->
+<!--         WHERE A.STORE_NO = #{storeNo};-->
         SELECT DISTINCT
                A.OPER_TIME
              , IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)
-                    - IFNULL((
-                                SELECT COUNT(1)
-                                  FROM TBL_RESERVATION A_2
-                                 WHERE A.STORE_NO = A_2.STORE_NO
-                                   AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
-                            ),0) AS RES_POS_NUMBER
-          FROM ${day} A
-          LEFT
-          JOIN TBL_RES_POS_NUMBER B
+                      - IFNULL((
+                                 SELECT COUNT(1)
+                                   FROM TBL_RESERVATION A_2
+                                  WHERE A.STORE_NO = A_2.STORE_NO
+                                    AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
+                                    AND DATE_FORMAT(A_2.RES_TIME, '%Y-%m-%d') = #{rDate}
+                                    ), 0) AS RES_POS_NUMBER
+          FROM ${rDay} A
+          LEFT JOIN TBL_RES_POS_NUMBER B
             ON A.STORE_NO = B.STORE_NO
            AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')
-           AND DATE_FORMAT(B.R_DATE,'%Y-%m-%d') = #{date}
+           AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{rDate}
          WHERE A.STORE_NO = #{storeNo};
     </select>
 

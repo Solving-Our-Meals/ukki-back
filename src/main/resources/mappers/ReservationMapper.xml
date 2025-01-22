@@ -52,7 +52,7 @@
                *
           FROM TBL_RESERVATION
          WHERE RES_DATE = #{ resDate }
-           AND RES_TIME = #{ resTile }
+           AND RES_TIME = #{ resTime }
            AND USER_NO = #{ userNo }
            AND STORE_NO = #{ storeNo }
     </select>

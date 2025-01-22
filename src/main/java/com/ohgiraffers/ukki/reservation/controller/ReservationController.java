@@ -104,7 +104,11 @@ public class ReservationController {
 
         String resultMessage = "";
         // 중복 예약 정보가 있는지 확인
+        System.out.println("reservation 정보 : " + reservationInfoDTO);
+
         ReservationInfoDTO isExistReservation = reservationService.checkExistReservation(reservationInfoDTO);
+
+        System.out.println("isExistReservation = " + isExistReservation);
 
         if(isExistReservation == null){
             System.out.println("예약 DB 드가자");
