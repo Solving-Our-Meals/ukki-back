@@ -648,10 +648,10 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
     }
 
 
-    private static final String QR_FILE_PATH = "\\\\192.168.0.138\\ukki_nas\\qr\\";
+/*    private static final String QR_FILE_PATH = "\\\\192.168.0.138\\ukki_nas\\qr\\";*/
 
     public boolean deleteReservation(Long resNo) {
-        try {
+/*        try {
             MypageReservationQRDTO reservationQR = mypageMapper.findReservationQRById(resNo);
             System.out.println(reservationQR);
 
@@ -666,9 +666,9 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
                 } else {
                     System.out.println("안됨");
                 }
-            }
+            }*/
 
-            int deletedRows = mypageMapper.deleteReservation(resNo);
+        try { int deletedRows = mypageMapper.deleteReservation(resNo);
             return deletedRows > 0; // 삭제된 행이 있으면 true 반환
         } catch (Exception e) {
             e.printStackTrace();
