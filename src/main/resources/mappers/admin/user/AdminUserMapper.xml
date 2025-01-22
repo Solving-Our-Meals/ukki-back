@@ -33,7 +33,7 @@
         </foreach>
     </insert>
 
-    <select id="searchBy" parameterType="map" resultMap="user">
+    <select id="searchBy" resultMap="user">
         SELECT * FROM TBL_USER
         WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
         <if test="category != null and word != null">
