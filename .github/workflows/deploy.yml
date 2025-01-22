@@ -6,15 +6,15 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  BACKEND_ECR_REPOSITORY: ukki-back
+  ECR_REPOSITORY: ukki-back
+  ECR_REGISTRY: public.ecr.aws/j7n6r7d0
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-  PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+  EC2_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -24,37 +24,32 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: us-east-1  # public ECR은 us-east-1 사용
 
-    - name: Login to Amazon ECR
-      id: login-ecr
+    - name: Login to Amazon ECR Public
+      id: login-ecr-public
       uses: aws-actions/amazon-ecr-login@v1
+      with:
+        registry-type: public
 
-    # Backend Build & Push
-    - name: Build, tag, and push backend image to Amazon ECR
+    - name: Build and push
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG
-        docker tag $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:latest
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-    # Deploy to EC2
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ env.EC2_HOST }}
         username: ${{ env.EC2_USERNAME }}
-        key: ${{ env.PRIVATE_KEY }}
+        key: ${{ env.EC2_PRIVATE_KEY }}
         script: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
-          
-          # Stop and remove existing backend container
-          docker stop ukki-backend || true
-          docker rm ukki-backend || true
-          
-          # Pull and run new backend container
-          docker pull ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_ECR_REPOSITORY }}:latest
-          docker run -d --name ukki-backend -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_ECR_REPOSITORY }}:latest 
+          cd /home/ec2-user/ukki-project
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+          docker-compose down || true
+          docker-compose pull
+          docker-compose up -d 
