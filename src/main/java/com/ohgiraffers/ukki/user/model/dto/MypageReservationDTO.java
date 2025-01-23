@@ -7,8 +7,8 @@ public class MypageReservationDTO {
     private int resNo;
     private String userId;
     private String storeName;
-    private Date date;
-    private Time time;
+    private String date;
+    private String time;
     private String qr;
     private String search;
     private int replyNo;
@@ -16,7 +16,7 @@ public class MypageReservationDTO {
 
     public MypageReservationDTO() {}
 
-    public MypageReservationDTO(int resNo, String userId, String storeName, Date date, Time time, String qr, String search, int replyNo, Boolean qrConfirm) {
+    public MypageReservationDTO(int resNo, String userId, String storeName, String date, String time, String qr, String search, int replyNo, Boolean qrConfirm) {
         this.resNo = resNo;
         this.userId = userId;
         this.storeName = storeName;
@@ -52,20 +52,24 @@ public class MypageReservationDTO {
         this.storeName = storeName;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public Time getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
-        this.time = time;
+    public void setTime(String time) {
+        if (time != null && time.endsWith(":00")) {
+            this.time = time.substring(0, time.length() - 3);
+        } else {
+            this.time = time;
+        }
     }
 
     public String getQr() {
@@ -106,8 +110,8 @@ public class MypageReservationDTO {
                 "resNo=" + resNo +
                 ", userId='" + userId + '\'' +
                 ", storeName='" + storeName + '\'' +
-                ", date=" + date +
-                ", time=" + time +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
                 ", qr='" + qr + '\'' +
                 ", search='" + search + '\'' +
                 ", replyNo=" + replyNo +

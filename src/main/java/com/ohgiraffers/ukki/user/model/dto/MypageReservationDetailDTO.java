@@ -9,11 +9,13 @@ public class MypageReservationDetailDTO {
     private String userName;
     private int storeNo;
     private String storeName;
-    private Date date;
-    private Time time;
+    private String date;
+    private String time;
     private String qr;
 
-    public MypageReservationDetailDTO(int resNo, String userId, String userName, int storeNo, String storeName, Date date, Time time, String qr) {
+    public MypageReservationDetailDTO() {}
+
+    public MypageReservationDetailDTO(int resNo, String userId, String userName, int storeNo, String storeName, String date, String time, String qr) {
         this.resNo = resNo;
         this.userId = userId;
         this.userName = userName;
@@ -64,20 +66,24 @@ public class MypageReservationDetailDTO {
         this.storeName = storeName;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public Time getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
-        this.time = time;
+    public void setTime(String time) {
+        if (time != null && time.endsWith(":00")) {
+            this.time = time.substring(0, time.length() - 3);
+        } else {
+            this.time = time;
+        }
     }
 
     public String getQr() {
@@ -96,8 +102,8 @@ public class MypageReservationDetailDTO {
                 ", userName='" + userName + '\'' +
                 ", storeNo=" + storeNo +
                 ", storeName='" + storeName + '\'' +
-                ", date=" + date +
-                ", time=" + time +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
                 ", qr='" + qr + '\'' +
                 '}';
     }
