@@ -60,6 +60,8 @@ public class StoreController {
         OperationDTO operationDTO = storeService.getOperation(storeNo);
         storeInfoDTO.setOperationTime(operationDTO);
 
+        System.out.println("가게 정보" + storeInfoDTO);
+
         mv.addObject("getStoreInfo", storeInfoDTO);
 
 //        System.out.println(keywordDTO);

@@ -1,5 +1,8 @@
 package com.ohgiraffers.ukki.store.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class InquiryDTO {
 
     private long inquiryNo;
