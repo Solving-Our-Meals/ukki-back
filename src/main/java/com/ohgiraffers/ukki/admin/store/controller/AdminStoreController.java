@@ -3,8 +3,11 @@ package com.ohgiraffers.ukki.admin.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import com.ohgiraffers.ukki.admin.store.model.service.AdminStoreService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,15 +19,21 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/stores")
 public class AdminStoreController {
 
     private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
+//private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AdminStoreController(AdminStoreService adminStoreService){
+    @Autowired
+    public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder) {
         this.adminStoreService = adminStoreService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/monthly")
@@ -35,13 +44,14 @@ public class AdminStoreController {
             List<MonthlyRegistStoreDTO> monthlyRegistStore = adminStoreService.monthlyRegistStore();
 
             System.out.println(monthlyRegistStore);
-            return ResponseEntity.ok(monthlyRegistStore);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(monthlyRegistStore);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("월별 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("월별 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -55,13 +65,14 @@ public class AdminStoreController {
 
             response.put("totalStore", total);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("총 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("총 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -70,13 +81,14 @@ public class AdminStoreController {
         try {
             List<AdminStoreListDTO> storeList = adminStoreService.searchStores(category, word);
 
-            return ResponseEntity.ok(storeList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeList);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -98,19 +110,18 @@ public class AdminStoreController {
             List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
             storeInfo.setStoreCategory(categoryDTO);
 
-
-            return ResponseEntity.ok(storeInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeInfo);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
     @DeleteMapping("/info/{storeNo}/delete")
-    @Transactional
     public ResponseEntity<?> deleteStoreInfo(@PathVariable int storeNo){
         System.out.println("삭제하러 옴");
         Map<String, String> response = new HashMap<>();
@@ -119,27 +130,59 @@ public class AdminStoreController {
 
             int result = adminStoreService.deleteStoreInfo(storeNo);
 
-            if(result > 1){
-                message = "삭제에 실패했습니다.";
-            }else{
+            if(result > 0){
                 message = "삭제에 성공했습니다.";
+                adminStoreService.deleteStoreBanner(storeNo);
+                for (int i = 1; i <= 5; i++) {
+                    String fileToDelete = storeNo + "banner" + i + ".png";
+                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
+                    Files.deleteIfExists(filePath);
+                }
+                String fileToDeleteProfile = storeNo + "profile" + ".png";
+                Path filePathProfile = Paths.get(SHARED_FOLDER, fileToDeleteProfile);
+                Files.deleteIfExists(filePathProfile);
+                String fileToDeleteMenu = storeNo + "menu" + ".png";
+                Path filePathMenu = Paths.get(SHARED_FOLDER, fileToDeleteMenu);
+                Files.deleteIfExists(filePathMenu);
+                adminStoreService.deleteStoreKeyword(storeNo);
+                adminStoreService.deleteStoreOperation(storeNo);
+                deleteReviewWithStore(storeNo);
+            }else{
+                message = "삭제에 실패했습니다.";
             }
 
+            System.out.println(message);
             response.put("message", message);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             message = "가게 정보를 삭제하는 도중 에러가 발생했습니다.";
             response.put("message", message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(response);
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteReviewWithStore(int storeNo) throws IOException {
+        String[] reviewImgArray = adminStoreService.getReviewImgStoreNo(storeNo);
+        for(int i = 0; i < reviewImgArray.length; i++){
+            System.out.println(reviewImgArray[i]);
+            String reviewImg = reviewImgArray[i]+".png";
+            Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
+            Files.deleteIfExists(filePathProfile);
+        }
+        adminStoreService.deleteReviewWithStore(storeNo);
+
+    }
+
         @PutMapping("/info/{storeNo}/edit")
-        @Transactional
-    public ResponseEntity<?> updateStore(
+        @Transactional(rollbackFor = Exception.class)
+        public ResponseEntity<?> updateStore(
             @PathVariable Long storeNo,
             @RequestPart(value = "storeData", required = false) String storeDataJson,
             @RequestPart(value = "bannerStatus", required = false) String bannerStatus,
@@ -150,10 +193,9 @@ public class AdminStoreController {
             @RequestPart(value = "banner3", required = false) MultipartFile banner3,
             @RequestPart(value = "banner4", required = false) MultipartFile banner4,
             @RequestPart(value = "banner5", required = false) MultipartFile banner5
-    ) {
-        try {
-            System.out.println(profileImage);
-            System.out.println(menuImage);
+        ) {
+            try {
+                System.out.println(bannerStatus);
 
             // JSON 문자열을 객체로 변환
             ObjectMapper mapper = new ObjectMapper();
@@ -169,12 +211,11 @@ public class AdminStoreController {
             }
             
             String[] bannerStatusParse = null;
-
             int count = 0;
             if (bannerStatus != null) {
                 bannerStatusParse = mapper.readValue(bannerStatus, String[].class);
                 count = (int) Arrays.stream(bannerStatusParse)
-                       .filter(banner -> banner.contains("/store/api/files?filename="))
+                       .filter(banner -> banner.contains("/store/" + storeNo + "/api/files?filename="))
                        .count();
             }
             System.out.println("포함된 갯수: " + count);
@@ -235,21 +276,27 @@ public class AdminStoreController {
                 maxBannerKey = count;
             }
             if (maxBannerKey < 5) {
-                System.out.println(maxBannerKey);
+                System.out.println("max배너"+maxBannerKey);
                 for (int i = maxBannerKey+1; i <= 5; i++) {
+                    System.out.println(i);
                     String fileToDelete = storeNo + "banner" + i + ".png";
+                    System.out.println(fileToDelete);
                     Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
                     Files.deleteIfExists(filePath);
                 }
             }
 
+            String[] bannerNameArr = new String[5];
+            for(int i = 0; i < count; i++){
+                bannerNameArr[i] = storeNo+"banner"+(i+1);
+            }
             for (Map.Entry<Integer, MultipartFile> entry : bannerUpdates.entrySet()) {
                 int key = entry.getKey();
                 MultipartFile file = entry.getValue();
 
                 // 파일 이름 생성
                 String fileName = storeNo + "banner" + key;
-
+                bannerNameArr[key-1] = fileName;
                 // fileController 호출하여 파일 저장
                 int result = fileController(file, fileName);
                 if (result == 2) {
@@ -261,21 +308,214 @@ public class AdminStoreController {
                 }
             }
 
+            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            System.out.println(bannerDTO);
+            adminStoreService.editBanner(bannerDTO);
 
-            // 서비스 호출
-            // adminStoreService.updateStore(storeNo, storeData, menuImage, profileImage, bannerImages);
-            
-            // 모든 작업이 완료된 후 storeData를 업데이트
             if (storeData != null) {
                 adminStoreService.editStore(storeData);
             }
 
-            return ResponseEntity.ok().body("가게 정보가 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보가 성공적으로 수정되었습니다.");
 
         } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/regist/user")
+    public ResponseEntity<?> registerUser(@RequestBody AdminStoreUserDTO userDTO, HttpSession session) {
+        // 세션에 저장해서 보내기
+//        form을 이용해 클라이언트 쪽에서 직접 보내는 것은 보안성과 코드 일관성에 좋지 않은 영향을 줄 수 있기때문에 세션방식 채택
+        session.setAttribute("userId", userDTO.getUserId());
+        session.setAttribute("userPassword", userDTO.getUserPassword());
+        session.setAttribute("userName", userDTO.getUserName());
+        session.setAttribute("email", userDTO.getEmail());
+        
+        Map<String, String> response = new HashMap<>();
+
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
+    }
+
+    @GetMapping("regist/store")
+    public ResponseEntity<?> ShowStoreInfoRegistPage(HttpSession session) {
+
+        List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
+        AdminStoreUserDTO userDTO = new AdminStoreUserDTO();
+        userDTO.setUserId(session.getAttribute("userId").toString());
+        userDTO.setUserPassword(session.getAttribute("userPassword").toString());
+        userDTO.setUserName(session.getAttribute("userName").toString());
+        userDTO.setEmail(session.getAttribute("email").toString());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("categoryDTO", categoryDTO);
+        response.put("userDTO", userDTO);
+
+
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(response);
+    }
+
+    @PostMapping("cancel/user")
+    public ResponseEntity<?> cancelUserSession(HttpSession session) {
+        session.removeAttribute("userId");
+        session.removeAttribute("userPassword");
+        session.removeAttribute("userName");
+        session.removeAttribute("email");
+        Map<String, Object> response = new HashMap<>();
+        response.put("userDTO", new AdminStoreUserDTO());
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(response);
+    }
+
+    @PostMapping("regist/store")
+    public ResponseEntity<?> registStore(
+            @RequestPart(value = "storeData", required = false) String storeDataJson,
+            @RequestPart(value = "userData", required = false) String userDataJson,
+            @RequestPart(value = "menu", required = false) MultipartFile menuImage,
+            @RequestPart(value = "profile", required = false) MultipartFile profileImage,
+            @RequestPart(value = "banner1", required = false) MultipartFile banner1,
+            @RequestPart(value = "banner2", required = false) MultipartFile banner2,
+            @RequestPart(value = "banner3", required = false) MultipartFile banner3,
+            @RequestPart(value = "banner4", required = false) MultipartFile banner4,
+            @RequestPart(value = "banner5", required = false) MultipartFile banner5
+    ){
+        try {
+
+            System.out.println(userDataJson);
+
+            System.out.println("배너1번"+banner1);
+            System.out.println(banner2);
+            System.out.println(banner3);
+            System.out.println(banner4);
+            System.out.println(banner5);
+
+            int storeNo = adminStoreService.lastStoreNo()+1;
+            // JSON 문자열을 객체로 변환
+            ObjectMapper mapper = new ObjectMapper();
+            AdminStoreInfoDTO storeData = new AdminStoreInfoDTO();
+            storeData = mapper.readValue(storeDataJson, AdminStoreInfoDTO.class);
+
+            OperationDTO operationDTO = storeData.getOperationTime();
+            operationDTO.setStoreNo(storeNo);
+            int operationResult = adminStoreService.insertOperationTime(operationDTO);
+            if(operationResult > 0){
+                System.out.println("운영시간 성공");
+            }else{
+                System.out.println("운영시간 실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("운영시간 업데이트 중 오류가 발생했습니다.");
+            }
+
+            KeywordDTO keywordDTO = storeData.getStoreKeyword();
+            keywordDTO.setStoreNo(storeNo);
+            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
+            if(keywordResult > 0){
+                System.out.println("키워드성공");
+            }else{
+                System.out.println("키워드실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("키워드 업데이트 중 오류가 발생했습니다.");
+            }
+
+            String menuName = storeNo+"menu";
+            System.out.println("메뉴 들어옴");
+            System.out.println(menuImage);
+            int menuResult = fileController(menuImage, menuName);
+            if(menuResult == 2){
+                System.out.println("메뉴성공");
+                storeData.setStoreMenu(menuName);
+            }else{
+                System.out.println("메뉴실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("메뉴 이미지 업데이트 중 오류가 발생했습니다.");
+            }
+
+            String fileName = storeNo+"profile";
+            System.out.println("프로필 파일 보낸다" + fileName);
+            int profileResult = fileController(profileImage, fileName);
+            if(profileResult == 2){
+                System.out.println("프로필 성공 보낸다" + fileName);
+                storeData.setStoreProfile(fileName);
+            }else{
+                System.out.println("실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("프로필 이미지 업데이트 중 오류가 발생했습니다.");
+            }
+
+
+            // 배너 이미지 리스트 생성
+            Map<Integer, MultipartFile> bannerUpdates = new HashMap<>();
+            if (banner1 != null) bannerUpdates.put(1, banner1);
+            if (banner2 != null) bannerUpdates.put(2, banner2);
+            if (banner3 != null) bannerUpdates.put(3, banner3);
+            if (banner4 != null) bannerUpdates.put(4, banner4);
+            if (banner5 != null) bannerUpdates.put(5, banner5);
+
+            String[] bannerNameArr = new String[5];
+
+            for(Map.Entry<Integer, MultipartFile> entry : bannerUpdates.entrySet()) {
+                int key = entry.getKey();
+                MultipartFile file = entry.getValue();
+                String bannerName = storeNo + "banner" + key;
+
+                bannerNameArr[key-1] = bannerName;
+
+                // fileController 호출하여 파일 저장
+                int result = fileController(file, bannerName);
+                if (result == 2) {
+                    System.out.println("배너 파일 저장 성공: " + fileName);
+                } else {
+                    System.out.println("배너 파일 저장 실패: " + fileName);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("배너 이미지 업데이트 중 오류가 발생했습니다.");
+                }
+            }
+            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            System.out.println(bannerDTO);
+
+            int bannerResult = adminStoreService.insertBanner(bannerDTO);
+            if(bannerResult > 0){
+                System.out.println("배너DB성공");
+            }else{
+                System.out.println("배너DB실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("배너 업데이트 중 오류가 발생했습니다.");
+            }
+
+            AdminStoreUserDTO userData = new AdminStoreUserDTO();
+            userData = mapper.readValue(userDataJson, AdminStoreUserDTO.class);
+            String encodePwd = passwordEncoder.encode(userData.getUserPassword());
+            userData.setUserPassword(encodePwd);
+
+            adminStoreService.insertStoreUser(userData);
+            int userNo = adminStoreService.searchCurrentStoreUser(userData.getUserId());
+            storeData.setStoreNo(storeNo);
+            storeData.setUserNo(userNo);
+            adminStoreService.insertStore(storeData);
+
+
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보가 성공적으로 등록되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
     }
 
     public int fileController(MultipartFile file, String fileName){
@@ -299,7 +539,7 @@ public class AdminStoreController {
             return 2;
         } catch (IOException e) {
             e.printStackTrace();
-            return 1;
+            return 1;   
         }
     }
 }

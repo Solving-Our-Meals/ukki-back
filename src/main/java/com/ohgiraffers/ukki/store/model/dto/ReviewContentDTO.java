@@ -1,12 +1,15 @@
 package com.ohgiraffers.ukki.store.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ReviewContentDTO {
 
     private long reviewNo;
     private String reviewContent;
     private String reviewImage;
     private String reviewDate;
-    private int reviewScope ;
+    private String reviewScope ;
     private long storeNo;
     private long userNo;
     private String userName;
@@ -16,7 +19,7 @@ public class ReviewContentDTO {
 
     public ReviewContentDTO(){}
 
-    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, int reviewScope, long storeNo, long userNo, String userName, String userProfile, long reportCount, long resNo) {
+    public ReviewContentDTO(long reviewNo, String reviewContent, String reviewImage, String reviewDate, String reviewScope, long storeNo, long userNo, String userName, String userProfile, long reportCount, long resNo) {
         this.reviewNo = reviewNo;
         this.reviewContent = reviewContent;
         this.reviewImage = reviewImage;
@@ -62,11 +65,11 @@ public class ReviewContentDTO {
         this.reviewDate = reviewDate;
     }
 
-    public int getReviewScope() {
+    public String getReviewScope() {
         return reviewScope;
     }
 
-    public void setReviewScope(int reviewScope) {
+    public void setReviewScope(String reviewScope) {
         this.reviewScope = reviewScope;
     }
 
@@ -125,7 +128,7 @@ public class ReviewContentDTO {
                 ", reviewContent='" + reviewContent + '\'' +
                 ", reviewImage='" + reviewImage + '\'' +
                 ", reviewDate='" + reviewDate + '\'' +
-                ", reviewScope=" + reviewScope +
+                ", reviewScope='" + reviewScope + '\'' +
                 ", storeNo=" + storeNo +
                 ", userNo=" + userNo +
                 ", userName='" + userName + '\'' +

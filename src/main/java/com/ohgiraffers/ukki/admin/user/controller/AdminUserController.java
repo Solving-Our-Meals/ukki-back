@@ -5,19 +5,27 @@ import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import com.ohgiraffers.ukki.admin.user.model.dto.*;
 import com.ohgiraffers.ukki.admin.user.model.service.AdminUserService;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/users")
 public class AdminUserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserController.class);
 
     private final AdminUserService adminUserService;
     private final AdminReservationService adminReservationService;
@@ -73,25 +81,39 @@ public class AdminUserController {
 
                 int result = adminUserService.insertActInfo(actInfoList);
 
-        return ResponseEntity.ok("hi");
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body("hi");
     }
     
     @GetMapping("/list")
-    public ResponseEntity<?> searchUsers(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
+    public ResponseEntity<?> searchUsers(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String word) {
         try {
             List<AdminUserDTO> userList = adminUserService.searchUsers(category, word);
-            return ResponseEntity.ok(userList);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(userList);
         } catch (Exception e) {
-            String errorMessage = "Error occurred while retrieving users: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("Error: " + e.getMessage());
         }
     }
 
     @GetMapping("/info/{userNo}")
-    public ResponseEntity<?> searchUserInfo(@PathVariable int userNo){
-        AdminUserInfoDTO userInfoDTO = adminUserService.searchUserInfo(userNo);
-
-        return ResponseEntity.ok(userInfoDTO);
+    public ResponseEntity<?> getUserInfo(@PathVariable int userNo) {
+        try {
+            AdminUserInfoDTO userInfo = adminUserService.searchUserInfo(userNo);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(userInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("Error: " + e.getMessage());
+        }
     }
 
     @PutMapping("/info/{userNo}")
@@ -116,7 +138,9 @@ public class AdminUserController {
         } else {
             responseMap.put("message", "닉네임 변경에 실패했습니다.");
             responseMap.put("success", false);
-        } return ResponseEntity.ok(responseMap);
+        } return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
     }
 
     @DeleteMapping("/info/{userNo}")
@@ -129,6 +153,26 @@ public class AdminUserController {
         } else {
             responseMap.put("message", "회원 삭제에 실패했습니다.");
             responseMap.put("success", false);
-        } return ResponseEntity.ok(responseMap);
+        } return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<?> totalUser() {
+        try {
+            int totalUser = adminUserService.totalUser();
+            Map<String, Object> response = new HashMap<>();
+            response.put("totalUser", totalUser);
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Error: " + e.getMessage());
+        }
     }
 }

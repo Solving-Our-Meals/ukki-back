@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.store.model.dao.BossMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="storeInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeDes" column="STORE_DES"/>
+        <result property="storeAddress" column="STORE_ADDRESS"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="longitude" column="LONGITUDE"/>
+        <result property="storeProfile" column="STORE_PROFILE"/>
+        <result property="storeMenu" column="STORE_MENU"/>
+        <result property="storeCategoryNo" column="STORE_CATEGORY_NO"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="posNumber" column="POS_NUMBER"/>
+    </resultMap>
+
+    <resultMap id="getReviewInfoResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="reviewCount" column="REVIEW_COUNT"/>
+        <collection property="reviewList" resultMap="reviewResultMap"/>
+    </resultMap>
+
+    <resultMap id="reviewResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReviewContentDTO">
+        <id property="reviewNo" column="REVIEW_NO"/>
+        <result property="reviewContent" column="REVIEW_CONTENT"/>
+        <result property="reviewImage" column="REVIEW_IMG"/>
+        <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="reviewScope" column="REVIEW_SCOPE"/>
+        <result property="userNo" column="USER_NO"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="userProfile" column="USER_PROFILE"/>
+        <result property="reportCount" column="REPORT_COUNT"/>
+        <result property="resNo" column="RES_NO"/>
+    </resultMap>
+    <resultMap id="reservationResultMap" type="com.ohgiraffers.ukki.store.controller.ReservationDTO">
+        <id property="reservationNo" column="RES_NO"/>
+        <result property="reservationDate" column="RES_DATE"/>
+        <result property="reservationTime" column="RES_TIME"/>
+        <result property="reservationPeople" column="RES_PEOPLE"/>
+        <result property="storeName" column="STORE_NAME"/>
+        <result property="storeNo" column="STORE_NO"/>
+    </resultMap>
+
+
+
+    <resultMap id="reportReviewResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReportReviewDTO">
+        <id property="reportNo" column="REPORT_NO"/>
+        <result property="reportTitle" column="REPORT_TITLE"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="reportDate" column="REPORT_DATE"/>
+        <result property="reviewNo" column="REVIEW_NO"/>
+        <result property="answerTitle" column="ANS_CONTENT"/>
+        <result property="answerContent" column="ANS_TITLE"/>
+        <result property="answerDate" column="ANS_DATE"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+
+    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        SELECT
+        RES_POS_NUMBER AS resPosNumber,
+        STORE_NO AS storeNo,
+        R_DATE AS reservationDate,
+        R_OPER_TIME AS reservationTime
+        FROM TBL_RES_POS_NUMBER
+        WHERE STORE_NO = #{storeNo}
+        AND R_DATE = #{reservationDate}
+        AND R_OPER_TIME = #{reservationTime}
+        ORDER BY R_DATE DESC, R_OPER_TIME DESC
+        LIMIT 1
+    </select>
+
+
+
+
+
+    <!-- 가게 정보 조회 -->
+    <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
+        SELECT
+        STORE_NO
+        , STORE_NAME
+        , STORE_DES
+        , STORE_ADDRESS
+        , LATITUDE
+        , LONGITUDE
+        , STORE_PROFILE
+        , STORE_MENU
+        , STORE_CATEGORY_NO
+        , USER_NO
+        , POS_NUMBER
+        FROM TBL_STORE
+        WHERE USER_NO = #{userNo}
+    </select>
+
+    <!--    &lt;!&ndash; 가게별 예약 현황 조회 &ndash;&gt;-->
+    <!--    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.controller.ReservationDTO">-->
+    <!--        SELECT * FROM TBL_RESERVATION-->
+    <!--        WHERE store_no = #{storeNo}-->
+    <!--    </select>-->
+
+
+    <!-- 예약 인원 리스트 조회 -->
+    <select id="selectReservationPeopleList" resultType="map">
+        SELECT
+        r.RES_NO,
+        r.RES_DATE,
+        r.RES_TIME,
+        r.IS_RANDOM,
+        r.USER_NO,
+        r.STORE_NO,
+        r.QR_CONFIRM,
+        r.QR
+        FROM TBL_RESERVATION r
+        WHERE r.STORE_NO = #{storeNo}
+    </select>
+
+<!--    &lt;!&ndash; 예약 가능 인원 조회 &ndash;&gt;-->
+<!--    <select id="selectAvailableReservationPeople" resultType="integer">-->
+<!--        SELECT-->
+<!--        (s.MAX_PEOPLE - SUM(r.RESERVATION_PEOPLE)) AS AVAILABLE_PEOPLE-->
+<!--        FROM TBL_STORE s-->
+<!--        LEFT JOIN TBL_RESERVATION r ON s.STORE_NO = r.STORE_NO AND r.RES_DATE = #{reservationDate}-->
+<!--        WHERE s.STORE_NO = #{storeNo}-->
+<!--        GROUP BY s.STORE_NO, s.MAX_PEOPLE-->
+<!--    </select>-->
+
+
+    <select id="selectWeeklyReservationCount" resultType="integer">
+        SELECT
+        COUNT(*) AS WEEKLY_RESERVATION_COUNT
+        FROM TBL_RESERVATION r
+        WHERE r.STORE_NO = #{storeNo}
+        AND YEARWEEK(r.RES_DATE, 1) = YEARWEEK(CURDATE(), 1)
+    </select>
+
+    <!-- 오늘 예약 수 조회 -->
+    <select id="selectTodayReservationCount" resultType="integer">
+        SELECT
+        COUNT(*) AS TODAY_RESERVATION_COUNT
+        FROM TBL_RESERVATION r
+        WHERE r.STORE_NO = #{storeNo}
+        AND r.RES_DATE = CURDATE()
+    </select>
+
+
+
+
+    <!-- 예약 가능한 다음 시간 조회 -->
+<!--    <select id="getNextAvailableTime" resultType="string">-->
+<!--        SELECT RES_TIME-->
+<!--        FROM TBL_RESERVATION-->
+<!--        WHERE STORE_NO = #{storeNo}-->
+<!--        AND RES_DATE = #{resDate}-->
+<!--        AND RES_TIME > #{currentTime}-->
+<!--        ORDER BY RES_TIME ASC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+
+
+
+
+    <insert id="insertAvailableSlots" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        INSERT INTO TBL_RES_POS_NUMBER
+        (
+        STORE_NO,
+        R_DATE,
+        R_OPER_TIME,
+        RES_POS_NUMBER,
+        R_DAY
+        )
+        VALUES
+        (
+        #{storeNo},
+        #{reservationDate},
+        #{reservationTime},
+        #{resPosNumber},
+        #{rDay}
+        )
+    </insert>
+
+
+    <update id="updateAvailableSlots" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        UPDATE TBL_RES_POS_NUMBER
+        SET RES_POS_NUMBER = #{resPosNumber}
+        WHERE STORE_NO = #{storeNo}
+        AND R_DATE = #{reservationDate}
+        AND R_DAY = #{rDay}
+        AND R_OPER_TIME = #{reservationTime}
+    </update>
+
+    <select id="getResPosNumByStoreAndDate" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        SELECT *
+        FROM TBL_RES_POS_NUMBER
+        WHERE STORE_NO = #{storeNo}
+        AND R_DATE = #{reservationDate}
+        AND R_OPER_TIME = #{reservationTime}
+    </select>
+
+
+
+
+    <!--    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">-->
+<!--        SELECT DISTINCT-->
+<!--        A.OPER_TIME,-->
+<!--        IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)-->
+<!--        - IFNULL((-->
+<!--        SELECT COUNT(1)-->
+<!--        FROM TBL_RESERVATION A_2-->
+<!--        WHERE A.STORE_NO = A_2.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')-->
+<!--        ), 0) AS RES_POS_NUMBER-->
+<!--        FROM ${day} A-->
+<!--        LEFT JOIN TBL_RES_POS_NUMBER B-->
+<!--        ON A.STORE_NO = B.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')-->
+<!--        AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{reservationDate}-->
+<!--        WHERE A.STORE_NO = #{storeNo};-->
+<!--    </select>-->
+
+
+
+    <select id="getRecentReview" parameterType="long" resultMap="reviewResultMap">
+        SELECT
+        *
+        FROM TBL_REVIEW
+        WHERE STORE_NO = #{ storeNo }
+        ORDER BY REVIEW_NO DESC
+        LIMIT 1
+    </select>
+
+    <select id="getReviewList" parameterType="long" resultMap="getReviewInfoResultMap">
+        SELECT
+        A.STORE_NO
+        , (SELECT
+        COUNT(*)
+        FROM TBL_REVIEW
+        WHERE STORE_NO = A.STORE_NO ) AS REVIEW_COUNT
+        , A.REVIEW_NO
+        , A.REVIEW_CONTENT
+        , A.REVIEW_IMG
+        , A.REVIEW_DATE
+        , A.REVIEW_SCOPE
+        , A.USER_NO
+        , B.USER_NAME
+        , B.USER_PROFILE
+        , A.REPORT_COUNT
+        , A.RES_NO
+        FROM TBL_REVIEW A
+        JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+        WHERE A.STORE_NO = #{storeNo}
+        ORDER BY REVIEW_NO DESC;
+    </select>
+
+    <!-- 리뷰 상세 조회 -->
+    <select id="getReviewInfo" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.DetailReviewInfoDTO">
+        SELECT
+        A.STORE_NO AS storeNo
+        , A.REVIEW_NO AS reviewNo
+        , A.REVIEW_CONTENT AS reviewContent
+        , A.REVIEW_IMG AS reviewImage
+        , A.REVIEW_DATE AS reviewDate
+        , A.REVIEW_SCOPE AS reviewScope
+        , A.USER_NO AS userNo
+        , B.USER_NAME AS userName
+        , B.USER_PROFILE AS userProfile
+        , A.REPORT_COUNT AS reportCount
+        , A.RES_NO AS resNo
+        FROM TBL_REVIEW A
+        JOIN TBL_USER B ON A.USER_NO = B.USER_NO
+        WHERE A.REVIEW_NO = #{reviewNo}
+    </select>
+
+<!--    <select id="findAvailableSlotsByStoreNo" resultType="int">-->
+<!--        SELECT POS_NUMBER-->
+<!--        FROM TBL_STORE-->
+<!--        WHERE STORE_NO = #{storeNo}-->
+<!--    </select>-->
+
+    <!-- 7일간의 예약 정보 조회 -->
+    <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+        SELECT r.RES_DATE AS resDate, r.RES_TIME AS resTime, u.USER_NAME AS userName
+        FROM TBL_RESERVATION r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE r.STORE_NO = #{storeNo}
+        AND r.RES_DATE BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+
+    <!-- 리뷰 신고 -->
+    <insert id="reportReview" parameterType="com.ohgiraffers.ukki.store.model.dto.ReportReviewDTO">
+        INSERT INTO TBL_REVIEW_REPORT
+        (
+        REPORT_TITLE
+        , REPORT_CONTENT
+        , REPORT_DATE
+        , REVIEW_NO
+        , ANS_CONTENT
+        , ANS_TITLE
+        , ANS_DATE
+        , STATE
+        )
+        VALUES
+        (
+        #{ reportTitle }
+        , #{ reportContent }
+        , #{ reportDate }
+        , #{ reviewNo }
+        , DEFAULT
+        , DEFAULT
+        , NULL
+        , DEFAULT
+        )
+    </insert>
+
+
+    <select id="getReservationsForDateAndTime">
+        SELECT R.RES_NO, U.USER_NO, U.USER_NAME, R.RES_TIME
+        FROM TBL_RESERVATION R
+        JOIN TBL_USER U ON R.USER_NO = U.USER_NO
+        WHERE R.STORE_NO = #{storeNo} AND R.RES_DATE = #{reservationDate} AND R.RES_TIME = #{reservationTime}
+    </select>
+
+    <select id="getReservationsForDate">
+        SELECT R.RES_NO, U.USER_NO, U.USER_NAME, R.RES_TIME
+        FROM TBL_RESERVATION R
+        JOIN TBL_USER U ON R.USER_NO = U.USER_NO
+        WHERE R.STORE_NO = #{storeNo} AND R.RES_DATE = #{reservationDate}
+    </select>
+
+    <update id="updateReportCount" parameterType="long">
+        UPDATE TBL_REVIEW
+        SET REPORT_COUNT = REPORT_COUNT + 1
+        WHERE REVIEW_NO = #{ reviewNo }
+    </update>
+
+    <!-- 문의 내역 가져오기 -->
+    <select id="getInquiryList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        SELECT
+        INQ_NO AS inquiryNo
+        , INQ_TITLE AS inquiryTitle
+        , INQ_CONTENT AS inquiryContent
+        , INQ_DATE AS inquiryDate
+        , null AS reviewNo
+        , CATEGORY_NO AS categoryNo
+        , USER_NO AS userNo
+        , ANS_TITLE AS answerTitle
+        , ANS_CONTENT AS answerContent
+        , ANS_DATE AS answerDate
+        , STATE AS state
+        , FILE AS file
+        , true AS isInquiry
+        FROM TBL_INQUIRY
+        WHERE USER_NO = #{ userNo }
+        <if test="searchWord != null and searchWord != ''">
+            AND (INQ_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+        </if>
+    </select>
+
+    <!-- 리뷰 신고 내역 가져오기 -->
+    <select id="getReportList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        SELECT
+        A.REPORT_NO AS inquiryNo,
+        A.REPORT_TITLE AS inquiryTitle,
+        A.REPORT_CONTENT AS inquiryContent,
+        A.REPORT_DATE AS inquiryDate,
+        B.REVIEW_NO AS reviewNo,
+        NULL AS categoryNo,
+        NULL AS userNo,
+        A.ANS_TITLE AS answerTitle,
+        A.ANS_CONTENT AS answerContent,
+        A.ANS_DATE AS answerDate,
+        A.STATE AS state,
+        NULL AS file,
+        false AS isInquiry
+        FROM TBL_REVIEW_REPORT A
+        JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
+        WHERE B.STORE_NO = #{ storeNo }
+        <if test="searchWord != null and searchWord != ''">
+            AND (REPORT_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+        </if>
+    </select>
+
+    <!-- 최근 내역 가져오기 -->
+    <select id="getRecentInquiryList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        SELECT
+        INQ_NO AS inquiryNo
+        , INQ_TITLE AS inquiryTitle
+        , INQ_CONTENT AS inquiryContent
+        , INQ_DATE AS inquiryDate
+        , null AS reviewNo
+        , CATEGORY_NO AS categoryNo
+        , USER_NO AS userNo
+        , ANS_TITLE AS answerTitle
+        , ANS_CONTENT AS answerContent
+        , ANS_DATE AS answerDate
+        , STATE AS state
+        , FILE AS file
+        , true AS isInquiry
+        FROM TBL_INQUIRY
+        WHERE USER_NO = #{ userNo }
+    </select>
+
+    <!-- 최근 리뷰 신고 내역 -->
+    <select id="getRecentReportList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        SELECT
+        A.REPORT_NO AS inquiryNo,
+        A.REPORT_TITLE AS inquiryTitle,
+        A.REPORT_CONTENT AS inquiryContent,
+        A.REPORT_DATE AS inquiryDate,
+        B.REVIEW_NO AS reviewNo,
+        NULL AS categoryNo,
+        NULL AS userNo,
+        A.ANS_TITLE AS answerTitle,
+        A.ANS_CONTENT AS answerContent,
+        A.ANS_DATE AS answerDate,
+        A.STATE AS state,
+        NULL AS file,
+        false AS isInquiry
+        FROM TBL_REVIEW_REPORT A
+        JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
+        WHERE B.STORE_NO = #{ storeNo }
+    </select>
+
+    <select id="getInquiryInfo" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+        <choose>
+            <when test="table == 'TBL_REVIEW_REPORT'">
+                SELECT
+                REPORT_NO AS inquiryNo,
+                REPORT_TITLE AS inquiryTitle,
+                REPORT_CONTENT AS inquiryContent,
+                REPORT_DATE AS inquiryDate,
+                REVIEW_NO AS reviewNo,
+                NULL AS categoryNo,
+                NULL AS userNo,
+                ANS_TITLE AS answerTitle,
+                ANS_CONTENT AS answerContent,
+                ANS_DATE AS answerDate,
+                STATE AS state,
+                NULL AS file,
+                false AS isInquiry
+                FROM ${ table }
+                WHERE REPORT_NO = #{ inquiryNo }
+            </when>
+            <otherwise>
+                SELECT
+                INQ_NO AS inquiryNo
+                , INQ_TITLE AS inquiryTitle
+                , INQ_CONTENT AS inquiryContent
+                , INQ_DATE AS inquiryDate
+                , NULL AS reviewNo
+                , CATEGORY_NO AS categoryNo
+                , USER_NO AS userNo
+                , ANS_TITLE AS answerTitle
+                , ANS_CONTENT AS answerContent
+                , ANS_DATE AS answerDate
+                , STATE AS state
+                , FILE AS file
+                , true AS isInquiry
+                FROM ${ table }
+                WHERE INQ_NO = #{ inquiryNo }
+            </otherwise>
+        </choose>
+    </select>
+
+    <delete id="deleteReviewReport" parameterType="long">
+        DELETE FROM TBL_REVIEW_REPORT WHERE REPORT_NO = #{ inquiryNo }
+    </delete>
+
+    <update id="decreaseReportCount" parameterType="long">
+        UPDATE TBL_REVIEW
+           SET REPORT_COUNT = REPORT_COUNT - 1
+         WHERE REVIEW_NO = #{ reviewNo }
+    </update>
+
+    <delete id="deleteInquiry" parameterType="long">
+        DELETE FROM TBL_INQUIRY WHERE INQ_NO = #{ inquiryNo }
+    </delete>
+
+    <update id="updateReviewReport" parameterType="map">
+        UPDATE TBL_REVIEW_REPORT
+        SET REPORT_TITLE = #{ inquiryDTO.inquiryTitle },
+        REPORT_CONTENT = #{ inquiryDTO.inquiryContent },
+        REPORT_DATE = #{ inquiryDTO.inquiryDate }
+        WHERE REPORT_NO = #{ inquiryNo }
+    </update>
+
+    <update id="updateInquiry" parameterType="map">
+        UPDATE TBL_INQUIRY
+        SET INQ_TITLE = #{ inquiryDTO.inquiryTitle },
+        INQ_CONTENT = #{ inquiryDTO.inquiryContent },
+        INQ_DATE = #{ inquiryDTO.inquiryDate },
+        FILE = #{ inquiryDTO.file }
+        WHERE INQ_NO = #{ inquiryNo }
+    </update>
+
+    <select id="getFileName" parameterType="long" resultType="String">
+        SELECT
+        FILE
+        FROM TBL_INQUIRY
+        WHERE INQ_NO = #{ inquiryNo }
+    </select>
+
+</mapper>

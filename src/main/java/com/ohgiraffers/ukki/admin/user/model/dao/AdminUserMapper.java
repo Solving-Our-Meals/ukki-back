@@ -16,7 +16,7 @@ public interface AdminUserMapper {
 
     List<AdminUserDTO> searchAllUsers();
 
-    List<AdminUserDTO> searchBy(Map<String, String> params);
+    List<AdminUserDTO> searchBy(@Param("category") String category, @Param("word") String word);
 
     List<AdminUserDTO> searchByWord(@Param("word") String word);
 
@@ -27,4 +27,6 @@ public interface AdminUserMapper {
     int updateUserName(Map<String, String> params);
 
     int deleteUserInfo(int userNo);
+
+    int totalUser();
 }

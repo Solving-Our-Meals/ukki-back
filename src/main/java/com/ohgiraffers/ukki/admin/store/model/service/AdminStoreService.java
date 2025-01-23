@@ -4,6 +4,7 @@ import com.ohgiraffers.ukki.admin.store.model.dao.AdminStoreMapper;
 import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,20 +49,87 @@ public class AdminStoreService {
     public List<CategoryDTO> getCategory() { return adminStoreMapper.getCategory();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void editOperationTime(OperationDTO operationTime) {
             adminStoreMapper.editOperationTime(operationTime);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void editKeyword(KeywordDTO storeKeyword) {
         adminStoreMapper.editKeyword(storeKeyword);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void editStore(AdminStoreInfoDTO storeData) {
         adminStoreMapper.editStore(storeData);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int deleteStoreInfo(int storeNo) {
 
         return adminStoreMapper.deleteStoreInfo(storeNo);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteStoreBanner(int storeNo) {
+        adminStoreMapper.deleteStoreBanner(storeNo);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteStoreOperation(int storeNo) {
+        adminStoreMapper.deleteStoreOperation(storeNo);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void editBanner(BannerDTO bannerDTO) {
+        adminStoreMapper.editBanner(bannerDTO);
+    }
+
+    public int lastStoreNo() {
+        return adminStoreMapper.lastStoreNo();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int insertOperationTime(OperationDTO operationDTO) {
+        return adminStoreMapper.insertOperationTime(operationDTO);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int insertKeyword(KeywordDTO keywordDTO) {
+        return adminStoreMapper.insertKeyword(keywordDTO);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int insertBanner(BannerDTO bannerDTO) {
+        return adminStoreMapper.insertBanner(bannerDTO);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void insertStoreUser(AdminStoreUserDTO userData) {
+        adminStoreMapper.insertStoreUser(userData);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void insertStore(AdminStoreInfoDTO storeData) {
+        adminStoreMapper.insertStore(storeData);
+    }
+
+    public int searchCurrentStoreUser(String userId) {
+        System.out.println(userId);
+        return adminStoreMapper.searchCurrentStoreUser(userId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteStoreKeyword(int storeNo) {
+        adminStoreMapper.deleteStoreKeyword(storeNo);
+    }
+
+    public String[] getReviewImgStoreNo(int storeNo) {
+        return adminStoreMapper.getReviewImgStoreNo(storeNo);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteReviewWithStore(int storeNo) {
+        adminStoreMapper.deleteReviewWithStore(storeNo);
     }
 }

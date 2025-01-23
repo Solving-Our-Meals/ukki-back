@@ -8,6 +8,31 @@
         <result property="totalReview" column="TOTAL_REVIEW"/>
     </resultMap>
 
+    <resultMap id="reviewList" type="com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO">
+        <id property="reviewNo" column="REVIEW_NO"/>
+        <result property="reviewContent" column="REVIEW_CONTENT"/>
+        <result property="reviewScope" column="REVIEW_SCOPE"/>
+        <result property="reviewDate" column="REVIEW_DATE"/>
+        <result property="reviewStoreName" column="STORE_NAME"/>
+        <result property="reviewUserId" column="USER_ID"/>
+    </resultMap>
+
+    <resultMap id="reviewInfo" type="com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO">
+        <id property="reviewNo" column="REVIEW_NO" />
+        <result property="reviewContent" column="REVIEW_CONTENT" />
+        <result property="reviewScope" column="REVIEW_SCOPE" />
+        <result property="reviewDate" column="REVIEW_DATE" />
+        <result property="reviewImage" column="REVIEW_IMG" />
+        <result property="reportCount" column="REPORT_COUNT" />
+        <result property="storeNo" column="STORE_NO" />
+        <result property="storeName" column="STORE_NAME" />
+        <result property="userNo" column="USER_NO" />
+        <result property="userName" column="USER_NAME" />
+        <result property="userProfile" column="USER_PROFILE" />
+        <result property="userId" column="USER_ID" />
+    </resultMap>
+
+
     <select id="userReviewList" resultMap="userActReview">
         SELECT
         USER_NO,
@@ -16,4 +41,79 @@
         GROUP BY USER_NO
         ORDER BY USER_NO;
     </select>
+
+    <select id="totalReview">
+        SELECT
+            COUNT(*)
+        FROM TBL_REVIEW
+    </select>
+
+    <select id="searchReview" parameterType="map" resultMap="reviewList">
+        SELECT
+        a.REVIEW_NO,
+        a.REVIEW_CONTENT,
+        a.REVIEW_DATE,
+        a.REVIEW_SCOPE,
+        b.USER_ID,
+        c.STORE_NAME
+        FROM TBL_REVIEW a
+        LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
+        LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
+        <where>
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "USER_ID"'>
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <when test='category == "STORE_NAME"'>
+                        c.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                <choose>
+                    <when test="word.matches('^\\d{4}-\\d{2}-\\d{2}$')">
+                        a.REVIEW_DATE = #{word}
+                    </when>
+                    <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
+                        a.REVIEW_DATE LIKE CONCAT (#{word}, '%')
+                    </when>
+                    <otherwise>
+                        CONCAT(IFNULL(a.REVIEW_NO, ''), ' ', IFNULL(a.REVIEW_DATE, ''), ' ', IFNULL(b.USER_ID, ''), ' ', IFNULL(c.STORE_NAME, ''), ' ', IFNULL(a.REVIEW_CONTENT, ''), ' ', IFNULL(a.REVIEW_SCOPE, ''))
+                        LIKE CONCAT('%', #{word},'%')
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </select>
+
+    <select id="searchReviewInfo" resultMap="reviewInfo">
+        SELECT
+        a.REVIEW_NO,
+        a.REVIEW_CONTENT,
+        a.REVIEW_SCOPE,
+        a.REVIEW_DATE,
+        a.REVIEW_IMG,
+        a.STORE_NO,
+        a.REPORT_COUNT,
+        b.STORE_NAME,
+        a.USER_NO,
+        c.USER_NAME,
+        c.USER_PROFILE,
+        c.USER_ID
+        FROM
+        TBL_REVIEW a
+        LEFT JOIN
+        TBL_STORE b ON a.STORE_NO = b.STORE_NO
+        LEFT JOIN
+        TBL_USER c ON a.USER_NO = c.USER_NO
+        WHERE REVIEW_NO = #{reviewNo}
+    </select>
+
+    <delete id="deleteReview">
+        DELETE FROM TBL_REVIEW WHERE REVIEW_NO = #{reviewNo}
+    </delete>
 </mapper>

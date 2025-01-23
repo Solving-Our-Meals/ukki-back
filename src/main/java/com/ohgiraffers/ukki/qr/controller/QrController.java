@@ -5,17 +5,26 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.ohgiraffers.ukki.qr.model.dto.QrConfirmDTO;
+import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.qr.model.service.QrService;
+import com.ohgiraffers.ukki.user.model.service.CookieService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -27,152 +36,74 @@ import java.util.UUID;
 public class QrController {
 
     private final QrService qrService;
+    private final JwtService jwtService;
+    private final CookieService cookieService;
+
+    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\qr";
+//    private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
     @Autowired
-    public QrController(QrService qrService){
+    public QrController(QrService qrService, JwtService jwtService, CookieService cookieService) {
         this.qrService = qrService;
-    }
-
-//    @GetMapping("/qr")
-//    public String qrCertificate() throws WriterException {
-//
-////        qrCertificate -> qrName을 만들고 reservation에 저장할 수 있도록
-////        string 그리고 이 안에 qrMaker을 만들어서 이메일로 전송할 거다.
-////          -> 이를 위해서 해당 회원의 email을 조회해야한다.
-////        코드의 만료기간은 해당 예약의 예약시간 + 5분 ->
-////        redisTemplate에서 set 어떻게 정할지 생각하자. -> 예약 시간도 받아야겠네
-////        예약시간을 Date로 전환시키고 그 Date빼기 현재시간 + 5분
-////        null일 때 실패를 반환해야함.
-//
-////        예약시간은 2024-12-23 12:30으로 잡아 놓고 12:35분을 계산하여 redis에 보관해보자.
-//        String resDate = "2024-12-30 12:30";
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//        LocalDateTime resTime = LocalDateTime.parse(resDate, formatter);
-//        resTime = resTime.plus(5, ChronoUnit.MINUTES);
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        long keepTime = ChronoUnit.MINUTES.between(now, resTime);
-//
-//        System.out.println(keepTime);
-//
-//// 현재 qr을 보내는 것은 완료 되었다. 그 qr을 통해 인증을 완료할 수 있는 창을 만들고 userNo가지고 db에서 email을 가져올 수 있게 해야겠다.
-////        qr을 보내기 위해서 필요한 값은 userEmail, resTime, resNo->코드중복성을 아예 없애기 위해서 필수는 아니다.
-//        String email = "gudjtr097@gmail.com";
-//        int resNo = 10;
-//
-//        System.out.println("실행");
-//        String randomCode = String.valueOf(UUID.randomUUID());
-//        String qrName = randomCode.substring(0,10)+resNo;
-//
-//
-//        System.out.println(qrName);
-//        int width = 200;
-//        int height = 200;
-//        String url = "http://localhost:3000/qr/"+qrName;
-//
-//        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-//        BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, width, height);
-//        try{
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            MatrixToImageWriter.writeToStream(bitMatrix, "png", baos);
-//            byte[] qrCodeByteArray = baos.toByteArray();
-//
-//            boolean isQrSend = qrService.qrSend(email, qrName ,qrCodeByteArray, keepTime);
-//            if(isQrSend){
-//                return qrName;
-//            }else {
-//                return null;
-//            }
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
-
-    @GetMapping("/qr")
-    public String qrCertificate(String resDate, String resTime, String email) throws WriterException {
-
-//        qrCertificate -> qrName을 만들고 reservation에 저장할 수 있도록
-//        string 그리고 이 안에 qrMaker을 만들어서 이메일로 전송할 거다.
-//          -> 이를 위해서 해당 회원의 email을 조회해야한다.
-//        코드의 만료기간은 해당 예약의 예약시간 + 5분 ->
-//        redisTemplate에서 set 어떻게 정할지 생각하자. -> 예약 시간도 받아야겠네
-//        예약시간을 Date로 전환시키고 그 Date빼기 현재시간 + 5분
-//        null일 때 실패를 반환해야함.
-
-//        예약시간은 2024-12-23 12:30으로 잡아 놓고 12:35분을 계산하여 redis에 보관해보자.
-        String qrResDate = resDate + " " + resTime;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime qrResTime = LocalDateTime.parse(qrResDate, formatter);
-        qrResTime = qrResTime.plus(5, ChronoUnit.MINUTES);
-        LocalDateTime now = LocalDateTime.now();
-
-        long keepTime = ChronoUnit.MINUTES.between(now, qrResTime);
-
-        System.out.println(keepTime);
-
-// 현재 qr을 보내는 것은 완료 되었다. 그 qr을 통해 인증을 완료할 수 있는 창을 만들고 userNo가지고 db에서 email을 가져올 수 있게 해야겠다.
-//        qr을 보내기 위해서 필요한 값은 userEmail, resTime, resNo->코드중복성을 아예 없애기 위해서 필수는 아니다.
-//        String email = "gudjtr097@gmail.com";
-        int resNo = 10;
-
-        System.out.println("실행");
-        String randomCode = String.valueOf(UUID.randomUUID());
-        String qrName = randomCode.substring(0,10)+resNo;
-
-
-        System.out.println(qrName);
-        int width = 200;
-        int height = 200;
-        String url = "http://localhost:3000/qr/"+qrName;
-
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, width, height);
-        try{
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "png", baos);
-            byte[] qrCodeByteArray = baos.toByteArray();
-
-            boolean isQrSend = qrService.qrSend(email, qrName ,qrCodeByteArray, keepTime);
-            if(isQrSend){
-                return qrName;
-            }else {
-                return null;
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        this.jwtService = jwtService;
+        this.cookieService = cookieService;
     }
 
     @GetMapping("/qr/{QR}")
-    public ResponseEntity<?> qrConfirmation(@PathVariable String QR){
+    public ResponseEntity<?> qrConfirmation(@PathVariable String QR, HttpServletRequest request){
 //        QR코드 확인 페이지에서 get요청 오게 되면 예약에 저장되어 있는 가게번호와 예약번호를 반환한다.
-        QrConfirmDTO qrConfirmDTO = qrService.qrConfirmation(QR);
+        String jwtToken = cookieService.getJWTCookie(request);
 
-        if(qrConfirmDTO!=null) {
-            return ResponseEntity.ok(qrConfirmDTO);
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        }
+
+        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+        if (userId == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        int isConfirm = qrService.qrConfirmation(QR, userId);
+
+        if(isConfirm!=0) {
+            qrService.editQrConfirmRes(QR);
+            Map<String, Object> data = new HashMap<>();
+            data.put("message", "예약 확인에 성공했습니다.");
+
+            return ResponseEntity.ok(data);
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"none\"}");
         }
     }
 
-    @PutMapping("/qr/{QR}/confirm")
-    public ResponseEntity<?> qrConfirmSuccess(@PathVariable String QR){
-        int result = qrService.qrConfirmSuccess(QR);
+    @GetMapping(value = "{qrName}/api/qrImage")
+    public ResponseEntity<Resource> getQrImage(@PathVariable String qrName){
 
-        Map<String, Object> responseMap = new HashMap<>();
-        String message = "";
-        if(result>0){
-            message="QR 확인에 성공하였습니다..";
-            responseMap.put("message", message);
-            return ResponseEntity.ok(responseMap);
-        }else {
-            message="오류로 인해 확인에 실패했습니다.";
-            responseMap.put("message", message);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        try {
+
+            System.out.println("QR이미지 왔다");
+            System.out.println(qrName);
+            Path file = Paths.get(SHARED_FOLDER).resolve(qrName + ".png");
+            if(!Files.exists(file)){
+                file = Paths.get(SHARED_FOLDER).resolve(qrName + ".jpg");
+            }
+
+            // 디버깅 확인
+//            System.out.println("프로필 파일 경로 : " + file);
+            Resource resource = new UrlResource(file.toUri());
+
+            System.out.println(resource);
+            System.out.println(file);
+            if(resource.exists() && resource.isReadable()){
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; qrName=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }

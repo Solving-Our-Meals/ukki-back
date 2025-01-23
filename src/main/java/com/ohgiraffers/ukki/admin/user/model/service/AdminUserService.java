@@ -25,12 +25,9 @@ public class AdminUserService {
     }
 
     public List<AdminUserDTO> searchUsers(String category, String word) {
-            Map<String, String> params = new HashMap<>();
-            params.put("category", category);
-            params.put("word", word);
-            return adminUserMapper.searchBy(params);
+        return adminUserMapper.searchBy(category, word);
     }
-
+    
     public AdminUserInfoDTO searchUserInfo(int userNo) {
         return adminUserMapper.searchUserInfo(userNo);
     }
@@ -48,5 +45,9 @@ public class AdminUserService {
 
     public int deleteUserInfo(int userNo) {
         return adminUserMapper.deleteUserInfo(userNo);
+    }
+
+    public int totalUser() {
+        return adminUserMapper.totalUser();
     }
 }

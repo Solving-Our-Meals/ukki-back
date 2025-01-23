@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.ukki.notice.model.dao.NoticeMapper">
+
+    <resultMap id="getNoticeResultMap" type="com.ohgiraffers.ukki.notice.model.dto.NoticeDTO">
+        <id property="noticeNo" column="NOTICE_NO"/>
+        <result property="noticeTitle" column="NOTICE_TITLE"/>
+        <result property="noticeContent" column="NOTICE_CONTENT"/>
+        <result property="date" column="DATE"/>
+        <result property="categoryNo" column="CATEGORY_NO"/>
+    </resultMap>
+
+    <!-- 유저 공지사항 전체 조회 -->
+    <select id="getUserNoticeList" parameterType="String" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+          WHERE (CATEGORY_NO = 1 OR CATEGORY_NO = 2)
+            <if test="searchWord != null">
+                AND (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+            </if>
+          ORDER BY DATE DESC
+    </select>
+
+    <select id="getBossNoticeList" parameterType="String" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+        <if test="searchWord != null">
+            WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
+        </if>
+        ORDER BY DATE DESC
+    </select>
+
+    <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+         WHERE NOTICE_NO = #{ noticeNo }
+    </select>
+
+    <select id="getRecentNotice" resultMap="getNoticeResultMap">
+        SELECT
+               *
+          FROM TBL_NOTICE
+         ORDER BY NOTICE_NO DESC
+         LIMIT 1;
+    </select>
+</mapper>

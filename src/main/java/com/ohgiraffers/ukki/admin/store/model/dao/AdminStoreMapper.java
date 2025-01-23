@@ -29,4 +29,30 @@ public interface AdminStoreMapper {
     void editStore(AdminStoreInfoDTO storeData);
 
     int deleteStoreInfo(int storeNo);
+
+    void deleteStoreBanner(int storeNo);
+
+    void deleteStoreOperation(int storeNo);
+
+    void editBanner(BannerDTO bannerDTO);
+
+    int lastStoreNo();
+
+    int insertOperationTime(OperationDTO operationDTO);
+
+    int insertKeyword(KeywordDTO keywordDTO);
+
+    int insertBanner(BannerDTO bannerDTO);
+
+    void insertStoreUser(AdminStoreUserDTO userData);
+
+    void insertStore(AdminStoreInfoDTO storeData);
+
+    int searchCurrentStoreUser(String userId);
+
+    void deleteStoreKeyword(int storeNo);
+
+    String[] getReviewImgStoreNo(int storeNo);
+
+    void deleteReviewWithStore(int storeNo);
 }

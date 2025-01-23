@@ -19,44 +19,110 @@
     </select>
 
     <select id="findUserReservationByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
+        <!-- 현재 예약 -->
         SELECT
+        r.RES_NO AS resNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         r.RES_DATE AS date,
         r.RES_TIME AS time,
-        r.QR
+        r.QR,
+        r.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
+        0 AS reservation_type
+        FROM
+        TBL_RESERVATION r
+        LEFT JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        LEFT JOIN TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON r.RES_NO = rev.RES_NO
+        WHERE
+        u.USER_ID = #{userId}
+
+        UNION ALL
+
+        <!-- 만료된 예약 -->
+        SELECT
+        er.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        er.RES_DATE AS date,
+        er.RES_TIME AS time,
+        er.QR,
+        er.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
+        1 AS reservation_type
+        FROM
+        TBL_END_RES er
+        LEFT JOIN TBL_USER u ON er.USER_NO = u.USER_NO
+        LEFT JOIN TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON er.RES_NO = rev.RES_NO
+        WHERE
+        u.USER_ID = #{userId}
+
+        ORDER BY
+        reservation_type ASC,
+        date ASC,
+        time ASC;
+    </select>
+
+
+    <select id="findUserReservationByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDTO">
+        SELECT
+        r.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        r.RES_DATE AS date,
+        r.RES_TIME AS time,
+        r.QR,
+        r.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
+        0 AS reservation_type
         FROM
         TBL_RESERVATION r
         LEFT JOIN
         TBL_USER u ON r.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON r.RES_NO = rev.RES_NO
         WHERE
         u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
 
         UNION
 
         SELECT
+        er.RES_NO AS resNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         er.RES_DATE AS date,
         er.RES_TIME AS time,
-        er.QR
+        er.QR,
+        er.QR_CONFIRM AS qrConfirm,
+        rev.REVIEW_NO AS replyNo,
+        1 AS reservation_type
         FROM
         TBL_END_RES er
         LEFT JOIN
         TBL_USER u ON er.USER_NO = u.USER_NO
         LEFT JOIN
         TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        LEFT JOIN TBL_REVIEW rev ON er.RES_NO = rev.RES_NO
         WHERE
         u.USER_ID = #{userId}
-
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
         ORDER BY
-        date DESC, time DESC;
+        reservation_type ASC,
+        date ASC, time ASC;
     </select>
+
 
     <select id="findUserReviewByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
         SELECT
+        u.USER_NO AS userNo,
         u.USER_ID AS userId,
         s.STORE_NAME AS storeName,
         s.STORE_NO AS storeNo,
@@ -74,7 +140,56 @@
         u.USER_ID = #{userId}
 
         ORDER BY
-        reviewDate DESC;
+        reviewNo DESC;
+    </select>
+
+    <select id="findUserReviewByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
+        SELECT
+        u.USER_NO AS userNo,
+        u.USER_ID AS userId,
+        s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
+        r.REVIEW_DATE AS reviewDate,
+        r.REVIEW_CONTENT AS reviewText,
+        r.REVIEW_SCOPE AS star
+        FROM
+        TBL_REVIEW r
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = r.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON s.STORE_NO = r.STORE_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND s.STORE_NAME LIKE CONCAT('%', #{search}, '%')
+        </if>
+        ORDER BY
+        reviewNo DESC;
+    </select>
+
+
+    <select id="findUserReviewDetailByReviewNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReviewDTO">
+        SELECT
+        u.USER_PROFILE AS userProfile,
+        u.USER_ID AS userId,
+        u.USER_NAME AS userName,
+        u.USER_NO AS userNo,
+        s.STORE_NAME AS storeName,
+        s.STORE_NO AS storeNo,
+        r.REVIEW_NO AS reviewNo,
+        r.REVIEW_DATE AS reviewDate,
+        r.REVIEW_CONTENT AS reviewText,
+        r.REVIEW_SCOPE AS star,
+        r.REVIEW_IMG AS reviewPicture
+        FROM
+        TBL_REVIEW r
+        LEFT JOIN
+        TBL_USER u ON u.USER_NO = r.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON s.STORE_NO = r.STORE_NO
+        WHERE
+        r.REVIEW_NO = #{reviewNo};
     </select>
 
     <delete id="deleteReviewById" parameterType="int">
@@ -82,6 +197,243 @@
         WHERE REVIEW_NO = #{reviewNo}
     </delete>
 
+    <select id="findUserInquiryByUserId" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        i.INQ_NO AS inquiryNo,
+        i.INQ_TITLE AS title,
+        i.INQ_CONTENT AS text,
+        i.INQ_DATE AS inquiryDate,
+        i.ANS_TITLE AS answerTitle,
+        i.ANS_CONTENT AS answerContent,
+        i.ANS_DATE AS answerDate,
+        i.FILE AS file,
+        i.STATE AS inquiryState,
+        c.CATEGORY_NO AS categoryNo,
+        c.CATEGORY_NAME AS category
+        FROM
+        TBL_INQUIRY i
+        LEFT JOIN TBL_USER u ON u.USER_NO = i.USER_NO
+        LEFT JOIN TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
+        WHERE
+        u.USER_ID = #{userId}
+        ORDER BY
+        i.INQ_NO DESC;
+    </select>
 
+    <select id="findUserInquiryByUserIdWithSearch" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        u.USER_ID AS userId,
+        u.USER_NO AS userNo,
+        i.INQ_NO AS inquiryNo,
+        i.INQ_TITLE AS title,
+        i.INQ_CONTENT AS text,
+        i.INQ_DATE AS inquiryDate,
+        i.ANS_TITLE AS answerTitle,
+        i.ANS_CONTENT AS answerContent,
+        i.ANS_DATE AS answerDate,
+        i.FILE AS file,
+        i.STATE AS inquiryState,
+        c.CATEGORY_NO AS categoryNo,
+        c.CATEGORY_NAME AS category
+        FROM
+        TBL_INQUIRY i
+        LEFT JOIN TBL_USER u ON u.USER_NO = i.USER_NO
+        LEFT JOIN TBL_INQUIRY_CATEGORY c ON c.CATEGORY_NO = i.CATEGORY_NO
+        WHERE
+        u.USER_ID = #{userId}
+        <if test="search != null and search != ''">
+            AND i.INQ_TITLE LIKE CONCAT('%', #{search}, '%')
+        </if>
+        ORDER BY
+        i.INQ_NO DESC;
+    </select>
+
+    <update id="updateInquiryStatus" parameterType="map">
+        UPDATE TBL_INQUIRY
+        SET STATE = #{inquiryState}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <update id="updateInquiry" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        UPDATE TBL_INQUIRY
+        SET INQ_TITLE = #{title},
+        INQ_CONTENT = #{text},
+        FILE = #{file}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <select id="findInquiryById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInquiryDTO">
+        SELECT
+        FILE
+        FROM
+        TBL_INQUIRY
+        WHERE
+        INQ_NO = #{inquiryNo}
+    </select>
+
+
+    <delete id="deleteInquiryById" parameterType="int">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
+
+    <select id="findPasswordByUserId" resultType="String">
+        SELECT USER_PWD
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="findUserProfileInfo" parameterType="String" resultType="com.ohgiraffers.ukki.user.model.dto.MypageInfoDTO">
+        SELECT
+        user_id AS userId,
+        user_name AS userName,
+        email
+        FROM
+        TBL_USER
+        WHERE
+        user_id = #{userId}
+    </select>
+
+    <update id="updateUserInfo" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageUpdateUserInfoDTO">
+        UPDATE TBL_USER
+        <set>
+            <if test="userName != null">
+                USER_NAME = #{userName},
+            </if>
+            <if test="userPass != null">
+                USER_PWD = #{userPass},
+            </if>
+            <if test="file != null">
+                USER_PROFILE = #{file}
+            </if>
+        </set>
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <update id="updateUserProfileImage" parameterType="com.ohgiraffers.ukki.user.model.dto.MypageProfileImageDTO">
+        UPDATE TBL_USER
+        SET USER_PROFILE = #{file}
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <select id="findProfileImagePathByUserId" resultType="String">
+        SELECT USER_PROFILE
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="findReservationDetailByResNo" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationDetailDTO">
+        SELECT
+        r.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        u.USER_NAME AS userName,
+        s.STORE_NO AS storeNo,
+        s.STORE_NAME AS storeName,
+        r.RES_DATE AS date,
+        r.RES_TIME AS time,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        LEFT JOIN
+        TBL_USER u ON r.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON r.STORE_NO = s.STORE_NO
+        WHERE
+        r.RES_NO = #{resNo}
+
+        UNION
+
+        SELECT
+        er.RES_NO AS resNo,
+        u.USER_ID AS userId,
+        u.USER_NAME AS userName,
+        s.STORE_NO AS storeNo,
+        s.STORE_NAME AS storeName,
+        er.RES_DATE AS date,
+        er.RES_TIME AS time,
+        er.QR
+        FROM
+        TBL_END_RES er
+        LEFT JOIN
+        TBL_USER u ON er.USER_NO = u.USER_NO
+        LEFT JOIN
+        TBL_STORE s ON er.STORE_NO = s.STORE_NO
+        WHERE
+        er.RES_NO = #{resNo}
+    </select>
+
+    <delete id="deleteUserById" parameterType="String">
+        DELETE FROM TBL_USER WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+    </delete>
+
+    <select id="getUserNoById" resultType="long">
+        SELECT USER_NO
+        FROM TBL_USER
+        WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="getReviewImagesByUserId" resultType="String">
+        SELECT REVIEW_IMG
+        FROM TBL_REVIEW r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE r.USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteReviewsByUserId" parameterType="long">
+        DELETE FROM TBL_REVIEW
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </delete>
+
+    <select id="getNoshowCountByUserNo" parameterType="long" resultType="int">
+        SELECT NOSHOW
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <select id="getEmailByUserNo" parameterType="long" resultType="String">
+        SELECT EMAIL
+        FROM TBL_USER
+        WHERE USER_NO = #{userNo, jdbcType=BIGINT}
+    </select>
+
+    <select id="getUserNoByIdForNoshow" resultType="com.ohgiraffers.ukki.user.model.dto.MypageDeleteAccount">
+        SELECT USER_NO, EMAIL, NOSHOW
+        FROM TBL_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <insert id="insertEmailIntoNoshow" parameterType="map">
+        INSERT INTO TBL_NOSHOW (EMAIL, NOSHOW)
+        VALUES (#{email}, #{noshow})
+    </insert>
+
+    <delete id="deleteUserAct" parameterType="java.lang.Long">
+        DELETE FROM TBL_USER_ACT_INFO
+        WHERE USER_NO = #{userNo}
+    </delete>
+
+    <delete id="deleteReservation" parameterType="Long">
+        DELETE FROM TBL_RESERVATION
+        WHERE RES_NO = #{resNo}
+    </delete>
+
+    <select id="findReservationQRById" resultType="com.ohgiraffers.ukki.user.model.dto.MypageReservationQRDTO">
+        SELECT
+        r.USER_NO AS userNo,
+        r.RES_NO AS resNo,
+        r.QR
+        FROM
+        TBL_RESERVATION r
+        WHERE
+        r.RES_NO = #{resNo}
+    </select>
+
+    <update id="countReservation">
+        UPDATE TBL_USER_ACT_INFO
+        SET RES_COUNT = RES_COUNT - 1
+        WHERE USER_NO = #{userNo}
+    </update>
 
 </mapper>

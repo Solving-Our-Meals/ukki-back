@@ -26,8 +26,8 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    //    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
     private final QrService qrService;
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images";
 
     public ReservationController(ReservationService reservationService, QrService qrService){
         this.reservationService = reservationService;
@@ -100,27 +100,40 @@ public class ReservationController {
     // 예약 DB에 insert
     @PostMapping(value = "/insert")
     @ResponseBody
-    public void insertReservation(@RequestBody ReservationInfoDTO reservationInfoDTO) throws WriterException {
+    public String insertReservation(@RequestBody ReservationInfoDTO reservationInfoDTO) throws WriterException {
 
-//        System.out.println("예약 DB 드가자");
+        String resultMessage = "";
+        // 중복 예약 정보가 있는지 확인
+        System.out.println("reservation 정보 : " + reservationInfoDTO);
 
-        // QR코드를 생성하기 위한 필수 파라미터인 이메일 DB에서 받아오기
-        String userEmail = reservationService.getEmail(reservationInfoDTO);
+        ReservationInfoDTO isExistReservation = reservationService.checkExistReservation(reservationInfoDTO);
+
+        System.out.println("isExistReservation = " + isExistReservation);
+
+        if(isExistReservation == null){
+            System.out.println("예약 DB 드가자");
+
+            // QR코드를 생성하기 위한 필수 파라미터인 이메일 DB에서 받아오기
+            String userEmail = reservationService.getEmail(reservationInfoDTO);
 //        System.out.println("userEmail = " + userEmail);
 
-        // QR코드 만드는 함수 호출
-        QrController qrController = new QrController(qrService);
-//        System.out.println("여긴 왔니...?");
-        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
-//        System.out.println("어디까지 왔니1");
-        // QR코드 reservationInfoDTO에 넣기
-        reservationInfoDTO.setQr(qrCode);
-//        System.out.println("어디까지 왔니2");
-//        System.out.println("reservationInfo : " + reservationInfoDTO);
-//        System.out.println("어디까지 왔니3");
+            // QR코드 만드는 함수 호출
+//        QrController qrController = new QrController(qrService);
+//        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
+            String qrCode = qrService.qrCertificate();
+//         QR코드 reservationInfoDTO에 넣기
+            reservationInfoDTO.setQr(qrCode);
+            System.out.println("reservationInfo : " + reservationInfoDTO);
 
-        reservationService.insertReservation(reservationInfoDTO);
+            reservationService.insertReservation(reservationInfoDTO);
 
-        reservationService.increaseReservation(reservationInfoDTO.getUserNo());
+            reservationService.increaseReservation(reservationInfoDTO.getUserNo());
+
+            resultMessage = "예약 성공";
+        } else {
+            resultMessage = "예약 실패";
+        }
+
+        return resultMessage;
     }
 }

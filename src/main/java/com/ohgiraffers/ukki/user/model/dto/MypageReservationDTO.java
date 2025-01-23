@@ -4,20 +4,36 @@ import java.sql.Time;
 import java.util.Date;
 
 public class MypageReservationDTO {
+    private int resNo;
     private String userId;
     private String storeName;
-    private Date date;
-    private Time time;
+    private String date;
+    private String time;
     private String qr;
+    private String search;
+    private int replyNo;
+    private Boolean qrConfirm;
 
     public MypageReservationDTO() {}
 
-    public MypageReservationDTO(String userId, String storeName, Date date, Time time, String qr) {
+    public MypageReservationDTO(int resNo, String userId, String storeName, String date, String time, String qr, String search, int replyNo, Boolean qrConfirm) {
+        this.resNo = resNo;
         this.userId = userId;
         this.storeName = storeName;
         this.date = date;
         this.time = time;
         this.qr = qr;
+        this.search = search;
+        this.replyNo = replyNo;
+        this.qrConfirm = qrConfirm;
+    }
+
+    public int getResNo() {
+        return resNo;
+    }
+
+    public void setResNo(int resNo) {
+        this.resNo = resNo;
     }
 
     public String getUserId() {
@@ -36,20 +52,24 @@ public class MypageReservationDTO {
         this.storeName = storeName;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public Time getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
-        this.time = time;
+    public void setTime(String time) {
+        if (time != null && time.endsWith(":00")) {
+            this.time = time.substring(0, time.length() - 3);
+        } else {
+            this.time = time;
+        }
     }
 
     public String getQr() {
@@ -60,14 +80,42 @@ public class MypageReservationDTO {
         this.qr = qr;
     }
 
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
+    public int getReplyNo() {
+        return replyNo;
+    }
+
+    public void setReplyNo(int replyNo) {
+        this.replyNo = replyNo;
+    }
+
+    public Boolean getQrConfirm() {
+        return qrConfirm;
+    }
+
+    public void setQrConfirm(Boolean qrConfirm) {
+        this.qrConfirm = qrConfirm;
+    }
+
     @Override
     public String toString() {
         return "MypageReservationDTO{" +
-                "userId='" + userId + '\'' +
+                "resNo=" + resNo +
+                ", userId='" + userId + '\'' +
                 ", storeName='" + storeName + '\'' +
-                ", date=" + date +
-                ", time=" + time +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
                 ", qr='" + qr + '\'' +
+                ", search='" + search + '\'' +
+                ", replyNo=" + replyNo +
+                ", qrConfirm=" + qrConfirm +
                 '}';
     }
 }

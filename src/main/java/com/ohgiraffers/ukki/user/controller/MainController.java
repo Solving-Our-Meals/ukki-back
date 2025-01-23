@@ -33,6 +33,9 @@ public class MainController {
     // 예시: Spring Boot를 사용하는 경우
     @RequestMapping(value = "/main/directions", method = RequestMethod.POST)
     public ResponseEntity<?> getDirections(@RequestBody DirectionsRequest request) {
+        String responseBody = "";
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // 기본 상태는 INTERNAL_SERVER_ERROR
+
         try {
             String url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
             HttpHeaders headers = new HttpHeaders();
@@ -42,15 +45,25 @@ public class MainController {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
+            // 성공적인 응답 처리
             if (response.getStatusCode() == HttpStatus.OK) {
-                return ResponseEntity.ok(response.getBody());
+                responseBody = response.getBody();  // 본문을 변수로 분리
+                status = HttpStatus.OK;
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("경로를 찾을 수 없습니다.");
+                responseBody = "경로를 찾을 수 없습니다.";  // 오류 메시지를 변수로 분리
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
+            responseBody = "오류 발생: " + e.getMessage();  // 예외 메시지를 변수로 분리
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
+
+        // 최종적으로 ResponseEntity를 반환
+        return ResponseEntity.status(status).body(responseBody);
     }
+
+
+
 
 }
 

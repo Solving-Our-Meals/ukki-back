@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.admin.inquiry.model.dao.AdminInquiryMapper">
-    <resultMap id="inquiry" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryDTO">
+    <resultMap id="inquiryInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO">
         <id property="inquiryNo" column="INQ_NO"/>
         <result property="inquiryTitle" column="INQ_TITLE"/>
         <result property="inquiryContent" column="INQ_CONTENT"/>
@@ -17,11 +17,190 @@
         <result property="file" column="FILE"/>
     </resultMap>
 
+    <resultMap id="inquiryList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO">
+            <id property="inqNo" column="INQ_NO" />
+            <result property="categoryName" column="CATEGORY_NAME" />
+            <result property="inqDate" column="INQ_DATE" />
+            <result property="inqTitle" column="INQ_TITLE" />
+            <result property="inqContent" column="INQ_CONTENT" />
+            <result property="state" column="STATE" typeHandler="com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler" />
+            <result property="isInquiry" column="IS_INQUIRY"/>
+    </resultMap>
+
+    <resultMap id="reportInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO">
+        <id property="reportNo" column="REPORT_NO"/>
+        <result property="reportTitle" column="REPORT_TITLE"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="reportDate" column="REPORT_DATE"/>
+        <result property="reviewNo" column="REVIEW_NO"/>
+        <result property="answerTitle" column="ANS_TITLE"/>
+        <result property="answerContent" column="ANS_CONTENT"/>
+        <result property="answerDate" column="ANS_DATE"/>
+        <result property="state" column="STATE"/>
+    </resultMap>
+
+    <resultMap id="reportList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO">
+        <id property="inqNo" column="REPORT_NO"/>
+        <result property="inqTitle" column="REPORT_TITLE"/>
+        <result property="inqContent" column="REPORT_CONTENT"/>
+        <result property="inqDate" column="REPORT_DATE"/>
+        <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="state" column="STATE" typeHandler="com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler" />
+        <result property="isInquiry" column="IS_INQUIRY"/>
+    </resultMap>
+
     <select id="processingInquiry">
         SELECT
-        COUNT(*)
+        SUM(cnt)
+        FROM (
+        SELECT COUNT(*) as cnt
         FROM TBL_INQUIRY
-        WHERE STATE='PROCESSING';
+        WHERE STATE = 'PROCESSING'
+        UNION ALL
+        SELECT COUNT(*) as cnt
+        FROM TBL_REVIEW_REPORT
+        WHERE STATE = 'PROCESSING'
+        ) as combined_counts;
     </select>
 
+
+    <select id="searchUserInquiry" resultMap="inquiryList">
+        SELECT
+            a.INQ_NO,
+            b.CATEGORY_NAME,
+            a.INQ_DATE,
+            a.INQ_TITLE,
+            a.INQ_CONTENT,
+            a.STATE,
+            true AS IS_INQUIRY
+        FROM TBL_INQUIRY a
+        LEFT JOIN TBL_INQUIRY_CATEGORY b ON a.CATEGORY_NO = b.CATEGORY_NO
+        <where>
+            a.CATEGORY_NO IN (1, 2, 3, 4)
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "CATEGORY_NAME"'>
+                        AND b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        AND a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="totalInquiry">
+        SELECT COUNT(*) AS total_count
+        FROM (
+        SELECT INQ_NO FROM TBL_INQUIRY
+        UNION ALL
+        SELECT REPORT_NO FROM TBL_REVIEW_REPORT
+        ) AS combined
+    </select>
+
+    <select id="searchStoreInquiry" resultMap="inquiryList">
+        SELECT
+        a.INQ_NO,
+        b.CATEGORY_NAME,
+        a.INQ_DATE,
+        a.INQ_TITLE,
+        a.INQ_CONTENT,
+        a.STATE,
+        true AS IS_INQUIRY
+        FROM TBL_INQUIRY a
+        LEFT JOIN TBL_INQUIRY_CATEGORY b ON a.CATEGORY_NO = b.CATEGORY_NO
+        <where>
+            a.CATEGORY_NO IN (5, 6, 7)
+            <if test="category != null and word != null">
+                <choose>
+                    <when test='category == "CATEGORY_NAME"'>
+                        AND b.${category} LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <otherwise>
+                        AND a.${category} LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="category == null and word != null">
+                AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="searchStoreReportInquiry" resultMap="reportList">
+        SELECT
+        REPORT_NO,
+        '리뷰신고' AS CATEGORY_NAME,
+        REPORT_DATE,
+        REPORT_TITLE,
+        REPORT_CONTENT,
+        STATE,
+        false AS IS_INQUIRY
+        FROM TBL_REVIEW_REPORT
+        <where>
+            <if test="category == 'CATEGORY_NAME' and word == '리뷰신고'">
+                1=1
+            </if>
+            <if test="category != null and word != null">
+                ${category} LIKE CONCAT('%', #{word}, '%')
+            </if>
+            <choose>
+                <when test="category == null and word != null and word.matches('(리|뷰|신|고|리뷰|뷰신|신고|리뷰신|뷰신고|리뷰신고)')">
+                    1=1
+                </when>
+                <otherwise>
+                    <if test="category == null and word != null">
+                        CONCAT(REPORT_NO, ' ', REPORT_DATE, ' ', REPORT_TITLE, ' ', REPORT_CONTENT, ' ', STATE) LIKE
+                        CONCAT('%', #{word}, '%')
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="inquiryInfo" resultMap="inquiryInfo">
+        SELECT
+            *
+        FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </select>
+
+    <select id="reportInfo" resultMap="reportInfo">
+        SELECT
+            *
+        FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </select>
+
+    <update id="inquiryAnswer" parameterType="com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO">
+        UPDATE TBL_INQUIRY SET
+            ANS_TITLE = #{answerTitle},
+            ANS_CONTENT = #{answerContent},
+            ANS_DATE = #{answerDate},
+            STATE = #{state}
+        WHERE INQ_NO = #{inquiryNo}
+    </update>
+
+    <delete id="inquiryDelete">
+        DELETE FROM TBL_INQUIRY
+        WHERE INQ_NO = #{inquiryNo}
+    </delete>
+
+    <update id="reportAnswer" parameterType="com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO">
+        UPDATE TBL_REVIEW_REPORT SET
+        ANS_TITLE = #{answerTitle},
+        ANS_CONTENT = #{answerContent},
+        ANS_DATE = #{answerDate},
+        STATE = #{state}
+        WHERE REPORT_NO = #{inquiryNo}
+    </update>
+
+    <delete id="reportDelete">
+        DELETE FROM TBL_REVIEW_REPORT
+        WHERE REPORT_NO = #{reportNo}
+    </delete>
 </mapper>

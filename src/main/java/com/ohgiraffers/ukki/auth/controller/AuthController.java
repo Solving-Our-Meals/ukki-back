@@ -8,7 +8,9 @@ import com.ohgiraffers.ukki.common.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +34,15 @@ public class AuthController {
             int isUserIdValid = authService.isUserIdValid(authDTO.getUserId());
             if (isUserIdValid == 0) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Map.of("isValid", false, "message", "ⓘ 아이디가 존재하지 않습니다."));
             }
-            return ResponseEntity.ok(Map.of("isValid", true, "message", "ⓘ 아이디 확인 완료"));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("isValid", true, "message", "ⓘ 아이디 확인 완료"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("isValid", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
@@ -50,6 +56,7 @@ public class AuthController {
 
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));
             }
 
@@ -80,10 +87,13 @@ public class AuthController {
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
         } catch (Exception e) {
             e.printStackTrace(); // 에러가 뭔지 전혀 모르겠으면 사용 -> 사용해보고 에러 보니까 HS512가 512bit수준의 SECRET_KEY를 원하는데 내가 너무 짧게 설정해서 오류가난거임 -> yml에서 해결완료
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
@@ -127,9 +137,12 @@ public class AuthController {
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 유효하지 않은 리프레시 토큰 !"));
         }
     }
@@ -138,15 +151,30 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
+            // 세션 무효화
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();  // 세션 종료
+            }
+
+            // 쿠키 삭제
             deleteCookie(request, response, "authToken");
             deleteCookie(request, response, "refreshToken");
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
+            // JSON 응답을 명시적으로 반환
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
         } catch (Exception e) {
+            // 서버 오류 발생 시, JSON 형식으로 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
+
+
+
 
     private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
         Cookie[] cookies = request.getCookies();
@@ -168,7 +196,9 @@ public class AuthController {
         String token = jwtFilter.getTokenFromCookies(request);
 
         if (token == null || !authService.validateToken(token)) {
-            return ResponseEntity.status(401).body("Unauthorized");  // 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "ⓘ 유효하지 않은 토큰입니다."));
         }
 
         // 토큰이 유효하면 사용자 정보를 추출하는 과정입니다.(Sub으로 지정한 ID가 추출)
@@ -176,9 +206,56 @@ public class AuthController {
         String userId = (String) userInfo.get("userId");
 
         if (userId != null) {
-            return ResponseEntity.ok("Authenticated");  // 200 인증완료 (권한있음)
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Authenticated");  // 200 인증완료 (권한있음)
         }
 
-        return ResponseEntity.status(401).body("Unauthorized"); // 401 인증실패 (권한없음)
+        return ResponseEntity.status(401)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("Unauthorized"); // 401 인증실패 (권한없음)
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        try {
+            // 1. 요청에서 JWT 토큰을 추출
+            String token = jwtFilter.getTokenFromCookies(request);
+
+            // 2. 토큰이 없거나 유효하지 않으면 인증 실패
+            if (token == null || !authService.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("status", "error", "message", "ⓘ 인증되지 않은 사용자입니다.", "code", HttpStatus.UNAUTHORIZED.value()));
+            }
+
+            // 3. 토큰에서 사용자 정보 추출
+            Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
+            String userId = (String) userInfo.get("userId");
+
+            // 4. 사용자 정보가 존재하면 반환
+            if (userId != null) {
+                // 사용자 정보 조회 (예: userId로 데이터베이스에서 사용자 정보 조회)
+                AuthDTO authDTO = authService.findUserById(userId);
+
+                // 사용자 정보를 AuthDTO로 반환
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(authDTO);
+            }
+
+            // 5. 사용자 정보가 없으면 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "ⓘ 사용자 정보를 찾을 수 없습니다."));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "ⓘ 사용자 정보를 가져오는 데 실패했습니다."));
+        }
+    }
+
+
 }
