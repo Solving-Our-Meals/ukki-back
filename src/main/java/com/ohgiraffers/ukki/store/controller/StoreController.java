@@ -207,7 +207,6 @@ public class StoreController {
             if(resource.exists() && resource.isReadable()){
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; menuName=\"" + resource.getFilename() + "\"")
-                        .contentType(MediaType.APPLICATION_JSON)
                         .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -295,7 +294,6 @@ public class StoreController {
             if(resource.exists() && resource.isReadable()){
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; reviewImgName=\"" + resource.getFilename() + "\"")
-                        .contentType(MediaType.APPLICATION_JSON)
                         .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -322,7 +320,6 @@ public class StoreController {
             if(resource.exists() && resource.isReadable()){
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; userProfileName=\"" + resource.getFilename() + "\"")
-                        .contentType(MediaType.APPLICATION_JSON)
                         .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -356,21 +353,27 @@ public class StoreController {
             paramMap.forEach((key, value) -> {
                 switch (key) {
                     case "reviewDate":
+                        System.out.println("reviewDate : " + value);
                         reviewContentDTO.setReviewDate(value.isEmpty() ? null : value);
                         break;
                     case "reviewContent":
+                        System.out.println("reviewContent : " + value);
                         reviewContentDTO.setReviewContent(value.isEmpty() ? null : value);
                         break;
                     case "reviewScope":
-                        reviewContentDTO.setReviewScope(value.isEmpty() ? null : Integer.parseInt(value));
+                        System.out.println("reviewScope : " + value);
+                        reviewContentDTO.setReviewScope(value.isEmpty() ? null : value);
                         break;
                     case "storeNo":
+                        System.out.println("storeNo : " + value);
                         reviewContentDTO.setStoreNo(value.isEmpty() ? null : Long.parseLong(value));
                         break;
                     case "userNo":
+                        System.out.println("userNo : " + value);
                         reviewContentDTO.setUserNo(value.isEmpty() ? null : Long.parseLong(value));
                         break;
                     case "resNo":
+                        System.out.println("resNo : " + value);
                         reviewContentDTO.setResNo(value.isEmpty() ? null : Long.parseLong(value));
                         break;
                 }
