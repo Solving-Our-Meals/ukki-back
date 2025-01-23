@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.user.model.service;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.common.InquiryState;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +26,20 @@ import java.util.Map;
 @Service
 public class MypageService {
 
+    private static final String PROFILE_IMAGE_FOLDER_ID = "1gxTNO0bbEGV-VeLlzMV76N1jGI03neUM";
+
+
     private final JwtService jwtService;
     private final MypageMapper mypageMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final GoogleDriveService googleDriveService;
 
     @Autowired
-    public MypageService(JwtService jwtService, MypageMapper mypageMapper, BCryptPasswordEncoder passwordEncoder) {
+    public MypageService(JwtService jwtService, MypageMapper mypageMapper, BCryptPasswordEncoder passwordEncoder, GoogleDriveService googleDriveService) {
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mypageMapper = mypageMapper;
+        this.googleDriveService = googleDriveService;
     }
 
     public MypageDTO getUserInfoFromToken(String jwtToken, String userId) {
@@ -384,45 +390,56 @@ public class MypageService {
         return reviewDetail;
     }
 
-    private static final String PROFILE_IMAGE_DIR = "C:\\Temp\\profile";
-//    private final String PROFILE_IMAGE_DIR = "\\\\192.168.0.138\\ukki_nas"; // 업로드 디렉토리 경로
-public boolean updateProfileImage(String userId, MultipartFile profileImage) {
-    try {
-        String existingFilePath = getExistingFilePath(userId);
+    public boolean updateProfileImage(String userId, MultipartFile profileImage) {
+        try {
+            // 기존 프로필 이미지 경로 가져오기 (Google Drive 파일 ID)
+            String existingFileId = getExistingFileId(userId);
 
-        // 기존 프로필 이미지가 있으면 삭제
-        if (existingFilePath != null && !existingFilePath.isEmpty()) {
-            File existingFile = new File(existingFilePath);
-            if (existingFile.exists()) {
-                boolean deleted = existingFile.delete();
-                if (deleted) {
-                    System.out.println("기존 파일 삭제 성공: " + existingFilePath);
-                } else {
-                    System.out.println("기존 파일 삭제 실패: " + existingFilePath);
+            if (existingFileId != null && !existingFileId.isEmpty()) {
+                try {
+                    googleDriveService.deleteFile(existingFileId); // Google Drive에서 파일 삭제
+                    System.out.println("구글 드라이브 파일에 있던 기존 파일 제거했습니다: " + existingFileId);
+                } catch (Exception e) {
+                    System.out.println("파일 삭제 실패: " + e.getMessage());
+                    e.printStackTrace();
                 }
+            } else {
+                System.out.println("파일 제거 실패: 파일 ID가 없습니다.");
             }
+
+            // 새 프로필 이미지가 존재하면 Google Drive에 저장
+            if (profileImage != null && !profileImage.isEmpty()) {
+                // 파일을 Google Drive에 업로드하고 파일 ID 반환
+                String fileId = googleDriveService.uploadFile(profileImage, PROFILE_IMAGE_FOLDER_ID, userId + "_profile_image");
+
+                // 업로드한 파일의 URL을 DB에 저장
+                String fileUrl = googleDriveService.getFileUrl(fileId);
+
+                // DB에 새 경로 업데이트 (파일 URL 저장)
+                MypageProfileImageDTO profileImageDTO = new MypageProfileImageDTO();
+                profileImageDTO.setUserId(userId);
+                profileImageDTO.setFile(fileUrl);
+
+                // DB 업데이트
+                int updatedRows = mypageMapper.updateUserProfileImage(profileImageDTO);
+                return updatedRows > 0;
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-
-        // 새 프로필 이미지가 존재하면 저장
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String newFilePath = saveFileProfile(profileImage, userId);  // saveFile 대신 saveFileProfile 사용
-
-            // DB에 새 경로를 업데이트 (경로만 저장)
-            MypageProfileImageDTO profileImageDTO = new MypageProfileImageDTO();
-            profileImageDTO.setUserId(userId);
-            profileImageDTO.setFile(newFilePath);
-
-            // DB 업데이트
-            int updatedRows = mypageMapper.updateUserProfileImage(profileImageDTO);
-            return updatedRows > 0;
-        }
-
-        return false;
-    } catch (IOException e) {
-        e.printStackTrace();
-        return false;
     }
-}
+
+    private String getExistingFileId(String userId) {
+        String fileUrl = mypageMapper.findProfileImagePathByUserId(userId);
+        if (fileUrl != null && !fileUrl.isEmpty()) {
+            // Google Drive URL에서 파일 ID 추출 (예: https://drive.google.com/uc?id=FILE_ID)
+            return fileUrl.substring(fileUrl.indexOf("id=") + 3);
+        }
+        return null;
+    }
 
     // 프로필은 메소드로 경로 가져옴
     private String getExistingFilePath(String userId) {
@@ -436,66 +453,30 @@ public boolean updateProfileImage(String userId, MultipartFile profileImage) {
         return existingFilePath;
     }
 
-    private String saveFileProfile(MultipartFile file, String userId) throws IOException {
-        // 파일 이름 가져오기 (프로필 이미지 이름을 userId를 포함한 형태로 저장)
-        String fileName = userId + "_profile_image.jpg";  // 프로필 이미지 파일명은 고정
-        if (fileName == null || fileName.isEmpty()) {
-            throw new IOException("파일 이름이 잘못되었습니다.");
-        }
-        System.out.println("업로드된 파일 이름: " + fileName);
-
-        // 저장할 경로 설정
-        String networkPath = PROFILE_IMAGE_DIR + File.separator;
-        System.out.println("파일 저장 경로: " + networkPath);
-
-        // 디렉토리 생성
-        File directory = new File(networkPath);
-        if (!directory.exists()) {
-            boolean dirCreated = directory.mkdirs();
-            if (dirCreated) {
-                System.out.println("디렉토리 생성 성공: " + networkPath);
-            } else {
-                throw new IOException("디렉토리 생성 실패: " + networkPath);
-            }
-        }
-
-        // 파일 저장 경로 설정
-        File targetFile = new File(directory, fileName);
-        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
-
+    public String saveFileProfile(MultipartFile file, String userId) throws IOException {
         try {
-            file.transferTo(targetFile);  // 파일 저장
-            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
-            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
+            // 파일 이름 생성 (userId를 포함한 프로필 이미지 이름)
+            String fileName = userId + "_profile_image.jpg";  // 프로필 이미지 파일명 고정
+            if (fileName == null || fileName.isEmpty()) {
+                throw new IOException("파일 이름이 잘못되었습니다.");
+            }
+            System.out.println("업로드된 파일 이름: " + fileName);
+
+            // Google Drive에 파일 업로드하기
+            // 폴더 ID를 전달해야 함
+            String fileId = googleDriveService.uploadFile(file, PROFILE_IMAGE_FOLDER_ID, userId + "_profile_image");
+
+            // 업로드된 파일의 Google Drive URL 반환
+            String fileUrl = googleDriveService.getFileUrl(fileId);
+            System.out.println("파일 업로드 완료: " + fileUrl);
+            return fileUrl;  // Google Drive URL 반환
         } catch (IOException e) {
             e.printStackTrace();
             throw new IOException("파일 저장 오류", e);
         }
     }
 
-/*    @Transactional // 여러 데이터베이스 연산을 하나의 트랜잭션으로 처리
-    public boolean deleteUser(String userId) {
-        try {
-            String profileImagePath = getExistingFilePath(userId);
-            if (profileImagePath != null) {
-                boolean isFileDeleted = deleteFile(profileImagePath);
-                if (!isFileDeleted) {
-                    return false;
-                }
-            }
 
-            int result = mypageMapper.deleteUserById(userId);
-            if (result == 0) {
-                return false;
-            }
-
-            return true;
-        } catch (Exception e) {
-            // 예외 처리
-            e.printStackTrace();
-            return false;
-        }
-    }*/
 
     @Transactional
     public boolean deleteUser(String userId) {

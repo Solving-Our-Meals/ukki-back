@@ -52,7 +52,7 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
             try {
                 Integer lastNo = inquiryService.lastInquiryNo();
                 String fileName = "inquiry" + (lastNo == null ? 1 : lastNo + 1);
-                
+
                 // Google Drive에 파일 업로드 (파일명 지정)
                 String fileId = googleDriveService.uploadFile(file, INQUIRY_FOLDER_ID, fileName);
                 String fileUrl = googleDriveService.getFileUrl(fileId);
@@ -71,7 +71,7 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
         Map<String, Object> responseMap = new HashMap<>();
         int result = inquiryService.addInquiry(inquiryDTO);
-        
+
         if (result > 0) {
             responseMap.put("message", "문의가 성공적으로 전달되었습니다.");
             return ResponseEntity.ok()

@@ -9,7 +9,7 @@ build
 *.log
 .DS_Store
 README.md
-.env*
+src/main/.env
 .idea
 .vscode
 *.iml

@@ -5,6 +5,7 @@ import com.ohgiraffers.ukki.user.model.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,16 +42,22 @@ public class EmailController {
 
         // 이메일
         if (isDuplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response); // 409 Conflict
         }
 
         // 노쇼
         if (isNoshowLimitExceeded) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response); // 403 Forbidden
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response); // 403 Forbidden
         }
 
         // 정상
-        return ResponseEntity.ok(response); // 200 OK
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response); // 200 OK
     }
 
     @PostMapping("/sendemail")
@@ -58,7 +65,9 @@ public class EmailController {
         String email = request.get("email");
 
         if (!isValidEmail(email)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "ⓘ 유효하지 않은 이메일입니다."));
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "ⓘ 유효하지 않은 이메일입니다."));
         }
 
         // 이메일과 인증 번호를 서비스로 보내서 처리
@@ -66,7 +75,13 @@ public class EmailController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", emailSent);
-        return emailSent ? ResponseEntity.ok(response) : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return emailSent ?
+                ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(response) :
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(response);
     }
 
     @PostMapping("/verifycode")
@@ -80,9 +95,13 @@ public class EmailController {
         response.put("isValid", isValidCode);
 
         if (isValidCode) {
-            return ResponseEntity.ok(response);  // 인증 성공
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);  // 인증 성공
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);  // 인증 실패
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);  // 인증 실패
         }
     }
 }

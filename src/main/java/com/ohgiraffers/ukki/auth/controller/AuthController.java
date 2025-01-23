@@ -34,11 +34,15 @@ public class AuthController {
             int isUserIdValid = authService.isUserIdValid(authDTO.getUserId());
             if (isUserIdValid == 0) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Map.of("isValid", false, "message", "ⓘ 아이디가 존재하지 않습니다."));
             }
-            return ResponseEntity.ok(Map.of("isValid", true, "message", "ⓘ 아이디 확인 완료"));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("isValid", true, "message", "ⓘ 아이디 확인 완료"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("isValid", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
@@ -52,6 +56,7 @@ public class AuthController {
 
             if (!isPasswordValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Map.of("message", "ⓘ 비밀번호가 잘못되었습니다."));
             }
 
@@ -82,10 +87,13 @@ public class AuthController {
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
         } catch (Exception e) {
             e.printStackTrace(); // 에러가 뭔지 전혀 모르겠으면 사용 -> 사용해보고 에러 보니까 HS512가 512bit수준의 SECRET_KEY를 원하는데 내가 너무 짧게 설정해서 오류가난거임 -> yml에서 해결완료
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
@@ -129,9 +137,12 @@ public class AuthController {
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
-            return ResponseEntity.ok(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("success", true, "message", "ⓘ 접근 토큰 갱신 성공 !", "token", newToken));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 유효하지 않은 리프레시 토큰 !"));
         }
     }
@@ -185,7 +196,9 @@ public class AuthController {
         String token = jwtFilter.getTokenFromCookies(request);
 
         if (token == null || !authService.validateToken(token)) {
-            return ResponseEntity.status(401).body("Unauthorized");  // 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "ⓘ 유효하지 않은 토큰입니다."));
         }
 
         // 토큰이 유효하면 사용자 정보를 추출하는 과정입니다.(Sub으로 지정한 ID가 추출)
@@ -193,10 +206,14 @@ public class AuthController {
         String userId = (String) userInfo.get("userId");
 
         if (userId != null) {
-            return ResponseEntity.ok("Authenticated");  // 200 인증완료 (권한있음)
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Authenticated");  // 200 인증완료 (권한있음)
         }
 
-        return ResponseEntity.status(401).body("Unauthorized"); // 401 인증실패 (권한없음)
+        return ResponseEntity.status(401)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("Unauthorized"); // 401 인증실패 (권한없음)
     }
 
     @GetMapping("/me")
@@ -208,7 +225,8 @@ public class AuthController {
             // 2. 토큰이 없거나 유효하지 않으면 인증 실패
             if (token == null || !authService.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "ⓘ 인증되지 않은 사용자입니다."));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("status", "error", "message", "ⓘ 인증되지 않은 사용자입니다.", "code", HttpStatus.UNAUTHORIZED.value()));
             }
 
             // 3. 토큰에서 사용자 정보 추출
@@ -221,16 +239,20 @@ public class AuthController {
                 AuthDTO authDTO = authService.findUserById(userId);
 
                 // 사용자 정보를 AuthDTO로 반환
-                return ResponseEntity.ok(authDTO);
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(authDTO);
             }
 
             // 5. 사용자 정보가 없으면 인증 실패
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("message", "ⓘ 사용자 정보를 찾을 수 없습니다."));
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("message", "ⓘ 사용자 정보를 가져오는 데 실패했습니다."));
         }
     }
