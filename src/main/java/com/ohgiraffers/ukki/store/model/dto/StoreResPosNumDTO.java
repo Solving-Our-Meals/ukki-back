@@ -17,6 +17,8 @@ public class StoreResPosNumDTO {
 
     public StoreResPosNumDTO (){};
 
+
+
     public StoreResPosNumDTO(Long rInfo, long storeNo, LocalDate reservationDate, String rDay, LocalTime reservationTime, int resPosNumber, List<DayResPosNumDTO> listDayResPosNumDTO) {
         this.rInfo = rInfo;
         this.storeNo = storeNo;

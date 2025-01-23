@@ -61,14 +61,22 @@
     </resultMap>
 
 
-    <select id="selectReservationStatusByStore" parameterType="int" resultMap="reservationResultMap">
+    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         SELECT
-        RES_POS_NUMBER
+        RES_POS_NUMBER,
+        STORE_NO,
+        R_DATE,
+        R_OPER_TIME
         FROM TBL_RES_POS_NUMBER
         WHERE STORE_NO = #{storeNo}
         AND R_DATE = #{reservationDate}
         AND R_OPER_TIME = #{reservationTime}
+        ORDER BY R_DATE DESC, R_OPER_TIME DESC
+        LIMIT 1
     </select>
+
+
+
     <!-- 가게 정보 조회 -->
     <select id="getStoreInfo" parameterType="long" resultMap="storeInfoResultMap">
         SELECT

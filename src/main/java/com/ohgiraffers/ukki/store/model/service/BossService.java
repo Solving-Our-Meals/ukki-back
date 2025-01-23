@@ -23,9 +23,10 @@ public class BossService {
     }
 
     // 가게 예약 현황 조회
-    public List<ReservationDTO> getReservationStatus(long storeNo, LocalDate reservationDate,LocalTime reservationTime) {
-        return bossMapper.selectReservationStatusByStore(storeNo,reservationDate,reservationTime);
+    public List<StoreResPosNumDTO> getReservationStatus(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
+        return bossMapper.selectReservationStatusByStore(storeNo, reservationDate, reservationTime);
     }
+
 
     // 예약 인원 리스트 조회
     public List<ReservationDTO> getReservationPeopleList(long storeNo) {
