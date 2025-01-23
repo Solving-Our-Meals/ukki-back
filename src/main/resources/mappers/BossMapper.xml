@@ -63,10 +63,10 @@
 
     <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         SELECT
-        RES_POS_NUMBER,
-        STORE_NO,
-        R_DATE,
-        R_OPER_TIME
+        RES_POS_NUMBER AS resPosNumber,
+        STORE_NO AS storeNo,
+        R_DATE AS reservationDate,
+        R_OPER_TIME AS reservationTime
         FROM TBL_RES_POS_NUMBER
         WHERE STORE_NO = #{storeNo}
         AND R_DATE = #{reservationDate}

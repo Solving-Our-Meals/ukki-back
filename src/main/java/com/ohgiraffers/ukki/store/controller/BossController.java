@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
+import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
 import jakarta.servlet.http.HttpSession;
@@ -42,7 +43,7 @@ public class BossController {
     @Autowired
     private BossService bossService;
     @Autowired
-    private ReservationService reservationService;
+    private BossMapper bossMapper;
 
     private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
 
@@ -88,10 +89,13 @@ public class BossController {
             return ResponseEntity.ok(Collections.singletonList(defaultResponse));
         }
 
-        // 세션에 값이 없으면 DB에서 값을 가져오기
-// 서버 로그 확인
         List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
         System.out.println("reservations: " + reservations);  // 로그 추가
+
+        // 예시로 mapper 호출 후 출력
+        List<StoreResPosNumDTO> reservation = bossMapper.selectReservationStatusByStore(storeNo, reservationDate, reservationTime);
+        System.out.println("Test reservations: " + reservation);  // 해당 쿼리의 반환 결과 출력
+
 
         if (reservations == null || reservations.isEmpty()) {
             // 예약이 없다면 기본값 5를 반환
