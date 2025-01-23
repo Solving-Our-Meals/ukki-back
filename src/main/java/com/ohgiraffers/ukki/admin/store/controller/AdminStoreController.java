@@ -19,6 +19,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/stores")
 public class AdminStoreController {
@@ -42,13 +44,14 @@ public class AdminStoreController {
             List<MonthlyRegistStoreDTO> monthlyRegistStore = adminStoreService.monthlyRegistStore();
 
             System.out.println(monthlyRegistStore);
-            return ResponseEntity.ok(monthlyRegistStore);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(monthlyRegistStore);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("월별 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("월별 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -62,13 +65,14 @@ public class AdminStoreController {
 
             response.put("totalStore", total);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("총 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("총 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -77,13 +81,14 @@ public class AdminStoreController {
         try {
             List<AdminStoreListDTO> storeList = adminStoreService.searchStores(category, word);
 
-            return ResponseEntity.ok(storeList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeList);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -105,13 +110,14 @@ public class AdminStoreController {
             List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
             storeInfo.setStoreCategory(categoryDTO);
 
-            return ResponseEntity.ok(storeInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeInfo);
         } catch (Exception e) {
-            // 에러 메시지 로그 출력
             e.printStackTrace();
-            // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -148,13 +154,16 @@ public class AdminStoreController {
             System.out.println(message);
             response.put("message", message);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             message = "가게 정보를 삭제하는 도중 에러가 발생했습니다.";
             response.put("message", message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(response);
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         }
     }
 
@@ -307,13 +316,16 @@ public class AdminStoreController {
                 adminStoreService.editStore(storeData);
             }
 
-            return ResponseEntity.ok().body("가게 정보가 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보가 성공적으로 수정되었습니다.");
 
         } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -328,7 +340,9 @@ public class AdminStoreController {
         
         Map<String, String> response = new HashMap<>();
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
     }
 
     @GetMapping("regist/store")
@@ -346,7 +360,9 @@ public class AdminStoreController {
         response.put("userDTO", userDTO);
 
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(response);
     }
 
     @PostMapping("cancel/user")
@@ -357,7 +373,9 @@ public class AdminStoreController {
         session.removeAttribute("email");
         Map<String, Object> response = new HashMap<>();
         response.put("userDTO", new AdminStoreUserDTO());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(response);
     }
 
     @PostMapping("regist/store")
@@ -487,10 +505,15 @@ public class AdminStoreController {
             adminStoreService.insertStore(storeData);
 
 
-            return ResponseEntity.ok().body("가게 정보가 성공적으로 등록되었습니다.");
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보가 성공적으로 등록되었습니다.");
 
         } catch (Exception e) {
-            throw new RuntimeException("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage(), e);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
 
     }
@@ -516,7 +539,7 @@ public class AdminStoreController {
             return 2;
         } catch (IOException e) {
             e.printStackTrace();
-            return 1;
+            return 1;   
         }
     }
 }

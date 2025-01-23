@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
 
@@ -58,6 +60,7 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
                 inquiryDTO.setFile(fileUrl);
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body("파일 업로드 중 오류가 발생했습니다: " + e.getMessage());
             }
         };
@@ -71,10 +74,14 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
         if (result > 0) {
             responseMap.put("message", "문의가 성공적으로 전달되었습니다.");
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         } else {
             responseMap.put("message", "문의에 실패했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         }
     }
 
@@ -107,11 +114,15 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
         if(result>0){
             message="문의가 성공적으로 전달되었습니다.";
             responseMap.put("message", message);
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         }else {
             message="문의에 실패했습니다.";
             responseMap.put("message", message);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         }
     }
 
@@ -119,7 +130,9 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     public ResponseEntity<?> findUserInquiryCategory(){
         List<InquiryCategoryDTO> category = inquiryService.findCategory();
 
-        return ResponseEntity.ok(category);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(category);
     }
 
     @GetMapping(value = "/list")
@@ -139,14 +152,18 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
             necessaryInquiryList.add(temp);
         }
 
-        return ResponseEntity.ok(necessaryInquiryList);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(necessaryInquiryList);
     }
 
     @GetMapping(value = "/list/{inquiryNo}")
     public ResponseEntity<?> inquiryInfo(@PathVariable int inquiryNo){
         InquiryDTO inquiryDTO = inquiryService.inquiryInfo(inquiryNo);
 
-        return ResponseEntity.ok(inquiryDTO);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(inquiryDTO);
     }
 
     @PutMapping(value = "/list/{inquiryNo}")
@@ -180,7 +197,9 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("message", message);
 
-        return ResponseEntity.ok(responseMap);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
     }
 
     @DeleteMapping(value = "/list/{inquiryNo}")
@@ -196,7 +215,9 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("message", message);
 
-        return ResponseEntity.ok(responseMap);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
     }
 
     public String fileController(MultipartFile file, String fileName){

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/reviews")
 public class AdminReviewController {
@@ -39,12 +41,15 @@ public class AdminReviewController {
 
             response.put("totalReview", total);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
                     .body("총 제휴가게 수 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
@@ -55,13 +60,16 @@ public class AdminReviewController {
             List<ReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
             System.out.println(reviewList);
 
-            return ResponseEntity.ok(reviewList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(reviewList);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰리스트를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰리스트를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -71,13 +79,16 @@ public class AdminReviewController {
             ReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
             System.out.println(reviewInfo);
 
-            return ResponseEntity.ok(reviewInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(reviewInfo);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -102,13 +113,16 @@ public class AdminReviewController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "삭제 성공");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 }
