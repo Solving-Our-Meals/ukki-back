@@ -3,7 +3,7 @@ package com.ohgiraffers.ukki.store.model.dto;
 public class WeeklyReservationCountDTO {
     private int weeklyReservationCount;
 
-    public WeeklyReservationCountDTO(int weeklyReservationCount) {
+    public WeeklyReservationCountDTO() {
         this.weeklyReservationCount = weeklyReservationCount;
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -48,25 +48,72 @@ public class BossController {
 
     // 가게 정보 조회
     @GetMapping("/getStoreInfo")
-    public ResponseEntity<StoreInfoDTO> getStoreInfo(@ModelAttribute StoreInfoDTO storeInfoDTO, @RequestParam("userNo") long userNo){
-        storeInfoDTO = bossService.getStoreInfo(userNo);
+    public ResponseEntity<StoreInfoDTO> getStoreInfo(@RequestParam("userNo") long userNo) {
+        // 사용자 번호로 가게 정보 가져오기
+        StoreInfoDTO storeInfoDTO = bossService.getStoreInfo(userNo);
+
+        // 가게 정보가 없으면 404 반환 (없을 경우에 대한 처리)
+        if (storeInfoDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 가게 정보가 있으면 200 OK와 함께 반환
         return ResponseEntity.ok(storeInfoDTO);
     }
 
+
     // 예약 현황 조회
+
+
     @GetMapping("/reservation-status")
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
             @RequestParam Long storeNo,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate reservationDate,
-            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime) {
-        try {
-            List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
-            if (reservations.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(reservations);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime,
+            HttpSession session) {
+
+        // 파라미터 로그 찍기
+        System.out.println("storeNo: " + storeNo);
+        System.out.println("reservationDate: " + reservationDate);
+        System.out.println("reservationTime: " + reservationTime);
+
+        // 세션에서 예약 가능한 인원 수 가져오기
+        String sessionKey = storeNo + "_" + reservationDate + "_" + reservationTime;
+        Integer cachedResPosNumber = (Integer) session.getAttribute(sessionKey);
+
+        if (cachedResPosNumber != null) {
+            // 세션에 저장된 값이 있으면 그것을 반환
+            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
+            defaultResponse.setResPosNumber(cachedResPosNumber);
+            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+        }
+
+        // 세션에 값이 없으면 DB에서 값을 가져오기
+// 서버 로그 확인
+        List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
+        System.out.println("reservations: " + reservations);  // 로그 추가
+
+        if (reservations == null || reservations.isEmpty()) {
+            // 예약이 없다면 기본값 5를 반환
+            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
+            defaultResponse.setResPosNumber(5);  // 기본값 5
+            session.setAttribute(sessionKey, 5);  // 세션에 기본값 5를 저장
+            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+        }
+
+        // 가장 최신 예약 데이터를 반환
+        StoreResPosNumDTO latestReservation = reservations.get(0);  // 내림차순 정렬로 최신값이 첫 번째
+
+        if (latestReservation != null) {
+            // 세션에 최신 값을 저장
+            session.setAttribute(sessionKey, latestReservation.getResPosNumber());
+            return ResponseEntity.ok(Collections.singletonList(latestReservation));
+        } else {
+            // 만약 latestReservation이 null이라면 기본값 5를 반환
+            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
+            defaultResponse.setResPosNumber(5);  // 기본값 5
+            session.setAttribute(sessionKey, 5);  // 세션에 기본값 5를 저장
+            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
         }
     }
 
@@ -81,22 +128,27 @@ public class BossController {
     public ResponseEntity<List<ReservationDTO>> getReservationPeopleList(@RequestParam long storeNo) {
         try {
             List<ReservationDTO> reservations = bossService.getReservationPeopleList(storeNo);
-            return ResponseEntity.ok(reservations);
+
+            // 바디를 밖으로 빼서 반환
+            return ResponseEntity.ok(reservations); // 이 부분을 분리
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // 이번 주 예약 수 조회
+
+
     @GetMapping("/weekly-reservation-count")
     public ResponseEntity<WeeklyReservationCountDTO> getWeeklyReservationCount(@RequestParam long storeNo) {
         try {
             WeeklyReservationCountDTO count = bossService.getWeeklyReservationCount(storeNo);
             return ResponseEntity.ok(count);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            WeeklyReservationCountDTO emptyCount = new WeeklyReservationCountDTO();  // 빈 DTO를 별도로 분리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyCount);
         }
     }
+
 
     // 오늘 예약 수 조회
     @GetMapping("/today-reservation-count")
@@ -105,20 +157,10 @@ public class BossController {
             int count = bossService.getTodayReservationCount(storeNo);
             return ResponseEntity.ok(count);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0);  // 기본 값 0을 별도로 분리
         }
     }
 
-    // 다음 예약 가능한 시간 조회
-    @GetMapping("/next-available-time")
-    public ResponseEntity<String> getNextAvailableTime(@RequestParam long storeNo, @RequestParam String resDate, @RequestParam String currentTime) {
-        try {
-            String nextTime = bossService.getNextAvailableTime(storeNo, resDate, currentTime);
-            return ResponseEntity.ok(nextTime);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
     // 예약 가능 인원 조회
     @PostMapping("/getResPosNum")
@@ -127,11 +169,12 @@ public class BossController {
             List<DayResPosNumDTO> result = bossService.getResPosNum(storeResPosNumDTO);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
         }
     }
 
 
+    // 예약 가능 인원 삽입
     @PostMapping("/insertAvailableSlots")
     public ResponseEntity<String> insertAvailableSlots(@RequestBody StoreResPosNumDTO storeResPosNumDTO) {
         Long storeNo = storeResPosNumDTO.getStoreNo();
@@ -144,8 +187,8 @@ public class BossController {
 
         // storeNo가 없는 경우 처리
         if (storeNo == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Missing required parameter: storeNo");
+            String errorMessage = "Missing required parameter: storeNo";  // 오류 메시지를 변수로 분리
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
 
         try {
@@ -153,12 +196,10 @@ public class BossController {
             bossService.insertAvailableSlots(storeNo, reservationDate, reservationTime, resPosNumber);
             return ResponseEntity.ok("Available slots inserted successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to insert available slots: " + e.getMessage());
+            String errorMessage = "Failed to insert available slots: " + e.getMessage();  // 오류 메시지를 변수로 분리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
-
-
 
 
     // 예약 가능 인원 업데이트
@@ -174,26 +215,23 @@ public class BossController {
         System.out.println("Reservation Time: " + reservationTime);
         System.out.println("Reservation Number: " + resPosNumber);
 
-        // Validate reservation number
+        // 예약 가능한 인원 수가 음수일 경우 처리
         if (resPosNumber < 0) {
-            return ResponseEntity.badRequest().body("Slot number cannot be negative");
+            return ResponseEntity.badRequest().body("Slot number cannot be negative");  // 오류 메시지를 변수로 분리
         }
 
         try {
-            // Call service to update available slots
+            // 서비스 호출
             bossService.updateAvailableSlots(storeNo, reservationDate, reservationTime, resPosNumber);
             return ResponseEntity.ok("Available slots updated successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update available slots: " + e.getMessage());
+            String errorMessage = "Failed to update available slots: " + e.getMessage();  // 오류 메시지를 변수로 분리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
-
     }
 
 
-
-
-        // 예약 리스트 조회
+    // 예약 리스트 조회
     @GetMapping("/reservations-list")
     public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
             @RequestParam long storeNo,
@@ -204,24 +242,26 @@ public class BossController {
             List<ReservationDTO> reservations = bossService.getReservationListForTime(storeNo, reservationDate, reservationTime);
             return ResponseEntity.ok(reservations);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
         }
     }
 
 
+    // 예약 가능한 슬롯 수 조회
     @GetMapping("/getAvailableSlots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@RequestParam long storeNo) {
         try {
             int availableSlots = bossService.getAvailableSlots(storeNo);
             Map<String, Object> response = new HashMap<>();
-            response.put("availableSlots", availableSlots);
+            response.put("availableSlots", availableSlots);  // 바디를 별도의 변수로 분리
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to fetch available slots"));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to fetch available slots");  // 오류 메시지를 변수로 분리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
 
     // 최신 리뷰 받아오기
     @GetMapping("/recentReview")
