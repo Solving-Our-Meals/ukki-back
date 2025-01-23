@@ -65,6 +65,7 @@ public class BossController {
 
 
     // 예약 현황 조회
+
     @GetMapping("/reservation-status")
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
             @RequestParam Long storeNo,
@@ -119,6 +120,7 @@ public class BossController {
             return ResponseEntity.ok(Collections.singletonList(defaultResponse));
         }
     }
+
 
 
 
