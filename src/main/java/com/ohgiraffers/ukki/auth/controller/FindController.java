@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.auth.controller;
 import com.ohgiraffers.ukki.auth.model.dto.FindDTO;
 import com.ohgiraffers.ukki.auth.model.dto.FindResponseDTO;
 import com.ohgiraffers.ukki.auth.model.service.FindService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,13 @@ public class FindController {
 
         if (userId != null) {
             FindResponseDTO responseDTO = new FindResponseDTO(userId, true);
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(responseDTO);
         } else {
-            return ResponseEntity.status(404).body(new FindResponseDTO(null, false));
+            return ResponseEntity.status(404)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new FindResponseDTO(null, false));
         }
     }
 
@@ -42,9 +47,13 @@ public class FindController {
         boolean passwordChanged = findService.changePassword(findDTO.getEmail(), findDTO.getNewPassword());
         if (passwordChanged) {
             FindResponseDTO responseDTO = new FindResponseDTO(true, "비밀번호 변경 완료 !");
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(responseDTO);
         } else {
-            return ResponseEntity.status(400).body(false);
+            return ResponseEntity.status(400)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(false);
         }
     }
 
