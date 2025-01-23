@@ -22,10 +22,7 @@ import java.io.File;
 import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/user/mypage")
@@ -86,10 +83,14 @@ public class MypageController {
         }
 
         if (reservations.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ArrayList<>());
         }
 
-        return ResponseEntity.ok(reservations);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reservations);
     }
 
 
@@ -99,6 +100,7 @@ public class MypageController {
 
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(null);
         }
 
@@ -106,6 +108,7 @@ public class MypageController {
 
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(null);
         }
 
@@ -113,10 +116,13 @@ public class MypageController {
 
         if (reservationDetail == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(null);
         }
 
-        return ResponseEntity.ok(reservationDetail);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reservationDetail);
     }
 
 
@@ -145,10 +151,14 @@ public class MypageController {
         }
 
         if (reviews.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ArrayList<>());
         }
         System.out.println(reviews);
-        return ResponseEntity.ok(reviews);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reviews);
     }
 
 
@@ -169,10 +179,13 @@ public class MypageController {
         MypageReviewDTO reviewDetail = mypageService.getUserReviewDetailFromToken(jwtToken, userId, reviewNo);
 
         if (reviewDetail == null) {
+            // 2025-01-23
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(reviewDetail);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reviewDetail);
     }
 
 
@@ -184,9 +197,13 @@ public class MypageController {
         boolean deleted = mypageService.deleteReview(reviewNo);
 
         if (deleted) {
-            return ResponseEntity.ok("리뷰가 삭제되었습니다.");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("리뷰가 삭제되었습니다.");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리뷰 삭제에 실패했습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("리뷰 삭제에 실패했습니다.");
         }
     }
 
@@ -217,7 +234,9 @@ public class MypageController {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(inquiry);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(inquiry);
     }
 
 
@@ -244,23 +263,30 @@ public class MypageController {
 
         if (inquiry == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
         if (inquiry.getInquiryState() == InquiryState.CHECK) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "이미 문의는 '읽음' 상태입니다."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Collections.singletonMap("message", "이미 문의는 '읽음' 상태입니다."));
         }
 
         if (inquiry.getAnswerDate() != null && inquiry.getInquiryState() != InquiryState.CHECK) {
             boolean updated = mypageService.updateInquiryStatus(inquiryNo, InquiryState.CHECK);
             if (updated) {
-                return ResponseEntity.ok(Collections.singletonMap("message", "문의 상태가 '읽음'으로 업데이트되었습니다."));
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Collections.singletonMap("message", "문의 상태가 '읽음'으로 업데이트되었습니다."));
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Collections.singletonMap("message", "상태 업데이트에 실패했습니다."));
             }
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "답변이 없습니다."));
         }
     }
@@ -278,12 +304,14 @@ public class MypageController {
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "토큰이 일치하지 않음"));
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
@@ -298,6 +326,7 @@ public class MypageController {
 
         if (inquiryToUpdate == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
@@ -309,16 +338,20 @@ public class MypageController {
                 boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
                 if (!updated) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
                             .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
             }
         }
 
-        return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Collections.singletonMap("message", "문의가 성공적으로 수정되었습니다."));
     }
 
     @DeleteMapping("/inquiry/{inquiryNo}")
@@ -345,15 +378,19 @@ public class MypageController {
 
         if (inquiryToDelete == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
         boolean deleted = mypageService.deleteInquiry(inquiryNo);
 
         if (deleted) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "문의가 성공적으로 삭제되었습니다."));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Collections.singletonMap("message", "문의가 성공적으로 삭제되었습니다."));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "문의 삭제에 실패했습니다."));
         }
     }
@@ -368,15 +405,17 @@ public class MypageController {
 
             // 파일이 존재하는지 확인
             if (!resource.exists()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .build(); // 파일이 존재하지 않으면 404 상태 반환
             }
 
             // 다운로드 응답 설정
             return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                    .body(resource);
+                    .body(resource);  // 파일을 응답 본문에 담아서 반환
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 서버 오류 처리
         }
     }
 
@@ -389,14 +428,18 @@ public class MypageController {
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null || jwtService.getUserInfoFromTokenId(jwtToken) == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
         if (mypageService.verifyPassword(userId, password)) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 확인되었습니다."));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Collections.singletonMap("message", "비밀번호가 확인되었습니다."));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "비밀번호가 일치하지 않습니다."));
         }
     }
@@ -424,7 +467,9 @@ public class MypageController {
                     .body(null);
         }
 
-        return ResponseEntity.ok(userInfo);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userInfo);
     }
 
     @PutMapping("/update")
@@ -437,6 +482,7 @@ public class MypageController {
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null || jwtService.getUserInfoFromTokenId(jwtToken) == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "유효하지 않은 토큰입니다."));
         }
 
@@ -446,7 +492,9 @@ public class MypageController {
             boolean updated = mypageService.updateUserInfo(userId, userName, userPass, profileImage);
 
             if (updated) {
-                return ResponseEntity.ok(Collections.singletonMap("message", "정보가 성공적으로 업데이트되었습니다."));
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Collections.singletonMap("message", "정보가 성공적으로 업데이트되었습니다."));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Collections.singletonMap("message", "정보 업데이트에 실패했습니다."));
@@ -471,7 +519,9 @@ public class MypageController {
 
             boolean result = mypageService.updateProfileImage(userId, profileImage);
             if (result) {
-                return ResponseEntity.ok("프로필 이미지가 성공적으로 업데이트되었습니다.");
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("프로필 이미지가 성공적으로 업데이트되었습니다.");
             } else {
                 return ResponseEntity.status(500).body("프로필 이미지 업데이트에 실패했습니다.");
             }
@@ -499,7 +549,9 @@ public class MypageController {
             boolean deleted = mypageService.deleteUser(userId);
 
             if (deleted) {
-                return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("회원 탈퇴가 완료되었습니다.");
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("회원 탈퇴 처리 중 오류가 발생했습니다.");
@@ -518,7 +570,9 @@ public class MypageController {
         if (isCancelled) {
             Map<String, String> response = new HashMap<>();
             response.put("message", "예약이 취소되었습니다.");
-            return ResponseEntity.ok(response);  // 200 OK와 함께 JSON 응답 반환
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);  // 200 OK와 함께 JSON 응답 반환
         } else {
             Map<String, String> response = new HashMap<>();
             response.put("message", "예약 취소에 실패했습니다.");
