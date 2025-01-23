@@ -119,18 +119,17 @@
         WHERE r.STORE_NO = #{storeNo}
     </select>
 
-    <!-- 예약 가능 인원 조회 -->
-    <select id="selectAvailableReservationPeople" resultType="integer">
-        SELECT
-        (s.MAX_PEOPLE - SUM(r.RESERVATION_PEOPLE)) AS AVAILABLE_PEOPLE
-        FROM TBL_STORE s
-        LEFT JOIN TBL_RESERVATION r ON s.STORE_NO = r.STORE_NO AND r.RES_DATE = #{reservationDate}
-        WHERE s.STORE_NO = #{storeNo}
-        GROUP BY s.STORE_NO, s.MAX_PEOPLE
-    </select>
+<!--    &lt;!&ndash; 예약 가능 인원 조회 &ndash;&gt;-->
+<!--    <select id="selectAvailableReservationPeople" resultType="integer">-->
+<!--        SELECT-->
+<!--        (s.MAX_PEOPLE - SUM(r.RESERVATION_PEOPLE)) AS AVAILABLE_PEOPLE-->
+<!--        FROM TBL_STORE s-->
+<!--        LEFT JOIN TBL_RESERVATION r ON s.STORE_NO = r.STORE_NO AND r.RES_DATE = #{reservationDate}-->
+<!--        WHERE s.STORE_NO = #{storeNo}-->
+<!--        GROUP BY s.STORE_NO, s.MAX_PEOPLE-->
+<!--    </select>-->
 
 
-    <!-- 이번 주 예약 수 조회 -->
     <select id="selectWeeklyReservationCount" resultType="integer">
         SELECT
         COUNT(*) AS WEEKLY_RESERVATION_COUNT
@@ -152,22 +151,16 @@
 
 
     <!-- 예약 가능한 다음 시간 조회 -->
-    <select id="getNextAvailableTime" resultType="string">
-        SELECT RES_TIME
-        FROM TBL_RESERVATION
-        WHERE STORE_NO = #{storeNo}
-        AND RES_DATE = #{resDate}
-        AND RES_TIME > #{currentTime}
-        ORDER BY RES_TIME ASC
-        LIMIT 1
-    </select>
+<!--    <select id="getNextAvailableTime" resultType="string">-->
+<!--        SELECT RES_TIME-->
+<!--        FROM TBL_RESERVATION-->
+<!--        WHERE STORE_NO = #{storeNo}-->
+<!--        AND RES_DATE = #{resDate}-->
+<!--        AND RES_TIME > #{currentTime}-->
+<!--        ORDER BY RES_TIME ASC-->
+<!--        LIMIT 1-->
+<!--    </select>-->
 
-    <select id="getResPosNumByStoreAndDate" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
-        SELECT * FROM TBL_RES_POS_NUMBER
-        WHERE STORE_NO = #{storeNo}
-        AND R_DATE = #{reservationDate}
-        AND R_OPER_TIME = #{reservationTime}
-    </select>
 
 
 
@@ -191,7 +184,6 @@
     </insert>
 
 
-
     <update id="updateAvailableSlots" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         UPDATE TBL_RES_POS_NUMBER
         SET RES_POS_NUMBER = #{resPosNumber}
@@ -201,26 +193,34 @@
         AND R_OPER_TIME = #{reservationTime}
     </update>
 
-
-
-
-    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">
-        SELECT DISTINCT
-        A.OPER_TIME,
-        IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)
-        - IFNULL((
-        SELECT COUNT(1)
-        FROM TBL_RESERVATION A_2
-        WHERE A.STORE_NO = A_2.STORE_NO
-        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')
-        ), 0) AS RES_POS_NUMBER
-        FROM ${day} A
-        LEFT JOIN TBL_RES_POS_NUMBER B
-        ON A.STORE_NO = B.STORE_NO
-        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')
-        AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{reservationDate}
-        WHERE A.STORE_NO = #{storeNo};
+    <select id="getResPosNumByStoreAndDate" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
+        SELECT *
+        FROM TBL_RES_POS_NUMBER
+        WHERE STORE_NO = #{storeNo}
+        AND R_DATE = #{reservationDate}
+        AND R_OPER_TIME = #{reservationTime}
     </select>
+
+
+
+
+    <!--    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">-->
+<!--        SELECT DISTINCT-->
+<!--        A.OPER_TIME,-->
+<!--        IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)-->
+<!--        - IFNULL((-->
+<!--        SELECT COUNT(1)-->
+<!--        FROM TBL_RESERVATION A_2-->
+<!--        WHERE A.STORE_NO = A_2.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')-->
+<!--        ), 0) AS RES_POS_NUMBER-->
+<!--        FROM ${day} A-->
+<!--        LEFT JOIN TBL_RES_POS_NUMBER B-->
+<!--        ON A.STORE_NO = B.STORE_NO-->
+<!--        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')-->
+<!--        AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{reservationDate}-->
+<!--        WHERE A.STORE_NO = #{storeNo};-->
+<!--    </select>-->
 
 
 
@@ -275,11 +275,11 @@
         WHERE A.REVIEW_NO = #{reviewNo}
     </select>
 
-    <select id="findAvailableSlotsByStoreNo" resultType="int">
-        SELECT POS_NUMBER
-        FROM TBL_STORE
-        WHERE STORE_NO = #{storeNo}
-    </select>
+<!--    <select id="findAvailableSlotsByStoreNo" resultType="int">-->
+<!--        SELECT POS_NUMBER-->
+<!--        FROM TBL_STORE-->
+<!--        WHERE STORE_NO = #{storeNo}-->
+<!--    </select>-->
 
     <!-- 7일간의 예약 정보 조회 -->
     <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">

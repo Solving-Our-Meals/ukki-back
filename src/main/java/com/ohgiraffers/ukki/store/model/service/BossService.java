@@ -33,25 +33,25 @@ public class BossService {
         return bossMapper.selectReservationPeopleList(storeNo);
     }
 
-    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
-        return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
-    }
+//    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
+//        return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
+//    }
 
     // 예약 가능 인원 조회
-    public int getAvailableSlots(long storeNo) {
-        try {
-            return bossMapper.findAvailableSlotsByStoreNo(storeNo);
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching available slots for storeNo: " + storeNo, e);
-        }
-    }
+//    public int getAvailableSlots(long storeNo) {
+//        try {
+//            return bossMapper.findAvailableSlotsByStoreNo(storeNo);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Error fetching available slots for storeNo: " + storeNo, e);
+//        }
+//    }
 
 
 
     // 7일간의 예약 정보 조회
-    public List<ReservationInfoDTO> getReservationsForPeriod(long storeNo, LocalDate startDate, LocalDate endDate) {
-        return bossMapper.findReservationsForPeriod(storeNo, startDate, endDate);
-    }
+//    public List<ReservationInfoDTO> getReservationsForPeriod(long storeNo, LocalDate startDate, LocalDate endDate) {
+//        return bossMapper.findReservationsForPeriod(storeNo, startDate, endDate);
+//    }
 
     // 기타 로직은 동일
     public WeeklyReservationCountDTO getWeeklyReservationCount(long storeNo) {
@@ -62,13 +62,13 @@ public class BossService {
         return bossMapper.selectTodayReservationCount(storeNo);
     }
 
-    public String getNextAvailableTime(long storeNo, String resDate, String currentTime) {
-        return bossMapper.getNextAvailableTime(storeNo, resDate, currentTime);
-    }
+//    public String getNextAvailableTime(long storeNo, String resDate, String currentTime) {
+//        return bossMapper.getNextAvailableTime(storeNo, resDate, currentTime);
+//    }
 
-    public List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
-        return bossMapper.getResPosNum(storeResPosNumDTO);
-    }
+//    public List<DayResPosNumDTO> getResPosNum(StoreResPosNumDTO storeResPosNumDTO) {
+//        return bossMapper.getResPosNum(storeResPosNumDTO);
+//    }
 
     // 최신 리뷰 받아오기
     public ReviewContentDTO getRecentReview(long storeNo) {
@@ -125,14 +125,17 @@ public class BossService {
     @Transactional
     public void updateAvailableSlots(long storeNo, LocalDate reservationDate, LocalTime reservationTime, int resPosNumber) {
         try {
+            // DTO 생성
             StoreResPosNumDTO storeResPosNum = new StoreResPosNumDTO();
             storeResPosNum.setStoreNo(storeNo);
             storeResPosNum.setReservationDate(reservationDate);
-            storeResPosNum.setResPosNumber(resPosNumber);
             storeResPosNum.setReservationTime(reservationTime);
+            storeResPosNum.setResPosNumber(resPosNumber);
 
+            // 기존 예약 가능한 슬롯을 가져옵니다.
             StoreResPosNumDTO existingSlot = bossMapper.getResPosNumByStoreAndDate(storeNo, reservationDate, reservationTime);
 
+            // 슬롯이 존재하면 업데이트, 존재하지 않으면 추가
             if (existingSlot != null) {
                 bossMapper.updateAvailableSlots(storeResPosNum);
             } else {
@@ -143,6 +146,8 @@ public class BossService {
             throw new RuntimeException("Failed to update or insert available slots", e);
         }
     }
+
+
 
 
 
@@ -190,6 +195,8 @@ public class BossService {
         // rDay가 자동으로 계산되어 설정됩니다.
         bossMapper.insertAvailableSlots(storeResPosNumDTO);
     }
+
+
 
 }
 
