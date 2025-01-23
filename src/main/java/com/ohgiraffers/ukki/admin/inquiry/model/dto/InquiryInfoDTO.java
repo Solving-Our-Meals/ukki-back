@@ -8,12 +8,12 @@ public class InquiryInfoDTO {
     private int inquiryNo;
     private String inquiryTitle;
     private String inquiryContent;
-    private LocalDate inquiryDate;
+    private String inquiryDate;
     private int categoryNo;
     private int userNo;
     private String answerTitle;
     private String answerContent;
-    private LocalDate answerDate;
+    private String answerDate;
     private InquiryState state;
     private String file;
 
@@ -23,12 +23,12 @@ public class InquiryInfoDTO {
         this.inquiryNo = inquiryNo;
         this.inquiryTitle = inquiryTitle;
         this.inquiryContent = inquiryContent;
-        this.inquiryDate = inquiryDate;
+        this.inquiryDate = inquiryDate.toString();
         this.categoryNo = categoryNo;
         this.userNo = userNo;
         this.answerTitle = answerTitle;
         this.answerContent = answerContent;
-        this.answerDate = answerDate;
+        this.answerDate = answerDate != null ? answerDate.toString() : null;
         this.state = state;
         this.file = file;
     }
@@ -58,11 +58,11 @@ public class InquiryInfoDTO {
         this.inquiryContent = inquiryContent;
     }
 
-    public LocalDate getInquiryDate() {
+    public String getInquiryDate() {
         return inquiryDate;
     }
 
-    public void setInquiryDate(LocalDate inquiryDate) {
+    public void setInquiryDate(String inquiryDate) {
         this.inquiryDate = inquiryDate;
     }
 
@@ -98,11 +98,11 @@ public class InquiryInfoDTO {
         this.answerContent = answerContent;
     }
 
-    public LocalDate getAnswerDate() {
+    public String getAnswerDate() {
         return answerDate;
     }
 
-    public void setAnswerDate(LocalDate answerDate) {
+    public void setAnswerDate(String answerDate) {
         this.answerDate = answerDate;
     }
 
