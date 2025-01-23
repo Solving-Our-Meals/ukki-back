@@ -14,16 +14,16 @@ public class MypageInquiryDTO {
     private String text;
     private int categoryNo;
     private String category;
-    private Date inquiryDate;
+    private String inquiryDate;
     private String answerTitle;
     private String answerContent;
-    private Date answerDate;
+    private String answerDate;
     private String file;
     private String search;
 
     public MypageInquiryDTO() {}
 
-    public MypageInquiryDTO(int userNo, String userId, int inquiryNo, InquiryState inquiryState, String title, String text, int categoryNo, String category, Date inquiryDate, String answerTitle, String answerContent, Date answerDate, String file, String search) {
+    public MypageInquiryDTO(int userNo, String userId, int inquiryNo, InquiryState inquiryState, String title, String text, int categoryNo, String category, String inquiryDate, String answerTitle, String answerContent, String answerDate, String file, String search) {
         this.userNo = userNo;
         this.userId = userId;
         this.inquiryNo = inquiryNo;
@@ -104,11 +104,11 @@ public class MypageInquiryDTO {
         this.category = category;
     }
 
-    public Date getInquiryDate() {
+    public String getInquiryDate() {
         return inquiryDate;
     }
 
-    public void setInquiryDate(Date inquiryDate) {
+    public void setInquiryDate(String inquiryDate) {
         this.inquiryDate = inquiryDate;
     }
 
@@ -128,11 +128,11 @@ public class MypageInquiryDTO {
         this.answerContent = answerContent;
     }
 
-    public Date getAnswerDate() {
+    public String getAnswerDate() {
         return answerDate;
     }
 
-    public void setAnswerDate(Date answerDate) {
+    public void setAnswerDate(String answerDate) {
         this.answerDate = answerDate;
     }
 
@@ -163,10 +163,10 @@ public class MypageInquiryDTO {
                 ", text='" + text + '\'' +
                 ", categoryNo=" + categoryNo +
                 ", category='" + category + '\'' +
-                ", inquiryDate=" + inquiryDate +
+                ", inquiryDate='" + inquiryDate + '\'' +
                 ", answerTitle='" + answerTitle + '\'' +
                 ", answerContent='" + answerContent + '\'' +
-                ", answerDate=" + answerDate +
+                ", answerDate='" + answerDate + '\'' +
                 ", file='" + file + '\'' +
                 ", search='" + search + '\'' +
                 '}';

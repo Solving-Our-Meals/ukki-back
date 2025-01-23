@@ -162,10 +162,17 @@
     <!--  운영 시간 불러오기  -->
     <select id="getOperation" parameterType="long" resultMap="operationResultMap">
         SELECT
-               *
-          FROM TBL_OPERATION
-         WHERE STORE_NO = #{storeNo}
-        <!-- 검색 페이지 만들어지면 pathvariable로 변경하기-->
+        STORE_NO,
+        MONDAY,
+        TUESDAY,
+        WEDNESDAY,
+        THURSDAY,
+        FRIDAY,
+        SATURDAY,
+        SUNDAY,
+        BREAK_TIME
+        FROM TBL_OPERATION
+        WHERE STORE_NO = #{storeNo}
     </select>
 
     <!--  배너 불러오기  -->

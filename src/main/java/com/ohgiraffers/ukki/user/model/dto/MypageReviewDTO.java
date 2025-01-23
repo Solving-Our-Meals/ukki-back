@@ -10,7 +10,7 @@ public class MypageReviewDTO {
     private int storeNo;
     private String storeName;
     private int reviewNo;
-    private Date reviewDate;
+    private String reviewDate;
     private String reviewPicture;
     private String reviewText;
     private String star;
@@ -18,7 +18,7 @@ public class MypageReviewDTO {
 
     public MypageReviewDTO() {}
 
-    public MypageReviewDTO(String userProfile, String userId, String userName, int userNo, int storeNo, String storeName, int reviewNo, Date reviewDate, String reviewPicture, String reviewText, String star, String search) {
+    public MypageReviewDTO(String userProfile, String userId, String userName, int userNo, int storeNo, String storeName, int reviewNo, String reviewDate, String reviewPicture, String reviewText, String star, String search) {
         this.userProfile = userProfile;
         this.userId = userId;
         this.userName = userName;
@@ -89,11 +89,11 @@ public class MypageReviewDTO {
         this.reviewNo = reviewNo;
     }
 
-    public Date getReviewDate() {
+    public String getReviewDate() {
         return reviewDate;
     }
 
-    public void setReviewDate(Date reviewDate) {
+    public void setReviewDate(String reviewDate) {
         this.reviewDate = reviewDate;
     }
 
@@ -139,7 +139,7 @@ public class MypageReviewDTO {
                 ", storeNo=" + storeNo +
                 ", storeName='" + storeName + '\'' +
                 ", reviewNo=" + reviewNo +
-                ", reviewDate=" + reviewDate +
+                ", reviewDate='" + reviewDate + '\'' +
                 ", reviewPicture='" + reviewPicture + '\'' +
                 ", reviewText='" + reviewText + '\'' +
                 ", star='" + star + '\'' +
