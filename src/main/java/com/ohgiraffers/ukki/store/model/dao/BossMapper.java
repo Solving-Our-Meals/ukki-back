@@ -15,7 +15,7 @@ public interface BossMapper {
     // 가게 정보 조회
     StoreInfoDTO getStoreInfo(long userNo);
 
-    List<ReservationDTO> selectReservationStatusByStore(long storeNo, LocalDate reservationDate,LocalTime reservationTime);
+    List<StoreResPosNumDTO> selectReservationStatusByStore(long storeNo, LocalDate reservationDate,LocalTime reservationTime);
 
     List<ReservationDTO> selectReservationPeopleList(long storeNo);
 

@@ -7,6 +7,7 @@ import com.ohgiraffers.ukki.store.model.service.BossService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,12 +55,12 @@ public class BossController {
 
     // 예약 현황 조회
     @GetMapping("/reservation-status")
-    public ResponseEntity<List<ReservationDTO>> getReservationStatus(
-            @RequestParam long storeNo,
-            @RequestParam LocalDate reservationDate,
-            @RequestParam LocalTime reservationTime) {
+    public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
+            @RequestParam Long storeNo,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate reservationDate,
+            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime) {
         try {
-            List<ReservationDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
+            List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
             if (reservations.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
@@ -68,6 +69,9 @@ public class BossController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
+
 
 
 
