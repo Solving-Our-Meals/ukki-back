@@ -2,8 +2,10 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
+import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -42,7 +44,7 @@ public class BossController {
     @Autowired
     private BossService bossService;
     @Autowired
-    private ReservationService reservationService;
+    private BossMapper bossMapper;
 
     private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
 
@@ -67,24 +69,55 @@ public class BossController {
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
             @RequestParam Long storeNo,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate reservationDate,
-            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime) {
+            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime,
+            HttpSession session) {
 
+        // 파라미터 로그 찍기
         System.out.println("storeNo: " + storeNo);
         System.out.println("reservationDate: " + reservationDate);
         System.out.println("reservationTime: " + reservationTime);
 
-        List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
+        // 세션에서 예약 가능한 인원 수 가져오기
+        String sessionKey = storeNo + "_" + reservationDate + "_" + reservationTime;
+        Integer cachedResPosNumber = (Integer) session.getAttribute(sessionKey);
 
-        // 예약 정보가 없을 경우 기본값 5를 반환
-        if (reservations.isEmpty()) {
+        if (cachedResPosNumber != null) {
+            // 세션에 저장된 값이 있으면 그것을 반환
+            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
+            defaultResponse.setResPosNumber(cachedResPosNumber);
+            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+        }
+
+        List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
+        System.out.println("reservations: " + reservations);  // 로그 추가
+
+        // 예시로 mapper 호출 후 출력
+        List<StoreResPosNumDTO> reservation = bossMapper.selectReservationStatusByStore(storeNo, reservationDate, reservationTime);
+        System.out.println("Test reservations: " + reservation);  // 해당 쿼리의 반환 결과 출력
+
+
+        if (reservations == null || reservations.isEmpty()) {
+            // 예약이 없다면 기본값 5를 반환
             StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
             defaultResponse.setResPosNumber(5);  // 기본값 5
+            session.setAttribute(sessionKey, 5);  // 세션에 기본값 5를 저장
             return ResponseEntity.ok(Collections.singletonList(defaultResponse));
         }
 
         // 가장 최신 예약 데이터를 반환
         StoreResPosNumDTO latestReservation = reservations.get(0);  // 내림차순 정렬로 최신값이 첫 번째
-        return ResponseEntity.ok(Collections.singletonList(latestReservation));
+
+        if (latestReservation != null) {
+            // 세션에 최신 값을 저장
+            session.setAttribute(sessionKey, latestReservation.getResPosNumber());
+            return ResponseEntity.ok(Collections.singletonList(latestReservation));
+        } else {
+            // 만약 latestReservation이 null이라면 기본값 5를 반환
+            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
+            defaultResponse.setResPosNumber(5);  // 기본값 5
+            session.setAttribute(sessionKey, 5);  // 세션에 기본값 5를 저장
+            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+        }
     }
 
 

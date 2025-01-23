@@ -4,6 +4,7 @@ import com.ohgiraffers.ukki.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.ukki.user.model.service.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,9 @@ public class SignupController {
         boolean isValid = signupService.signupId(signupUserDTO);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isValid", isValid);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
     @PostMapping("/signuppwd")
@@ -32,9 +35,13 @@ public class SignupController {
 
         String resultMessage = signupService.validatePassword(password);
         if (resultMessage.equals("ⓘ 비밀번호가 유효합니다.")) {
-            return ResponseEntity.ok(Map.of("isValid", true, "message", resultMessage));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("isValid", true, "message", resultMessage));
         } else {
-            return ResponseEntity.ok(Map.of("isValid", false, "message", resultMessage));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("isValid", false, "message", resultMessage));
         }
     }
 
@@ -43,7 +50,9 @@ public class SignupController {
         boolean isValid = signupService.signupNickname(signupUserDTO);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isValid", isValid);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
     // 마지막 모든 걸 합친 회원가입
@@ -54,11 +63,15 @@ public class SignupController {
         if (isSignupSuccess) {
             response.put("success", true);
             response.put("message", "ⓘ 회원가입이 완료되었습니다!");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
         } else {
             response.put("success", false);
             response.put("message", "ⓘ 회원가입에 실패했습니다.");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
         }
     }
 
