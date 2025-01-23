@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/users")
 public class AdminUserController {
@@ -79,7 +81,9 @@ public class AdminUserController {
 
                 int result = adminUserService.insertActInfo(actInfoList);
 
-        return ResponseEntity.ok("hi");
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body("hi");
     }
     
     @GetMapping("/list")
@@ -93,7 +97,8 @@ public class AdminUserController {
                     .body(userList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("Error: " + e.getMessage());
         }
     }
 
@@ -106,7 +111,8 @@ public class AdminUserController {
                     .body(userInfo);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("Error: " + e.getMessage());
         }
     }
 
@@ -132,7 +138,9 @@ public class AdminUserController {
         } else {
             responseMap.put("message", "닉네임 변경에 실패했습니다.");
             responseMap.put("success", false);
-        } return ResponseEntity.ok(responseMap);
+        } return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
     }
 
     @DeleteMapping("/info/{userNo}")
@@ -145,7 +153,9 @@ public class AdminUserController {
         } else {
             responseMap.put("message", "회원 삭제에 실패했습니다.");
             responseMap.put("success", false);
-        } return ResponseEntity.ok(responseMap);
+        } return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(responseMap);
     }
 
     @GetMapping("/total")
@@ -159,7 +169,9 @@ public class AdminUserController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body("Error: " + e.getMessage());
         }
     }

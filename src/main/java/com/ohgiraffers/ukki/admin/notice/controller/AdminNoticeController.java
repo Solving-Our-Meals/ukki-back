@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/admin/notices")
 public class AdminNoticeController {
@@ -28,12 +30,15 @@ public class AdminNoticeController {
         try {
             List<AdminNoticeCategoryDTO> noticeCategory = adminNoticeService.searchNoticeCategory();
 
-            return ResponseEntity.ok(noticeCategory);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(noticeCategory);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
                     .body("공지사항 카테고리를 불러오는 도중 에러가 발생했습니다.");
         }
     }
@@ -44,13 +49,16 @@ public class AdminNoticeController {
             System.out.println(word);
             List<AdminNoticeDTO> userNoticeList = adminNoticeService.searchUserNotice(word);
 
-            return ResponseEntity.ok(userNoticeList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(userNoticeList);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 공지사항을 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("회원 공지사항을 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -59,13 +67,16 @@ public class AdminNoticeController {
         try {
             List<AdminNoticeDTO> storeNoticeList = adminNoticeService.searchStoreNotice(word);
 
-            return ResponseEntity.ok(storeNoticeList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeNoticeList);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("가게 공지사항을 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("가게 공지사항을 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -74,13 +85,16 @@ public class AdminNoticeController {
         try {
             AdminNoticeDTO noticeInfo = adminNoticeService.searchNoticeInfo(noticeNo);
 
-            return ResponseEntity.ok(noticeInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(noticeInfo);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("공지사항 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -94,13 +108,16 @@ public class AdminNoticeController {
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("message", "수정에 성공했습니다.");
 
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 수정 중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("공지사항 수정 중 에러가 발생했습니다.");
         }
     }
 
@@ -112,11 +129,14 @@ public class AdminNoticeController {
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("message", "삭제에 성공했습니다.");
 
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 삭제 중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("공지사항 삭제 중 에러가 발생했습니다.");
         }
     }
 
@@ -128,11 +148,14 @@ public class AdminNoticeController {
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("message", "등록에 성공했습니다.");
 
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseMap);
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 등록 중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("공지사항 등록 중 에러가 발생했습니다.");
         }
     }
 }

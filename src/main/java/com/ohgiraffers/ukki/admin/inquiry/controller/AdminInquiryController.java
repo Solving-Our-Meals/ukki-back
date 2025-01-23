@@ -1,5 +1,7 @@
 package com.ohgiraffers.ukki.admin.inquiry.controller;
 
+import org.springframework.http.MediaType;
+
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
@@ -50,13 +52,16 @@ public class AdminInquiryController {
             Map<String, Integer> response = new HashMap<>();
             response.put("processing", processingInquiryCount);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("처리 중인 문의 수를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("처리 중인 문의 수를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -68,7 +73,9 @@ public class AdminInquiryController {
         Map<String, Integer> response = new HashMap<>();
         response.put("totalInquiry", totalInquiry);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(response);
     }
 
     @GetMapping("/list/user")
@@ -79,13 +86,16 @@ public class AdminInquiryController {
             }
             List<InquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
 
-            return ResponseEntity.ok(userInquiryList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(userInquiryList);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");    
         }
     }
 
@@ -102,13 +112,16 @@ public class AdminInquiryController {
 
             storeInquiryList.sort(Comparator.comparing(InquiryListDTO::getInqDate));
 
-            return ResponseEntity.ok(storeInquiryList);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(storeInquiryList);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("회원 문의를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -119,13 +132,16 @@ public class AdminInquiryController {
             InquiryInfoDTO inquiryInfo = adminInquiryService.inquiryInfo(inquiryNo);
             System.out.println(inquiryInfo);
 
-            return ResponseEntity.ok(inquiryInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(inquiryInfo);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -136,13 +152,16 @@ public class AdminInquiryController {
             ReportInfoDTO reportInfo = adminInquiryService.reportInfo(reportNo);
             System.out.println(reportInfo);
 
-            return ResponseEntity.ok(reportInfo);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(reportInfo);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -160,11 +179,14 @@ public class AdminInquiryController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "답변 등록 완료");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -186,11 +208,14 @@ public class AdminInquiryController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "문의 삭제 완료");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("문의 삭제 중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("문의 삭제 중 에러가 발생했습니다.");
         }
     }
 
@@ -209,11 +234,14 @@ public class AdminInquiryController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "답변 등록 완료");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -225,13 +253,16 @@ public class AdminInquiryController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "리뷰신고 삭제 완료");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(response);
         } catch (Exception e) {
             // 에러 메시지 로그 출력
             e.printStackTrace();
             // 적절한 에러 메시지와 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("리뷰정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -239,11 +270,14 @@ public class AdminInquiryController {
     public ResponseEntity<?> getFile(@PathVariable String fileUrl) {
         try {
             // 이미 완전한 URL이므로 그대로 반환
-            return ResponseEntity.ok().body(Collections.singletonMap("url", fileUrl));
+            return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Collections.singletonMap("url", fileUrl));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("파일 URL을 가져오는 중 에러가 발생했습니다.");
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("파일 URL을 가져오는 중 에러가 발생했습니다.");
         }
     }
 
