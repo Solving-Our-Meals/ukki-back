@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
+env: #기존 AWS리전 삭제 -> 쓰이지 않기 때문
   ECR_REPOSITORY: ukki-back
   ECR_REGISTRY: public.ecr.aws/j7n6r7d0
   EC2_HOST: ${{ secrets.EC2_HOST }}
