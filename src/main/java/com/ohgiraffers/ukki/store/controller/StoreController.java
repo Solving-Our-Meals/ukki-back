@@ -337,7 +337,7 @@ public class StoreController {
             System.out.println("리뷰 등록하러 왔다.");
 
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> paramMap;
+            Map<String, Object> paramMap;
             ReviewContentDTO reviewContentDTO = new ReviewContentDTO();
 
             try {
@@ -350,34 +350,66 @@ public class StoreController {
             System.out.println("리뷰 정보들 : " + paramMap);
             System.out.println("리뷰 사진" + singleFile);
 
+//            paramMap.forEach((key, value) -> {
+//                switch (key) {
+//                    case "reviewDate":
+//                        System.out.println("reviewDate : " + value);
+//                        reviewContentDTO.setReviewDate(value.isEmpty() ? null : value);
+//                        break;
+//                    case "reviewContent":
+//                        System.out.println("reviewContent : " + value);
+//                        reviewContentDTO.setReviewContent(value.isEmpty() ? null : value);
+//                        break;
+//                    case "reviewScope":
+//                        System.out.println("reviewScope : " + value);
+//                        reviewContentDTO.setReviewScope(value.isEmpty() ? null : value);
+//                        break;
+//                    case "storeNo":
+//                        System.out.println("storeNo : " + value);
+//                        reviewContentDTO.setStoreNo(value.isEmpty() ? null : Long.parseLong(value));
+//                        break;
+//                    case "userNo":
+//                        System.out.println("userNo : " + value);
+//                        reviewContentDTO.setUserNo(value.isEmpty() ? null : Long.parseLong(value));
+//                        break;
+//                    case "resNo":
+//                        System.out.println("resNo : " + value);
+//                        reviewContentDTO.setResNo(value.isEmpty() ? null : Long.parseLong(value));
+//                        break;
+//                }
+//            });
+
             paramMap.forEach((key, value) -> {
-                switch (key) {
-                    case "reviewDate":
-                        System.out.println("reviewDate : " + value);
-                        reviewContentDTO.setReviewDate(value.isEmpty() ? null : value);
-                        break;
-                    case "reviewContent":
-                        System.out.println("reviewContent : " + value);
-                        reviewContentDTO.setReviewContent(value.isEmpty() ? null : value);
-                        break;
-                    case "reviewScope":
-                        System.out.println("reviewScope : " + value);
-                        reviewContentDTO.setReviewScope(value.isEmpty() ? null : value);
-                        break;
-                    case "storeNo":
-                        System.out.println("storeNo : " + value);
-                        reviewContentDTO.setStoreNo(value.isEmpty() ? null : Long.parseLong(value));
-                        break;
-                    case "userNo":
-                        System.out.println("userNo : " + value);
-                        reviewContentDTO.setUserNo(value.isEmpty() ? null : Long.parseLong(value));
-                        break;
-                    case "resNo":
-                        System.out.println("resNo : " + value);
-                        reviewContentDTO.setResNo(value.isEmpty() ? null : Long.parseLong(value));
-                        break;
+                try {
+                    String strValue = value.toString(); // 값이 문자열로 변환된 상태에서 작업을 시작
+                    switch (key) {
+                        case "reviewDate":
+                            reviewContentDTO.setReviewDate(strValue.isEmpty() ? null : strValue);
+                            break;
+                        case "reviewContent":
+                            reviewContentDTO.setReviewContent(strValue.isEmpty() ? null : strValue);
+                            break;
+                        case "reviewScope":
+                            reviewContentDTO.setReviewScope(strValue.isEmpty() ? null : strValue);
+                            break;
+                        case "storeNo":
+                            reviewContentDTO.setStoreNo(strValue.isEmpty() ? null : Long.parseLong(strValue));
+                            break;
+                        case "userNo":
+                            reviewContentDTO.setUserNo(strValue.isEmpty() ? null : Long.parseLong(strValue));
+                            break;
+                        case "resNo":
+                            reviewContentDTO.setResNo(strValue.isEmpty() ? null : Long.parseLong(strValue));
+                            break;
+                    }
+                    System.out.println("Parsed value for key: " + key + ", value: " + strValue);
+                } catch (NumberFormatException e) {
+                    System.err.println("Value format error for key: " + key + ", value: " + value);
+                    e.printStackTrace();
                 }
             });
+
+
 
 
             // 파일 업로드가 있을 때만 파일명 커스텀 및 업로드 처리
