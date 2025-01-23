@@ -19,7 +19,7 @@ public interface BossMapper {
 
     List<ReservationDTO> selectReservationPeopleList(long storeNo);
 
-    int selectAvailableReservationPeople(long storeNo, LocalDate reservationDate);
+//    int selectAvailableReservationPeople(long storeNo, LocalDate reservationDate);
 
     WeeklyReservationCountDTO selectWeeklyReservationCount(long storeNo);
 
@@ -43,7 +43,7 @@ public interface BossMapper {
     // 리뷰 신고
     void reportReview(ReportReviewDTO reportReviewDTO);
 
-    int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
+//    int findAvailableSlotsByStoreNo(@Param("storeNo") long storeNo);
 
     // 예약 가능 인원 업데이트
     void updateAvailableSlots(StoreResPosNumDTO storeResPosNum);
@@ -60,7 +60,7 @@ public interface BossMapper {
     List<ReservationDTO> getReservationsForDateAndTime(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
     List<ReservationDTO> getReservationsForDate(long storeNo, LocalDate reservationDate);
 
-    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
+//    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
 
     void updateReportCount(long reviewNo);
 
