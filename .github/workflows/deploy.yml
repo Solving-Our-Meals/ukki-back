@@ -3,9 +3,10 @@ name: Deploy Backend to Amazon ECR
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-env:
-  AWS_REGION: ap-northeast-2
+env: #기존 AWS리전 삭제 -> 쓰이지 않기 때문
   ECR_REPOSITORY: ukki-back
   ECR_REGISTRY: public.ecr.aws/j7n6r7d0
   EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -19,27 +20,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Configure AWS credentials #현재 여기서 오류나는중
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # public ECR은 us-east-1 사용
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR Public
         id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
 
       - name: create credentials.json
         run: |
-          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > src/main/resources/credentials.json
 
       - name: Build and push
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
@@ -49,7 +51,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_HOST }}
-          username: ubuntu
+          username: ${{ env.EC2_USERNAME }}
           key: ${{ env.EC2_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/ukki-project
