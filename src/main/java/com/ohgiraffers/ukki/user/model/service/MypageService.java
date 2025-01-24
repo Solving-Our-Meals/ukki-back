@@ -6,8 +6,6 @@ import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -395,6 +392,7 @@ public class MypageService {
             // 기존 프로필 이미지 경로 가져오기 (Google Drive 파일 ID)
             String existingFileId = getExistingFileId(userId);
 
+            // 기존 파일이 있으면 삭제
             if (existingFileId != null && !existingFileId.isEmpty()) {
                 try {
                     googleDriveService.deleteFile(existingFileId); // Google Drive에서 파일 삭제
@@ -412,13 +410,10 @@ public class MypageService {
                 // 파일을 Google Drive에 업로드하고 파일 ID 반환
                 String fileId = googleDriveService.uploadFile(profileImage, PROFILE_IMAGE_FOLDER_ID, userId + "_profile_image");
 
-                // 업로드한 파일의 URL을 DB에 저장
-                String fileUrl = googleDriveService.getFileUrl(fileId);
-
-                // DB에 새 경로 업데이트 (파일 URL 저장)
+                // 업로드한 파일의 ID를 DB에 저장 (파일 URL 대신 fileId만 저장)
                 MypageProfileImageDTO profileImageDTO = new MypageProfileImageDTO();
                 profileImageDTO.setUserId(userId);
-                profileImageDTO.setFile(fileUrl);
+                profileImageDTO.setFile(fileId);  // 파일 ID만 저장
 
                 // DB 업데이트
                 int updatedRows = mypageMapper.updateUserProfileImage(profileImageDTO);
@@ -433,13 +428,13 @@ public class MypageService {
     }
 
     private String getExistingFileId(String userId) {
-        String fileUrl = mypageMapper.findProfileImagePathByUserId(userId);
-        if (fileUrl != null && !fileUrl.isEmpty()) {
-            // Google Drive URL에서 파일 ID 추출 (예: https://drive.google.com/uc?id=FILE_ID)
-            return fileUrl.substring(fileUrl.indexOf("id=") + 3);
-        }
-        return null;
+        // DB에서 파일 ID만 가져옵니다.
+        String fileId = mypageMapper.findProfileImagePathByUserId(userId);
+
+        // fileId가 존재하면 바로 반환
+        return (fileId != null && !fileId.isEmpty()) ? fileId : null;
     }
+
 
     // 프로필은 메소드로 경로 가져옴
     private String getExistingFilePath(String userId) {
@@ -453,18 +448,23 @@ public class MypageService {
         return existingFilePath;
     }
 
+
     public String saveFileProfile(MultipartFile file, String userId) throws IOException {
         try {
             // 파일 이름 생성 (userId를 포함한 프로필 이미지 이름)
-            String fileName = userId + "_profile_image.jpg";  // 프로필 이미지 파일명 고정
-            if (fileName == null || fileName.isEmpty()) {
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isEmpty()) {
                 throw new IOException("파일 이름이 잘못되었습니다.");
             }
+
+            // 파일 확장자 추출
+            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            String fileName = userId + "_profile_image" + fileExtension;  // 확장자 포함하여 파일명 생성
             System.out.println("업로드된 파일 이름: " + fileName);
 
             // Google Drive에 파일 업로드하기
             // 폴더 ID를 전달해야 함
-            String fileId = googleDriveService.uploadFile(file, PROFILE_IMAGE_FOLDER_ID, userId + "_profile_image");
+            String fileId = googleDriveService.uploadFile(file, PROFILE_IMAGE_FOLDER_ID, fileName);
 
             // 업로드된 파일의 Google Drive URL 반환
             String fileUrl = googleDriveService.getFileUrl(fileId);
