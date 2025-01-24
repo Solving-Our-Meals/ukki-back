@@ -8,10 +8,12 @@ import com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO;
 import com.ohgiraffers.ukki.reservation.model.dto.ReservationStoreDTO;
 import com.ohgiraffers.ukki.reservation.model.dto.StoreBannerDTO;
 import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
+import org.apache.coyote.Response;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +27,8 @@ import java.nio.file.Paths;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-    //    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+        private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
     private final QrService qrService;
 
     public ReservationController(ReservationService reservationService, QrService qrService){
@@ -36,13 +38,21 @@ public class ReservationController {
 
     // 대표 사진
     @GetMapping(value = "/repPhoto")
-    public ResponseEntity<String> getRepPhotoName(@RequestParam("storeNo") long storeNo){
+    public ResponseEntity<?> getRepPhotoName(@RequestParam("storeNo") long storeNo){
+        try{
 
-        StoreBannerDTO storeBannerDTO = reservationService.getRepPhotoName(storeNo);
-        String bannerName = storeBannerDTO.getRepPhoto();
-//        System.out.println(storeBannerDTO);
+            StoreBannerDTO storeBannerDTO = reservationService.getRepPhotoName(storeNo);
+            String bannerName = storeBannerDTO.getRepPhoto();
+    //        System.out.println(storeBannerDTO);
 
-        return ResponseEntity.ok(bannerName);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(bannerName);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("예약한 가게 사진을 불러오는 도중에 에러가 발생했습니다.");
+        }
     }
 
     @GetMapping(value ="/api/repPhoto")
@@ -68,13 +78,21 @@ public class ReservationController {
 
     // 프로필 사진
     @GetMapping (value = "/profile")
-    ResponseEntity<String> getProfileName(@RequestParam("storeNo") long storeNo, ReservationStoreDTO reservationStoreDTO){
+    ResponseEntity<?> getProfileName(@RequestParam("storeNo") long storeNo, ReservationStoreDTO reservationStoreDTO){
+        try{
 
-//        long storeNo = 5;
-        reservationStoreDTO = reservationService.getReservationedStoreInfo(storeNo);
-        String profileName = reservationStoreDTO.getStoreProfile();
+//          long storeNo = 5;
+            reservationStoreDTO = reservationService.getReservationedStoreInfo(storeNo);
+            String profileName = reservationStoreDTO.getStoreProfile();
 
-        return ResponseEntity.ok(profileName);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(profileName);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("예약한 가게 프로필 사진 불러오는 도중에 에러가 발생했습니다.");
+        }
     }
 
     @GetMapping(value = "/api/profile")
@@ -100,40 +118,48 @@ public class ReservationController {
     // 예약 DB에 insert
     @PostMapping(value = "/insert")
     @ResponseBody
-    public String insertReservation(@RequestBody ReservationInfoDTO reservationInfoDTO) throws WriterException {
+    public ResponseEntity<?> insertReservation(@RequestBody ReservationInfoDTO reservationInfoDTO) throws WriterException {
+        try{
 
-        String resultMessage = "";
-        // 중복 예약 정보가 있는지 확인
-        System.out.println("reservation 정보 : " + reservationInfoDTO);
+            String resultMessage = "";
+            // 중복 예약 정보가 있는지 확인
+            System.out.println("reservation 정보 : " + reservationInfoDTO);
 
-        ReservationInfoDTO isExistReservation = reservationService.checkExistReservation(reservationInfoDTO);
+            ReservationInfoDTO isExistReservation = reservationService.checkExistReservation(reservationInfoDTO);
 
-        System.out.println("isExistReservation = " + isExistReservation);
+            System.out.println("isExistReservation = " + isExistReservation);
 
-        if(isExistReservation == null){
-            System.out.println("예약 DB 드가자");
+            if(isExistReservation == null){
+                System.out.println("예약 DB 드가자");
 
-            // QR코드를 생성하기 위한 필수 파라미터인 이메일 DB에서 받아오기
-            String userEmail = reservationService.getEmail(reservationInfoDTO);
-//        System.out.println("userEmail = " + userEmail);
+                // QR코드를 생성하기 위한 필수 파라미터인 이메일 DB에서 받아오기
+                String userEmail = reservationService.getEmail(reservationInfoDTO);
+    //        System.out.println("userEmail = " + userEmail);
 
-            // QR코드 만드는 함수 호출
-//        QrController qrController = new QrController(qrService);
-//        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
-            String qrCode = qrService.qrCertificate();
-//         QR코드 reservationInfoDTO에 넣기
-            reservationInfoDTO.setQr(qrCode);
-            System.out.println("reservationInfo : " + reservationInfoDTO);
+                // QR코드 만드는 함수 호출
+    //        QrController qrController = new QrController(qrService);
+    //        String qrCode = qrController.qrCertificate(reservationInfoDTO.getResDate(), reservationInfoDTO.getResTime(), userEmail);
+                String qrCode = qrService.qrCertificate();
+    //         QR코드 reservationInfoDTO에 넣기
+                reservationInfoDTO.setQr(qrCode);
+                System.out.println("reservationInfo : " + reservationInfoDTO);
 
-            reservationService.insertReservation(reservationInfoDTO);
+                reservationService.insertReservation(reservationInfoDTO);
 
-            reservationService.increaseReservation(reservationInfoDTO.getUserNo());
+                reservationService.increaseReservation(reservationInfoDTO.getUserNo());
 
-            resultMessage = "예약 성공";
-        } else {
-            resultMessage = "예약 실패";
+                resultMessage = "예약 성공";
+            } else {
+                resultMessage = "예약 실패";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(resultMessage);
+        } catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("예약 정보를 저장하는 도중에 에러가 발생했습니다.");
         }
-
-        return resultMessage;
     }
 }
