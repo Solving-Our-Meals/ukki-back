@@ -185,8 +185,8 @@
             <if test="storeName != null">STORE_NAME = #{storeName},</if>
             <if test="storeDes != null">STORE_DES = #{storeDes},</if>
             <if test="storeAddress != null">STORE_ADDRESS = #{storeAddress},</if>
-            <if test="latitude != null">LATITUDE = #{latitude},</if>
-            <if test="longitude != null">LONGITUDE = #{longitude},</if>
+            <if test="latitude != 0.0">LATITUDE = #{latitude},</if>
+            <if test="longitude != 0.0">LONGITUDE = #{longitude},</if>
             <if test="storeProfile != null">STORE_PROFILE = #{storeProfile},</if>
             <if test="storeMenu != null">STORE_MENU = #{storeMenu},</if>
             <if test="storeCategoryNo != null">STORE_CATEGORY_NO = #{storeCategoryNo},</if>

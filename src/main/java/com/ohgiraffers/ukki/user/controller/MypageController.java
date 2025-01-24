@@ -519,15 +519,19 @@ public class MypageController {
 
             boolean result = mypageService.updateProfileImage(userId, profileImage);
             if (result) {
+                // 프로필 이미지 업데이트 성공 시 응답에 메시지 포함
                 return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body("프로필 이미지가 성공적으로 업데이트되었습니다.");
+                        .body("{\"message\": \"프로필 이미지가 성공적으로 업데이트되었습니다.\"}");
             } else {
-                return ResponseEntity.status(500).body("프로필 이미지 업데이트에 실패했습니다.");
+                // 프로필 이미지 업데이트 실패 시 응답에 메시지 포함
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("{\"message\": \"프로필 이미지 업데이트에 실패했습니다.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("이미지 업로드 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"이미지 업로드 중 오류가 발생했습니다.\"}");
         }
     }
 

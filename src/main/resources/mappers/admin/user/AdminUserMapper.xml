@@ -84,4 +84,10 @@
     <select id="totalUser">
         SELECT COUNT(*) FROM TBL_USER WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
     </select>
+
+    <update id="minusNoShow">
+        UPDATE TBL_USER
+        SET NOSHOW = #{minusCount}
+        WHERE USER_NO = #{userNo};
+    </update>
 </mapper>

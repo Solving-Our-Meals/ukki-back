@@ -29,4 +29,6 @@ public interface AdminUserMapper {
     int deleteUserInfo(int userNo);
 
     int totalUser();
+
+    void minusNoShow(@Param("userNo") int userNo, @Param("minusCount") int minusCount);
 }
