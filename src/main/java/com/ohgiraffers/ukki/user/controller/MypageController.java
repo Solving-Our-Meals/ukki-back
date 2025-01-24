@@ -195,8 +195,6 @@ public class MypageController {
                 .body(reviewDetail);
     }
 
-
-
     @DeleteMapping("/review/delete")
     public ResponseEntity<String> deleteReview(@RequestBody MypageReviewDTO mypageReviewDTO) {
         int reviewNo = mypageReviewDTO.getReviewNo();
