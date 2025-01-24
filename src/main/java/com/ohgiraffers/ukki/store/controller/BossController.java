@@ -355,6 +355,11 @@ public class BossController {
             RecentInquirytList.addAll(RecentReportList);
             RecentInquirytList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
 
+            if (RecentInquirytList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body("최근 문의 내역이 없습니다.");
+            }
+
             // 가장 마지막 요소 가져오기
             InquiryDTO lastInquiry = RecentInquirytList.get(0);
 
