@@ -24,6 +24,7 @@ import java.util.Map;
 public class MypageService {
 
     private static final String PROFILE_IMAGE_FOLDER_ID = "1gxTNO0bbEGV-VeLlzMV76N1jGI03neUM";
+    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
 
 
     private final JwtService jwtService;
@@ -165,131 +166,48 @@ public class MypageService {
         int result = mypageMapper.updateInquiryStatus(inquiryNo, inquiryState);
         return result > 0;
     }
-//    private static final String FILE_UPLOAD_DIR = "\\\\192.168.0.138\\ukki_nas\\inquiry";
-    private static final String FILE_UPLOAD_DIR = "C:\\Temp\\inquiry";
 
     public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
-            // 1. 기존 파일 삭제
-            String existingFileName = inquiryToUpdate.getFile();  // 기존 파일명 가져오기
-            if (existingFileName != null && !existingFileName.isEmpty()) {
-                String existingFilePath = getInquiryFilePath(existingFileName);  // Inquiry 경로로 수정
-                System.out.println("기존 파일 경로: " + existingFilePath);  // 경로 출력하여 확인
+            // DB에서 저장된 파일 ID 가져오기
+            String existingFileId = inquiryToUpdate.getFile();
 
-                File existingFile = new File(existingFilePath);
-
-                if (existingFile.exists()) {
-                    boolean deleted = existingFile.delete();  // 파일 삭제
-                    if (deleted) {
-                        System.out.println("기존 파일 삭제 성공: " + existingFilePath);
-                    } else {
-                        System.out.println("기존 파일 삭제 실패: " + existingFilePath);
-                        System.out.println("파일 삭제 실패. 파일의 삭제 권한 또는 경로를 확인하세요.");
-                    }
-                } else {
-                    System.out.println("기존 파일이 존재하지 않습니다: " + existingFilePath);
+            // 기존 파일이 있으면 Google Drive에서 삭제
+            if (existingFileId != null && !existingFileId.isEmpty()) {
+                try {
+                    System.out.println(existingFileId);
+                    // 구글 드라이브에서 파일 삭제
+                    googleDriveService.deleteFile(existingFileId);
+                    System.out.println("기존 파일 삭제 성공, 파일 ID: " + existingFileId);
+                } catch (Exception e) {
+                    System.out.println("기존 파일 삭제 실패: " + e.getMessage());
+                    // 예외 발생 시에도 계속 진행하려면 여기서 true를 반환하도록 설정
                 }
+            } else {
+                System.out.println("기존 파일이 드라이브에 존재하지 않거나 파일 ID가 잘못되었습니다.");
             }
 
-            // 2. 새 파일 저장
             if (file != null && !file.isEmpty()) {
-                String newFileName = file.getOriginalFilename();  // 파일명 그대로 사용
-                String newFilePath = saveInquiryFile(file, newFileName);  // Inquiry 저장
-                inquiryToUpdate.setFile(newFileName);  // DB에는 파일명만 저장
+                // 폴더 이름을 폴더 ID로 변경 (Inquiry 폴더 ID 사용)
+                String folderId = Inquiry_FOLDER_ID;  // Inquiry 폴더 ID
+
+                // 파일 업로드 및 파일 ID 반환
+                String fileId = googleDriveService.uploadFile(file, folderId, userId + "_inquiry_files");
+
+                // 파일 URL을 DB에 저장 (구글 드라이브 URL 형식으로)
+                String fileUrl = googleDriveService.getFileUrl(fileId);
+                inquiryToUpdate.setFile(fileId);
             }
 
-            // 3. DB 업데이트
+            // DB 업데이트
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
-            return updatedRows > 0;
+            return updatedRows > 0;  // 업데이트된 행이 있으면 true 반환
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return false;  // 예외 발생 시 false 반환
         }
     }
 
-    // 인쿼리용 파일 경로 생성
-    private String getInquiryFilePath(String fileName) {
-        // inquiry 파일 저장 디렉토리와 파일명을 결합하여 전체 경로를 반환
-        return "C:\\Temp\\inquiry\\" + fileName;
-    }
-
-    // 인쿼리용 파일을 저장하는 메소드
-    private String saveInquiryFile(MultipartFile file, String fileName) throws IOException {
-        // 로컬 경로 설정 (인쿼리 폴더로 저장)
-        String networkPath = "C:\\Temp\\inquiry\\";  // inquiry 폴더로 설정
-        System.out.println("파일 저장 경로: " + networkPath);
-
-        // 디렉토리 생성
-        File directory = new File(networkPath);
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                throw new IOException("디렉토리 생성 실패: " + networkPath);
-            }
-        }
-
-        // 파일 저장 경로 설정
-        File targetFile = new File(directory, fileName);
-        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
-
-        try {
-            file.transferTo(targetFile);  // 파일 저장
-            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
-            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("파일 저장 오류", e);  // 파일 저장 실패 시 예외 처리
-        }
-    }
-
-    private String saveFile(MultipartFile file, String userId) throws IOException {
-        // 파일 이름 가져오기
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || fileName.isEmpty()) {
-            throw new IOException("파일 이름이 잘못되었습니다.");
-        }
-        System.out.println("업로드된 파일 이름: " + fileName);
-
-        // 로컬 경로 설정 (필요한 디렉터리를 사용자 폴더로 설정)
-        String networkPath = FILE_UPLOAD_DIR + File.separator;
-        System.out.println("파일 저장 경로: " + networkPath);
-
-        // 디렉토리 생성
-        File directory = new File(networkPath);
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                throw new IOException("디렉토리 생성 실패: " + networkPath);
-            }
-        }
-
-        // 파일 저장 경로 설정
-        File targetFile = new File(directory, fileName);
-        System.out.println("파일을 저장하는 경로: " + targetFile.getAbsolutePath());
-
-        try {
-            file.transferTo(targetFile);  // 파일 저장
-            System.out.println("파일 저장 완료: " + targetFile.getAbsolutePath());
-            return targetFile.getAbsolutePath();  // 저장된 파일 경로 리턴
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("파일 저장 오류", e);  // 파일 저장 실패 시 예외 처리
-        }
-    }
-
-/*    public boolean deleteInquiry(int inquiryNo) {
-
-        MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
-
-        if (inquiry != null && inquiry.getFile() != null && !inquiry.getFile().isEmpty()) {
-            boolean fileDeleted = deleteFile(inquiry.getFile());
-            if (!fileDeleted) {
-                return false;
-            }
-        }
-
-        int result = mypageMapper.deleteInquiryById(inquiryNo);
-
-        return result > 0;
-    }*/
 
     public boolean deleteInquiry(int inquiryNo) {
 
