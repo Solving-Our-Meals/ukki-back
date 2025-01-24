@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.admin.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import com.ohgiraffers.ukki.admin.store.model.service.AdminStoreService;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,11 +30,14 @@ public class AdminStoreController {
 private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
-
+    private final GoogleDriveService googleDriveService;
+//    private static final String STORE_FOLDER_ID = "19mb-5n8hNjrdRAksh4hTKcFY-Gp0Aaoz";
+    private static final String STORE_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
     @Autowired
-    public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder) {
+    public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder, GoogleDriveService googleDriveService) {
         this.adminStoreService = adminStoreService;
         this.passwordEncoder = passwordEncoder;
+        this.googleDriveService = googleDriveService;
     }
 
     @GetMapping("/monthly")
@@ -310,10 +314,10 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         System.out.println(session.getAttribute("userPassword"));
         System.out.println(session.getAttribute("userName"));
         System.out.println(session.getAttribute("email"));
+        System.out.println(session.getId());
         
         Map<String, String> response = new HashMap<>();
         response.put("message", "User registered and session created successfully");
-
             return ResponseEntity.ok()
             .body(response);
     }
@@ -321,6 +325,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     @GetMapping("regist/store")
     public ResponseEntity<?> ShowStoreInfoRegistPage(HttpSession session) {
 
+        System.out.println(session.getId());
         System.out.println(session.getAttribute("userId"));
         System.out.println(session.getAttribute("userPassword"));
         System.out.println(session.getAttribute("userName"));
@@ -376,47 +381,15 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
             OperationDTO operationDTO = storeData.getOperationTime();
             operationDTO.setStoreNo(storeNo);
-            int operationResult = adminStoreService.insertOperationTime(operationDTO);
-            if(operationResult > 0){
-
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("운영시간 업데이트 중 오류가 발생했습니다.");
-            }
-
-            KeywordDTO keywordDTO = storeData.getStoreKeyword();
-            keywordDTO.setStoreNo(storeNo);
-            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
-            if(keywordResult > 0){
-
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("키워드 업데이트 중 오류가 발생했습니다.");
-            }
 
             String menuName = storeNo+"menu";
 
-            int menuResult = fileController(menuImage, menuName);
-            if(menuResult == 2){
-
-                storeData.setStoreMenu(menuName);
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("메뉴 이미지 업데이트 중 오류가 발생했습니다.");
-            }
+            String menuResult = googleDriveService.uploadFile(menuImage, STORE_FOLDER_ID, menuName);
+            storeData.setStoreMenu(menuResult);
 
             String fileName = storeNo+"profile";
-            int profileResult = fileController(profileImage, fileName);
-            if(profileResult == 2){
-                storeData.setStoreProfile(fileName);
-            }else{
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("프로필 이미지 업데이트 중 오류가 발생했습니다.");
-            }
-
+            String profileResult = googleDriveService.uploadFile(profileImage, STORE_FOLDER_ID, fileName);
+            storeData.setStoreProfile(profileResult);
 
             // 배너 이미지 리스트 생성
             Map<Integer, MultipartFile> bannerUpdates = new HashMap<>();
@@ -433,15 +406,12 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
                 MultipartFile file = entry.getValue();
                 String bannerName = storeNo + "banner" + key;
 
-                bannerNameArr[key-1] = bannerName;
+                String result = googleDriveService.uploadFile(file, STORE_FOLDER_ID ,bannerName);
+                bannerNameArr[key-1] = result;
 
                 // fileController 호출하여 파일 저장
-                int result = fileController(file, bannerName);
-                if (result == 2) {
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("배너 이미지 업데이트 중 오류가 발생했습니다.");
-                }
+
+
             }
             BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
 
@@ -459,8 +429,25 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
             adminStoreService.insertStoreUser(userData);
             int userNo = adminStoreService.searchCurrentStoreUser(userData.getUserId());
+
             storeData.setStoreNo(storeNo);
+
             storeData.setUserNo(userNo);
+            int operationResult = adminStoreService.insertOperationTime(operationDTO);
+            if(operationResult > 0){
+            }else{
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("운영시간 업데이트 중 오류가 발생했습니다.");
+            }
+
+            KeywordDTO keywordDTO = storeData.getStoreKeyword();
+            keywordDTO.setStoreNo(storeNo);
+            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
+            if(keywordResult > 0){
+            }else{
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("키워드 업데이트 중 오류가 발생했습니다.");
+            }
             adminStoreService.insertStore(storeData);
 
 
