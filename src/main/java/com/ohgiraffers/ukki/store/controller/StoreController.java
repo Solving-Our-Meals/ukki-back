@@ -1,16 +1,15 @@
 package com.ohgiraffers.ukki.store.controller;
 
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,10 +34,12 @@ public class StoreController {
     private final StoreService storeService;
     private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 //    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+    private final GoogleDriveService googleDriveService;
+    private static final String STORE_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
 
-
-    public StoreController(StoreService storeService, BossService bossService){
+    public StoreController(StoreService storeService, BossService bossService, GoogleDriveService googleDriveService){
         this.storeService = storeService;
+        this.googleDriveService = googleDriveService;
     }
 
     // 검색 페이지 만들어지면 pathvariable로 변경하기
@@ -279,53 +280,71 @@ public class StoreController {
         }
     }
 
-    // 서버에서 로컬에 있는 리뷰 사진 불러오기
+    // 서버에서 드라이브에 있는 리뷰 사진 불러오기
     @GetMapping("/{storeNo}/api/reviewImg")
     @ResponseBody
-    public ResponseEntity<Resource> getReviewImg(@PathVariable("storeNo") long storeNo, @RequestParam("reviewImgName") String reviewImgName ){
-
+    public ResponseEntity<byte[]> getReviewImg(@PathVariable("storeNo") long storeNo, @RequestParam("reviewImgName") String reviewImgName ){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".png");
-            if(!Files.exists(file)){
-                file = Paths.get(SHARED_FOLDER).resolve(reviewImgName + ".jpg");
+            if (reviewImgName == null || reviewImgName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 fileId입니다.".getBytes());
             }
-            Resource resource = new UrlResource(file.toUri());
 
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; reviewImgName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + reviewImgName;
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이미지 다운로드 중 오류가 발생했습니다.".getBytes());
         }
     }
 
     // 서버에서 로컬에 있는 사용자 프로필 이미지 불러오기
     @GetMapping("/{storeNo}/api/userProfile")
     @ResponseBody
-    public ResponseEntity<Resource> getUserProfile(@PathVariable("storeNo") long storeNo, @RequestParam("userProfileName") String userProfileName ){
-
-//        System.out.println("사용자 프로필 이미지 api");
+    public ResponseEntity<byte[]> getUserProfile(@PathVariable("storeNo") long storeNo, @RequestParam("userProfileName") String userProfileName ){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".png");
-            if(!Files.exists(file)){
-                file = Paths.get(SHARED_FOLDER).resolve(userProfileName + ".jpg");
+            if (userProfileName == null || userProfileName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 fileId입니다.".getBytes());
             }
-//            System.out.println("유저 프로필 : " + file );
-            Resource resource = new UrlResource(file.toUri());
 
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; userProfileName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + userProfileName;
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이미지 다운로드 중 오류가 발생했습니다.".getBytes());
         }
     }
 
@@ -349,35 +368,6 @@ public class StoreController {
 
             System.out.println("리뷰 정보들 : " + paramMap);
             System.out.println("리뷰 사진" + singleFile);
-
-//            paramMap.forEach((key, value) -> {
-//                switch (key) {
-//                    case "reviewDate":
-//                        System.out.println("reviewDate : " + value);
-//                        reviewContentDTO.setReviewDate(value.isEmpty() ? null : value);
-//                        break;
-//                    case "reviewContent":
-//                        System.out.println("reviewContent : " + value);
-//                        reviewContentDTO.setReviewContent(value.isEmpty() ? null : value);
-//                        break;
-//                    case "reviewScope":
-//                        System.out.println("reviewScope : " + value);
-//                        reviewContentDTO.setReviewScope(value.isEmpty() ? null : value);
-//                        break;
-//                    case "storeNo":
-//                        System.out.println("storeNo : " + value);
-//                        reviewContentDTO.setStoreNo(value.isEmpty() ? null : Long.parseLong(value));
-//                        break;
-//                    case "userNo":
-//                        System.out.println("userNo : " + value);
-//                        reviewContentDTO.setUserNo(value.isEmpty() ? null : Long.parseLong(value));
-//                        break;
-//                    case "resNo":
-//                        System.out.println("resNo : " + value);
-//                        reviewContentDTO.setResNo(value.isEmpty() ? null : Long.parseLong(value));
-//                        break;
-//                }
-//            });
 
             paramMap.forEach((key, value) -> {
                 try {
@@ -409,9 +399,6 @@ public class StoreController {
                 }
             });
 
-
-
-
             // 파일 업로드가 있을 때만 파일명 커스텀 및 업로드 처리
             if (singleFile != null && !singleFile.isEmpty()) {
                 // 파일명 커스텀하기 ex)REVIEW2401022
@@ -428,36 +415,10 @@ public class StoreController {
 
                 String reviewImageValue = "REVIEW" + reviewDate;
 
-                reviewContentDTO.setReviewImage(reviewImageValue + reviewImageCount);
+                String fileId = googleDriveService.uploadFile(singleFile, STORE_FOLDER_ID, reviewImageValue);
+                System.out.println("fileId : " + fileId);
+                reviewContentDTO.setReviewImage(fileId);
 
-                // 컴퓨터가 특정 폴더를 찾아서 그 폴더가 없으면 새로 만드는 과정
-                // 파일 경로 설정
-                String filePath = SHARED_FOLDER;
-                // 설정한 파일 경로를 사용해서 File 객체 생성
-                File dir = new File(filePath);
-                // File 객체가 존재하는지 확인
-                if(!dir.exists()){
-                    // 디렉토리가 존재하지 않으면 모든 필요한 부모 디렉토리를 포함하여 디렉토리를 생성
-                    dir.mkdirs();
-                }
-
-                // 파일명을 reviewContentDTO.getReviewImage()와 같은 값으로 저장
-                // singleFile 객체에서 원래 파일 이름 가져와서 originFileName이라는 변수에 저장
-                String originFileName = singleFile.getOriginalFilename();
-                // 파일 이름에서 마지막 점(.) 이후의 문자열을 확장자로 추출하여 ext라는 변수에 저장
-                String ext = originFileName.substring(originFileName.lastIndexOf('.'));
-                // 리뷰 이미지 가져와서 앞에서 추출한 확장자와 결합해서 savedName 변수에 저장
-                String savedName = reviewContentDTO.getReviewImage() + ext;
-                // 파일 경로와 새로 저장할 파일 이름을 결합해서 최종 파일 경로를 설정
-                String fullPath = filePath + "/" + savedName;
-
-                try {
-                    // 파일 저장
-                    singleFile.transferTo(new File(fullPath));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
             } else {
                 // 이미지가 없을 경우 기본 값을 설정
                 reviewContentDTO.setReviewImage(null);
