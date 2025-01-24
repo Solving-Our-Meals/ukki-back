@@ -36,12 +36,11 @@ public class GoogleDriveController {
 
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(response.getBody());  // 다운로드한 이미지를 응답 본문에 담아서 반환
+                    .body(response.getBody());
 
         } catch (Exception e) {
-            e.printStackTrace();  // 서버 로그에 오류 출력
+            e.printStackTrace();
 
-            // 예외가 발생한 경우 500 Internal Server Error 상태 코드 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("이미지 다운로드 중 오류가 발생했습니다.".getBytes());
         }
