@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.admin.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.reservation.model.service.AdminReservationService;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import com.ohgiraffers.ukki.admin.user.model.dto.*;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -175,4 +177,24 @@ public class AdminUserController {
                     .body("Error: " + e.getMessage());
         }
     }
+
+    @PutMapping("/info/{userNo}/noshow")
+    public ResponseEntity<?> minusNoShow(@PathVariable int userNo, @RequestBody Map<String, Integer> minusCount){
+        try {
+            System.out.println(minusCount);
+            adminUserService.minusNoShow(userNo, minusCount.get("noShow"));
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "노쇼카운트가 감소했습니다.");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Error: " + e.getMessage());
+        }
+    }
+
 }
