@@ -61,6 +61,7 @@ public class AdminStoreService {
 
     @Transactional(rollbackFor = Exception.class)
     public void editStore(AdminStoreInfoDTO storeData) {
+        System.out.println(storeData);
         adminStoreMapper.editStore(storeData);
     }
 

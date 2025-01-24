@@ -50,4 +50,8 @@ public class AdminUserService {
     public int totalUser() {
         return adminUserMapper.totalUser();
     }
+
+    public void minusNoShow(int userNo, int minusCount) {
+        adminUserMapper.minusNoShow(userNo, minusCount);
+    }
 }

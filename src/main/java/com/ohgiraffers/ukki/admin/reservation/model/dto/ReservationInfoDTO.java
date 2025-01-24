@@ -78,7 +78,11 @@ public class ReservationInfoDTO {
     }
 
     public void setResTime(String resTime) {
-        this.resTime = resTime;
+        if (resTime != null && resTime.endsWith(":00")) {
+            this.resTime = resTime.substring(0, resTime.length() - 3);
+        } else {
+            this.resTime = resTime;
+        }
     }
 
     public String getQr() {
