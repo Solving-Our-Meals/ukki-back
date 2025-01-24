@@ -1,4 +1,5 @@
 package com.ohgiraffers.ukki.inquiry.controller;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
@@ -22,7 +23,6 @@ import java.util.Map;
 
 import org.springframework.http.MediaType;
 
-import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
 
 @RestController
