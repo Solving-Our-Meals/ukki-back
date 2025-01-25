@@ -210,13 +210,19 @@ public class MypageService {
 
 
     public boolean deleteInquiry(int inquiryNo) {
-
         MypageInquiryDTO inquiry = mypageMapper.findInquiryById(inquiryNo);
 
-        if (inquiry != null && inquiry.getFile() != null && !inquiry.getFile().isEmpty()) {
-            boolean fileDeleted = deleteFile(inquiry.getFile());
-            if (!fileDeleted) {
-                return false;
+        if (inquiry != null) {
+            String fileId = inquiry.getFile();
+
+            if (fileId != null && !fileId.isEmpty()) {
+                try {
+                    googleDriveService.deleteFile(fileId);
+                    System.out.println("구글 드라이브 파일 삭제 성공, 파일 ID: " + fileId);
+                } catch (Exception e) {
+                    System.out.println("파일 삭제 중 오류 발생: " + e.getMessage());
+                    return false;
+                }
             }
         }
 
@@ -224,6 +230,7 @@ public class MypageService {
 
         return result > 0;
     }
+
 
 
     public boolean verifyPassword(String userId, String password) {

@@ -397,17 +397,17 @@ public class MypageController {
 
 
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<String> downloadFile(@PathVariable String fileId) {
+    public ResponseEntity<Object> downloadFile(@PathVariable String fileId) {
         try {
-            String fileDownloadUrl = googleDriveService.getFileUrl(fileId);
-
-            return ResponseEntity.ok(fileDownloadUrl);
+            String fileDownloadUrl = googleDriveService.getFileUrl(fileId); // 파일 다운로드 URL 가져오기
+            return ResponseEntity.ok("{\"fileName\":\"문의 파일\",\"fileDownloadUrl\":\"" + fileDownloadUrl + "\"}");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("파일 다운로드 중 오류가 발생했습니다.");  // 서버 오류 처리
+                    .body("{\"fileName\":\"문의 파일\",\"error\":\"파일 다운로드 중 오류가 발생했습니다.\"}");
         }
     }
+
 
 
     @PostMapping("/confirm")
