@@ -429,31 +429,33 @@ public class MypageService {
                 }
             }
 
-            // 프로필 이미지 삭제
-            String profileImagePath = getExistingFilePath(userId);
-            if (profileImagePath != null && !profileImagePath.isEmpty()) {
-                boolean isFileDeleted = deleteFile(profileImagePath);
-                if (!isFileDeleted) {
-                    throw new RuntimeException("프로필 이미지 제거 실패");
-                } else {
-                    System.out.println("프로필 사진 없음");
+            // 프로필 이미지 삭제 (구글 드라이브에서 삭제)
+            String profileImageFileId = getExistingFileId(userId);
+            if (profileImageFileId != null && !profileImageFileId.isEmpty()) {
+                try {
+                    googleDriveService.deleteFile(profileImageFileId);  // 구글 드라이브에서 파일 삭제
+                    System.out.println("프로필 이미지 삭제 성공, 파일 ID: " + profileImageFileId);
+                } catch (Exception e) {
+                    throw new RuntimeException("프로필 이미지 삭제 실패: " + e.getMessage());
                 }
             } else {
-                System.out.println("프로필 이미지가 존재하지 않습니다. 건너뜁니다.");
+                System.out.println("프로필 이미지가 존재하지 않거나 파일 ID가 잘못되었습니다.");
             }
 
-            // 리뷰 이미지 삭제
-            List<String> reviewImages = mypageMapper.getReviewImagesByUserId(userNo);
-            if (reviewImages != null && !reviewImages.isEmpty()) {
-                for (String reviewImagePath : reviewImages) {
-                    boolean isFileDeleted = deleteFile(reviewImagePath);
-                    if (!isFileDeleted) {
-                        System.out.println("Failed to delete review image: " + reviewImagePath);
+            // 리뷰 이미지 삭제 (구글 드라이브에서 삭제)
+            List<String> reviewImageFileIds = mypageMapper.getReviewImagesByUserId(userNo);
+            if (reviewImageFileIds != null && !reviewImageFileIds.isEmpty()) {
+                for (String reviewImageFileId : reviewImageFileIds) {
+                    try {
+                        googleDriveService.deleteFile(reviewImageFileId);
+                        System.out.println("리뷰 이미지 삭제 성공, 파일 ID: " + reviewImageFileId);
+                    } catch (Exception e) {
+                        System.out.println("리뷰 이미지 삭제 실패: " + reviewImageFileId);
                         continue;
                     }
                 }
             } else {
-                System.out.println("리뷰 이미지가 존재하지 않습니다. 건너뜁니다.");
+                System.out.println("리뷰 이미지가 존재하지 않거나 파일 ID가 잘못되었습니다.");
             }
 
 
