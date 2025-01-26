@@ -50,6 +50,12 @@ public class SignupService {
             String hashedPassword = passwordEncoder.encode(signupUserDTO.getUserPass());
             signupUserDTO.setUserPass(hashedPassword);
 
+            int userIdCount = signupMapper.signupId(signupUserDTO.getUserId());
+            if (userIdCount > 0) {
+                System.out.println("이미 존재하는 아이디입니다.");
+                return false;
+            }
+
             int noshowCount = signupMapper.getNoshowCountByEmail(signupUserDTO.getEmail()); // DTO에서 이메일 가져와서 그 이메일의 NOSHOW 횟수를 가져오라
 //            System.out.println(noshowCount); 여기까지 반환 잘됨
             if (noshowCount > 0) {
