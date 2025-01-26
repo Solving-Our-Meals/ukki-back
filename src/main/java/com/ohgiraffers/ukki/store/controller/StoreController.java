@@ -32,10 +32,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class StoreController {
 
     private final StoreService storeService;
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
+//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
     private final GoogleDriveService googleDriveService;
-    private static final String STORE_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+
+    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    private static final String STORE_FOLDER_ID = "19mb-5n8hNjrdRAksh4hTKcFY-Gp0Aaoz";
+    private static final String REVIEW_FOLDER_ID = "1wJz5yiUrtwNiK3tk1rN1vGSrly8NiIQr";
 
     public StoreController(StoreService storeService, BossService bossService, GoogleDriveService googleDriveService){
         this.storeService = storeService;
@@ -94,42 +97,34 @@ public class StoreController {
 
     // 가게 배너 파일 서버에서 로컬 접근 및 불러오기
     @GetMapping("/{storeNo}/api/files")
-    public ResponseEntity<Resource> getBanner(@PathVariable("storeNo") long storeNo, @RequestParam("filename") String filename) {
+    public ResponseEntity<byte[]> getBanner(@PathVariable("storeNo") long storeNo, @RequestParam("filename") String filename) {
         try {
-            // Paths.get(SHARED_FOLDER)는 SHARED_FOLDER로 지정한 경로(여기서는 전역필드로 초기화) 문자열을 Path 객체로 변환
-            // 이 Path 객체는 파일 시스템 경로를 추상화하여 처리할 수 있게 한다.
-            // .resolve(filename) : filename은 파일 이름을 나타내는 문자열.
-            // ,resolve(filename) 메소드는 Path 객체에 파일 이름을 결합하여 새로운 경로를 생성한다.
-            // 이 결합된 경로는 SHATED_FOLDER 경로와 filename을 합쳐서 완전한 파일 경로를 만든다.
-            // 즉, 최종 경로가 \\\\192.168.0.138\\ukki_nas\\store\\5banner1 이 된다
-            Path file = Paths.get(SHARED_FOLDER).resolve(filename + ".png");
-            if(!Files.exists(file)){
-                file = Paths.get(SHARED_FOLDER).resolve(filename + ".jpg");
+            if (filename == null || filename.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 가게 배너 파일명입니다.".getBytes());
             }
 
-            // 디버깅 확인
-//            System.out.println("file 경로 : " + file.toString());
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + filename;
 
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
 
-            // 자바에서 Path 객체로부터 Resource 객체를 생성하는 부분
-            // file.toUri() :
-            // file은 Path 객체로 파일 시스템 상의 특정 파일을 나타낸다.
-            // toUri() 메소드는 이 Path객체를 URI(Uniform Resource Identifier) 객체로 변환한다. URI는 파일 위치를 나타내는 문자열 형식의 주소이다.
-            // new UriResource(uri) :
-            // UriResource는 스프링 프레임워크에서 제공하는 클래스 중 하나로, 주어진 URI를 이용해 리소스를 나타낸다.
-            // new UriResource(uri)는 지정된 URI를 기반으로 UriResource 객체를 생성한다. 이 객체는 주어진 URI가 가리키는 자원을 나타낸다.
-            // 이 UriResource 객체를 사용하여 파일을 읽거나 다른 작업을 수행할 수 있다.
-            Resource resource = new UrlResource(file.toUri());
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
 
-            if (resource.exists() && resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("배너 이미지를 불러오는 도중에 오류가 발생했습니다.".getBytes());
         }
     }
 
@@ -153,27 +148,34 @@ public class StoreController {
 
     // 가게 프로필 파일 서버에서 로컬 접근 및 불러오기
     @GetMapping(value = "/{storeNo}/api/profile")
-    public ResponseEntity<Resource> getProfile(@PathVariable("storeNo") long storeNo, @RequestParam("profileName") String profileName){
-
+    public ResponseEntity<byte[]> getProfile(@PathVariable("storeNo") long storeNo, @RequestParam("profileName") String profileName){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(profileName + ".png");
-            if(!Files.exists(file)){
-                file = Paths.get(SHARED_FOLDER).resolve(profileName + ".jpg");
+            if (profileName == null || profileName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 profileName입니다.".getBytes());
             }
 
-            // 디버깅 확인
-//            System.out.println("프로필 파일 경로 : " + file);
-            Resource resource = new UrlResource(file.toUri());
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + profileName;
 
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; profileName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("가게 프로필 이미지 불러오는 중 오류가 발생했습니다.".getBytes());
         }
     }
 
@@ -196,24 +198,34 @@ public class StoreController {
 
     // 메뉴 이미지 서버에서 로컬 접근 및 불러오기
     @GetMapping("/{storeNo}/api/menu")
-    public ResponseEntity<Resource> getMenu(@PathVariable("storeNo") long storeNo, @RequestParam("menuName") String menuName ){
+    public ResponseEntity<byte[]> getMenu(@PathVariable("storeNo") long storeNo, @RequestParam("menuName") String menuName ){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(menuName + ".png");
-            if(!Files.exists(file)){
-                file = Paths.get(SHARED_FOLDER).resolve(menuName + ".jpg");
+            if (menuName == null || menuName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 menuName입니다.".getBytes());
             }
-//            System.out.println("menu : " + file );
-            Resource resource = new UrlResource(file.toUri());
 
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; menuName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + menuName;
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("메뉴 이미지 불러오는 도중 오류가 발생했습니다.".getBytes());
         }
     }
 
@@ -305,7 +317,6 @@ public class StoreController {
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(response.getBody());
-
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -415,7 +426,8 @@ public class StoreController {
 
                 String reviewImageValue = "REVIEW" + reviewDate;
 
-                String fileId = googleDriveService.uploadFile(singleFile, STORE_FOLDER_ID, reviewImageValue);
+                String fileId = googleDriveService.uploadFile(singleFile, INQUIRY_FOLDER_ID, reviewImageValue);
+//                String fileId = googleDriveService.uploadFile(singleFile, REVIEW_FOLDER_ID, reviewImageValue);
                 System.out.println("fileId : " + fileId);
                 reviewContentDTO.setReviewImage(fileId);
 
@@ -451,32 +463,19 @@ public class StoreController {
 
             // 삭제할 리뷰 정보 가져오기(리뷰 이미지 포함)
             ReviewContentDTO reviewContentDTO = storeService.getReviewContent(reviewNo);
+            System.out.println("reviewContentDTO = " + reviewContentDTO);
 
             // 리뷰 삭제
             storeService.deleteReview(reviewNo);
 
             // 리뷰 이미지 파일 삭제
-            String pngFilePath = SHARED_FOLDER + "\\" + reviewContentDTO.getReviewImage() + ".png";
-            String jpgFilePath = SHARED_FOLDER + "\\" + reviewContentDTO.getReviewImage() + ".jpg";
-
-            File pngFile = new File(pngFilePath);
-            File jpgFile = new File(jpgFilePath);
-
-            if (reviewContentDTO.getReviewImage() != null) {
-                if (pngFile.exists()) {
-                    if (pngFile.delete()) {
-                        System.out.println("PNG 이미지 파일 삭제 성공: " + pngFilePath);
-                    } else {
-                        System.out.println("PNG 이미지 파일 삭제 실패: " + pngFilePath);
-                    }
-                } else if (jpgFile.exists()) {
-                    if (jpgFile.delete()) {
-                        System.out.println("JPG 이미지 파일 삭제 성공: " + jpgFilePath);
-                    } else {
-                        System.out.println("JPG 이미지 파일 삭제 실패: " + jpgFilePath);
-                    }
-                } else {
-                    System.out.println("이미지 파일이 존재하지 않음: " + pngFilePath + " 또는 " + jpgFilePath);
+            if (reviewContentDTO.getReviewImage() != null && !reviewContentDTO.getReviewImage().isEmpty()) {
+                try {
+                    googleDriveService.deleteFile(reviewContentDTO.getReviewImage()); // Google Drive에서 파일 삭제
+                    System.out.println("구글 드라이브 파일에 있던 기존 파일 제거했습니다: " + reviewContentDTO.getReviewImage());
+                } catch (Exception e) {
+                    System.out.println("파일 삭제 실패: " + e.getMessage());
+                    e.printStackTrace();
                 }
             } else {
                 System.out.println("기본 이미지이므로 삭제하지 않습니다: " + reviewContentDTO.getReviewImage());
