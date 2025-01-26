@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +23,12 @@ import org.springframework.http.MediaType;
 public class AdminReservationController {
 
     private final AdminReservationService adminReservationService;
+    private final GoogleDriveService googleDriveService;
 
     @Autowired
-    public AdminReservationController(AdminReservationService adminReservationService){
+    public AdminReservationController(AdminReservationService adminReservationService, GoogleDriveService googleDriveService){
         this.adminReservationService = adminReservationService;
+        this.googleDriveService = googleDriveService;
     }
 
     @GetMapping("/weekly")
@@ -181,7 +184,11 @@ public class AdminReservationController {
     @DeleteMapping("/info/today/{resNo}")
     public ResponseEntity<?> deleteTodayRes(@PathVariable int resNo) {
         try{
+            ReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
             adminReservationService.deleteTodayRes(resNo);
+            if(resInfo.getQr() != "expired"){
+                googleDriveService.deleteFile(resInfo.getQr());
+            }
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "삭제 성공");
