@@ -17,7 +17,7 @@
         <result property="reviewUserId" column="USER_ID"/>
     </resultMap>
 
-    <resultMap id="reviewInfo" type="com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO">
+    <resultMap id="reviewInfo" type="com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewInfoDTO">
         <id property="reviewNo" column="REVIEW_NO" />
         <result property="reviewContent" column="REVIEW_CONTENT" />
         <result property="reviewScope" column="REVIEW_SCOPE" />

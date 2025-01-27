@@ -311,7 +311,7 @@
     </update>
 
     <!-- 문의 내역 가져오기 -->
-    <select id="getInquiryList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+    <select id="getInquiryList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInquiryDTO">
         SELECT
         INQ_NO AS inquiryNo
         , INQ_TITLE AS inquiryTitle
@@ -334,7 +334,7 @@
     </select>
 
     <!-- 리뷰 신고 내역 가져오기 -->
-    <select id="getReportList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+    <select id="getReportList" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInquiryDTO">
         SELECT
         A.REPORT_NO AS inquiryNo,
         A.REPORT_TITLE AS inquiryTitle,
@@ -358,7 +358,7 @@
     </select>
 
     <!-- 최근 내역 가져오기 -->
-    <select id="getRecentInquiryList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+    <select id="getRecentInquiryList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInquiryDTO">
         SELECT
         INQ_NO AS inquiryNo
         , INQ_TITLE AS inquiryTitle
@@ -378,7 +378,7 @@
     </select>
 
     <!-- 최근 리뷰 신고 내역 -->
-    <select id="getRecentReportList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+    <select id="getRecentReportList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInquiryDTO">
         SELECT
                A.REPORT_NO AS inquiryNo,
                A.REPORT_TITLE AS inquiryTitle,
@@ -398,7 +398,7 @@
          WHERE B.STORE_NO = #{ storeNo }
     </select>
 
-    <select id="getInquiryInfo" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
+    <select id="getInquiryInfo" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.StoreInquiryDTO">
         <choose>
             <when test="table == 'TBL_REVIEW_REPORT'">
                 SELECT
@@ -457,18 +457,18 @@
 
     <update id="updateReviewReport" parameterType="map">
         UPDATE TBL_REVIEW_REPORT
-        SET REPORT_TITLE = #{ inquiryDTO.inquiryTitle },
-        REPORT_CONTENT = #{ inquiryDTO.inquiryContent },
-        REPORT_DATE = #{ inquiryDTO.inquiryDate }
+        SET REPORT_TITLE = #{ storeInquiryDTO.inquiryTitle },
+        REPORT_CONTENT = #{ storeInquiryDTO.inquiryContent },
+        REPORT_DATE = #{ storeInquiryDTO.inquiryDate }
         WHERE REPORT_NO = #{ inquiryNo }
     </update>
 
     <update id="updateInquiry" parameterType="map">
         UPDATE TBL_INQUIRY
-        SET INQ_TITLE = #{ inquiryDTO.inquiryTitle },
-        INQ_CONTENT = #{ inquiryDTO.inquiryContent },
-        INQ_DATE = #{ inquiryDTO.inquiryDate },
-        FILE = #{ inquiryDTO.file }
+        SET INQ_TITLE = #{ storeInquiryDTO.inquiryTitle },
+        INQ_CONTENT = #{ storeInquiryDTO.inquiryContent },
+        INQ_DATE = #{ storeInquiryDTO.inquiryDate },
+        FILE = #{ storeInquiryDTO.file }
         WHERE INQ_NO = #{ inquiryNo }
     </update>
 

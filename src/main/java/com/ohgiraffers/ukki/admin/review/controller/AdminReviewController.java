@@ -1,7 +1,7 @@
 package com.ohgiraffers.ukki.admin.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO;
+import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewInfoDTO;
 import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class AdminReviewController {
     @GetMapping("info/{reviewNo}")
     public ResponseEntity<?> searchReviewInfo(@PathVariable String reviewNo){
         try {
-            ReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
+            AdminReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
             System.out.println(reviewInfo);
 
             return ResponseEntity.ok()

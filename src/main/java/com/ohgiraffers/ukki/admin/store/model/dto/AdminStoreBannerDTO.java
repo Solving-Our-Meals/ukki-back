@@ -3,7 +3,7 @@ package com.ohgiraffers.ukki.admin.store.model.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BannerDTO {
+public class AdminStoreBannerDTO {
 
     private long storeNo;
     private String banner1;
@@ -12,7 +12,7 @@ public class BannerDTO {
     private String banner4;
     private String banner5;
 
-    public BannerDTO(long storeNo, String banner1, String banner2, String banner3, String banner4, String banner5) {
+    public AdminStoreBannerDTO(long storeNo, String banner1, String banner2, String banner3, String banner4, String banner5) {
         this.storeNo = storeNo;
         this.banner1 = banner1;
         this.banner2 = banner2;

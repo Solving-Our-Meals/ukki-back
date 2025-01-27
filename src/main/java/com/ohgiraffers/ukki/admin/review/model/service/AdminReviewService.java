@@ -1,7 +1,7 @@
 package com.ohgiraffers.ukki.admin.review.model.service;
 
 import com.ohgiraffers.ukki.admin.review.model.dao.AdminReviewMapper;
-import com.ohgiraffers.ukki.admin.review.model.dto.ReviewInfoDTO;
+import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewInfoDTO;
 import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class AdminReviewService {
         return adminReviewMapper.searchReview(params);
     }
 
-    public ReviewInfoDTO searchReviewInfo(String reviewNo) {
+    public AdminReviewInfoDTO searchReviewInfo(String reviewNo) {
         return adminReviewMapper.searchReviewInfo(reviewNo);
     }
 

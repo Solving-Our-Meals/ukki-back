@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.admin.store.model.dto;
 
-public class KeywordDTO {
+public class AdminStoreKeywordDTO {
 
     private long storeNo;
     private String keyword1;
@@ -10,9 +10,9 @@ public class KeywordDTO {
     private String keyword5;
     private String keyword6;
 
-    public KeywordDTO() {}
+    public AdminStoreKeywordDTO() {}
 
-    public KeywordDTO(long storeNo, String keyword1, String keyword2, String keyword3, String keyword4, String keyword5, String keyword6) {
+    public AdminStoreKeywordDTO(long storeNo, String keyword1, String keyword2, String keyword3, String keyword4, String keyword5, String keyword6) {
         this.storeNo = storeNo;
         this.keyword1 = keyword1;
         this.keyword2 = keyword2;

@@ -66,18 +66,18 @@ public interface BossMapper {
 
     void updateReportCount(long reviewNo);
 
-    List<InquiryDTO> getInquiryList(long userNo, String searchWord);
+    List<StoreInquiryDTO> getInquiryList(long userNo, String searchWord);
 
-    List<InquiryDTO> getReportList(long storeNo, String searchWord);
+    List<StoreInquiryDTO> getReportList(long storeNo, String searchWord);
 
-    List<InquiryDTO> getRecentInquiryList(long userNo);
+    List<StoreInquiryDTO> getRecentInquiryList(long userNo);
 
-    List<InquiryDTO> getRecentReportList(long storeNo);
+    List<StoreInquiryDTO> getRecentReportList(long storeNo);
 
 
 //    InquiryDTO getReviewReportInfo(long inquiryNo);
 
-    InquiryDTO getInquiryInfo(long inquiryNo, String table);
+    StoreInquiryDTO getInquiryInfo(long inquiryNo, String table);
 
     void deleteReviewReport(long inquiryNo);
 
@@ -85,9 +85,9 @@ public interface BossMapper {
 
     void decreaseReportCount(long reviewNo);
 
-    void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo);
+    void updateReviewReport(StoreInquiryDTO storeInquiryDTO, long inquiryNo);
 
-    void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo);
+    void updateInquiry(StoreInquiryDTO storeInquiryDTO, long inquiryNo);
 
     String getFileName(long inquiryNo);
 

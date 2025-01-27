@@ -16,13 +16,13 @@ public class AdminStoreInfoDTO {
     private long userNo;
     private int posNumber; // 예약 가능 인원
     private String storeRegistDate;
-    private KeywordDTO storeKeyword;
-    private List<CategoryDTO> storeCategory;
-    private OperationDTO operationTime;
+    private AdminStoreKeywordDTO storeKeyword;
+    private List<AdminStoreCategoryDTO> storeCategory;
+    private AdminStoreOperationDTO operationTime;
 
     public AdminStoreInfoDTO() {}
 
-    public AdminStoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, KeywordDTO storeKeyword, List<CategoryDTO> storeCategory, OperationDTO operationTime, String storeRegistDate) {
+    public AdminStoreInfoDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, AdminStoreKeywordDTO storeKeyword, List<AdminStoreCategoryDTO> storeCategory, AdminStoreOperationDTO operationTime, String storeRegistDate) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
@@ -128,27 +128,27 @@ public class AdminStoreInfoDTO {
         this.posNumber = posNumber;
     }
 
-    public KeywordDTO getStoreKeyword() {
+    public AdminStoreKeywordDTO getStoreKeyword() {
         return storeKeyword;
     }
 
-    public void setStoreKeyword(KeywordDTO storeKeyword) {
+    public void setStoreKeyword(AdminStoreKeywordDTO storeKeyword) {
         this.storeKeyword = storeKeyword;
     }
 
-    public List<CategoryDTO> getStoreCategory() {
+    public List<AdminStoreCategoryDTO> getStoreCategory() {
         return storeCategory;
     }
 
-    public void setStoreCategory(List<CategoryDTO> storeCategory) {
+    public void setStoreCategory(List<AdminStoreCategoryDTO> storeCategory) {
         this.storeCategory = storeCategory;
     }
 
-    public OperationDTO getOperationTime() {
+    public AdminStoreOperationDTO getOperationTime() {
         return operationTime;
     }
 
-    public void setOperationTime(OperationDTO operationTime) {
+    public void setOperationTime(AdminStoreOperationDTO operationTime) {
         this.operationTime = operationTime;
     }
 

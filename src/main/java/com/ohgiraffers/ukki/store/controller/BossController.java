@@ -2,10 +2,8 @@ package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
-import com.ohgiraffers.ukki.common.Controller.GoogleDriveController;
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
-import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
@@ -20,25 +18,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.Resource;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -310,13 +297,13 @@ public class BossController {
         try{
 
             // INQUIRY 테이블에서 가져오기
-            List<InquiryDTO> inquiryList =  bossService.getInquiryList(userNo, searchWord);
+            List<StoreInquiryDTO> inquiryList =  bossService.getInquiryList(userNo, searchWord);
 
             // REVIEW_REPORT 테이블에서 가져오기
-            List<InquiryDTO> reportList = bossService.getReportList(storeNo, searchWord);
+            List<StoreInquiryDTO> reportList = bossService.getReportList(storeNo, searchWord);
 
             inquiryList.addAll(reportList);
-            inquiryList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+            inquiryList.sort(Comparator.comparing(StoreInquiryDTO::getInquiryDate).reversed());
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -333,13 +320,13 @@ public class BossController {
     @GetMapping("/recentInquiry")
     public ResponseEntity<?> getRecentInquiryList(@RequestParam("storeNo") long storeNo, @RequestParam("userNo") long userNo){
         try {
-            List<InquiryDTO> RecentInquirytList = bossService.getRecentInquiryList(userNo);
+            List<StoreInquiryDTO> RecentInquirytList = bossService.getRecentInquiryList(userNo);
 
             // REVIEW_REPORT 테이블에서 가져오기
-            List<InquiryDTO> RecentReportList = bossService.getRecentReportList(storeNo);
+            List<StoreInquiryDTO> RecentReportList = bossService.getRecentReportList(storeNo);
 
             RecentInquirytList.addAll(RecentReportList);
-            RecentInquirytList.sort(Comparator.comparing(InquiryDTO::getInquiryDate).reversed());
+            RecentInquirytList.sort(Comparator.comparing(StoreInquiryDTO::getInquiryDate).reversed());
 
             if (RecentInquirytList.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)
@@ -347,7 +334,7 @@ public class BossController {
             }
 
             // 가장 마지막 요소 가져오기
-            InquiryDTO lastInquiry = RecentInquirytList.get(0);
+            StoreInquiryDTO lastInquiry = RecentInquirytList.get(0);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -362,19 +349,19 @@ public class BossController {
     @GetMapping("getSpecificInquiry")
     public ResponseEntity<?> getSpecificInquiry(@RequestParam("inquiryNo") long inquiryNo, @RequestParam("categoryNo") long categoryNo){
         try {
-            InquiryDTO inquiryDTO;
+            StoreInquiryDTO storeInquiryDTO;
             // 리뷰 신고일 경우
             if (categoryNo == 0) {
                 String table = "TBL_REVIEW_REPORT";
-                inquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
+                storeInquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
             } else {
                 String table = "TBL_INQUIRY";
-                inquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
+                storeInquiryDTO = bossService.getInquiryInfo(inquiryNo, table);
             }
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(inquiryDTO);
+                    .body(storeInquiryDTO);
         } catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -440,8 +427,8 @@ public class BossController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> paramMap;
-            InquiryDTO inquiryDTO = new InquiryDTO();
-            System.out.println("inquiryDTO = " + inquiryDTO);
+            StoreInquiryDTO storeInquiryDTO = new StoreInquiryDTO();
+            System.out.println("inquiryDTO = " + storeInquiryDTO);
 
             System.out.println("문의 수정입니다. = " + params);
 
@@ -455,13 +442,13 @@ public class BossController {
             paramMap.forEach((key, value) -> {
                 switch (key) {
                     case "inquiryTitle":
-                        inquiryDTO.setInquiryTitle(value);
+                        storeInquiryDTO.setInquiryTitle(value);
                         break;
                     case "inquiryContent":
-                        inquiryDTO.setInquiryContent(value);
+                        storeInquiryDTO.setInquiryContent(value);
                         break;
                     case "inquiryDate":
-                        inquiryDTO.setInquiryDate(value);
+                        storeInquiryDTO.setInquiryDate(value);
                         break;
                 }
             });
@@ -493,11 +480,11 @@ public class BossController {
                     String fileId = googleDriveService.uploadFile(singleFile, INQUIRY_FOLDER_ID, fileName);
                     String fileUrl = googleDriveService.getFileUrl(fileId);
                     System.out.println("fileUrl = " + fileUrl);
-                    inquiryDTO.setFile(fileUrl); // DB에 새로운 파일 이름 설정
+                    storeInquiryDTO.setFile(fileUrl); // DB에 새로운 파일 이름 설정
                 } else {
 
                     if(inquiryFileUrl != null && !"".equals(inquiryFileUrl)){
-                        inquiryDTO.setFile(inquiryFileUrl);
+                        storeInquiryDTO.setFile(inquiryFileUrl);
                     } else if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
                     // 클라이언트가 파일을 첨부하지 않으면 기존 파일을 삭제하고, DB에서 파일 정보도 null로 설정
                         try {
@@ -508,21 +495,21 @@ public class BossController {
                             System.out.println("파일 삭제 실패: " + e.getMessage());
                             e.printStackTrace();
                         }
-                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
+                        storeInquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                     } else {
                         System.out.println("파일 제거 실패: 파일 ID가 없습니다.");
-                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
+                        storeInquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                     }
                 }
             }
 
             // DB 업데이트
             if (categoryNo == 0) {
-                System.out.println("inquiryDTO 입니다. :" + inquiryDTO);
-                bossService.updateReviewReport(inquiryDTO, inquiryNo);
+                System.out.println("inquiryDTO 입니다. :" + storeInquiryDTO);
+                bossService.updateReviewReport(storeInquiryDTO, inquiryNo);
             } else {
-                System.out.println("inquiryDTO 입니다. :" + inquiryDTO);
-                bossService.updateInquiry(inquiryDTO, inquiryNo);
+                System.out.println("inquiryDTO 입니다. :" + storeInquiryDTO);
+                bossService.updateInquiry(storeInquiryDTO, inquiryNo);
             }
 
             Map<String, Object> responseMap = new HashMap<>();

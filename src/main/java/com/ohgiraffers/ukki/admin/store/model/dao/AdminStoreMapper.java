@@ -16,15 +16,15 @@ public interface AdminStoreMapper {
 
     AdminStoreInfoDTO searchStoreInfo(long storeNo);
 
-    KeywordDTO getKeyword(long storeNo);
+    AdminStoreKeywordDTO getKeyword(long storeNo);
 
-    OperationDTO getOperation(long storeNo);
+    AdminStoreOperationDTO getOperation(long storeNo);
 
-    List<CategoryDTO> getCategory();
+    List<AdminStoreCategoryDTO> getCategory();
 
-    void editOperationTime(OperationDTO operationTime);
+    void editOperationTime(AdminStoreOperationDTO operationTime);
 
-    void editKeyword(KeywordDTO storeKeyword);
+    void editKeyword(AdminStoreKeywordDTO storeKeyword);
 
     void editStore(AdminStoreInfoDTO storeData);
 
@@ -34,15 +34,15 @@ public interface AdminStoreMapper {
 
     void deleteStoreOperation(int storeNo);
 
-    void editBanner(BannerDTO bannerDTO);
+    void editBanner(AdminStoreBannerDTO adminStoreBannerDTO);
 
     int lastStoreNo();
 
-    int insertOperationTime(OperationDTO operationDTO);
+    int insertOperationTime(AdminStoreOperationDTO adminStoreOperationDTO);
 
-    int insertKeyword(KeywordDTO keywordDTO);
+    int insertKeyword(AdminStoreKeywordDTO adminStoreKeywordDTO);
 
-    int insertBanner(BannerDTO bannerDTO);
+    int insertBanner(AdminStoreBannerDTO adminStoreBannerDTO);
 
     void insertStoreUser(AdminStoreUserDTO userData);
 
@@ -56,5 +56,5 @@ public interface AdminStoreMapper {
 
     void deleteReviewWithStore(int storeNo);
 
-    BannerDTO getBanner(Long storeNo);
+    AdminStoreBannerDTO getBanner(Long storeNo);
 }

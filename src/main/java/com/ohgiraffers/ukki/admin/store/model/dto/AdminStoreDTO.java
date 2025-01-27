@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.admin.store.model.dto;
 
-public class StoreDTO {
+public class AdminStoreDTO {
 
     private long storeNo;
     private String storeName;
@@ -15,9 +15,9 @@ public class StoreDTO {
     private int posNumber; // 예약 가능 인원
     private String storeRegistDate;
 
-    public StoreDTO() {}
+    public AdminStoreDTO() {}
 
-    public StoreDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, String storeRegistDate) {
+    public AdminStoreDTO(long storeNo, String storeName, String storeDes, String storeAddress, float latitude, float longitude, String storeProfile, String storeMenu, int storeCategoryNo, long userNo, int posNumber, String storeRegistDate) {
         this.storeNo = storeNo;
         this.storeName = storeName;
         this.storeDes = storeDes;
