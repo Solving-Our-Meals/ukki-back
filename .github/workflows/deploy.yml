@@ -33,9 +33,9 @@ jobs:
         with:
           registry-type: public
 
-      - name: create credentials.json
+      - name: Create credentials.json
         run: |
-          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > src/main/resources/credentials.json
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' | base64 --decode > src/main/resources/credentials.json
 
       - name: Build and push
         env:
