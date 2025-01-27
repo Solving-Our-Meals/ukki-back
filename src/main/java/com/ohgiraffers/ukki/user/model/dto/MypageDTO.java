@@ -1,5 +1,7 @@
 package com.ohgiraffers.ukki.user.model.dto;
 
+import com.ohgiraffers.ukki.common.UserRole;
+
 public class MypageDTO {
 
     private String userId;
@@ -9,10 +11,11 @@ public class MypageDTO {
     private int reservationCount;
     private int reviewCount;
     private int randomCount;
+    private UserRole userRole;
 
     public MypageDTO() {}
 
-    public MypageDTO(String userId, int userNo, String nickname, String profileImage, int reservationCount, int reviewCount, int randomCount) {
+    public MypageDTO(String userId, int userNo, String nickname, String profileImage, int reservationCount, int reviewCount, int randomCount, UserRole userRole) {
         this.userId = userId;
         this.userNo = userNo;
         this.nickname = nickname;
@@ -20,6 +23,7 @@ public class MypageDTO {
         this.reservationCount = reservationCount;
         this.reviewCount = reviewCount;
         this.randomCount = randomCount;
+        this.userRole = userRole;
     }
 
     public String getUserId() {
@@ -78,6 +82,14 @@ public class MypageDTO {
         this.randomCount = randomCount;
     }
 
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
     @Override
     public String toString() {
         return "MypageDTO{" +
@@ -88,6 +100,7 @@ public class MypageDTO {
                 ", reservationCount=" + reservationCount +
                 ", reviewCount=" + reviewCount +
                 ", randomCount=" + randomCount +
+                ", userRole=" + userRole +
                 '}';
     }
 }
