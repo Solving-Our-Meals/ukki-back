@@ -1,5 +1,9 @@
 package com.ohgiraffers.ukki.user.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SignupUserDTO {
 
     private String userId;
@@ -7,6 +11,12 @@ public class SignupUserDTO {
     private String email;
     private String userName;
     private int noshow;
+
+    @JsonIgnore
+    private String auth;
+
+    @JsonIgnore
+    private boolean terms;
 
     public SignupUserDTO() {}
 

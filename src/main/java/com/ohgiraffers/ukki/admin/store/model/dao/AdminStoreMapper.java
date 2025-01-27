@@ -14,7 +14,7 @@ public interface AdminStoreMapper {
 
     List<AdminStoreListDTO> searchBy(Map<String, String> params);
 
-    AdminStoreInfoDTO searchStoreInfo(int storeNo);
+    AdminStoreInfoDTO searchStoreInfo(long storeNo);
 
     KeywordDTO getKeyword(long storeNo);
 
@@ -55,4 +55,6 @@ public interface AdminStoreMapper {
     String[] getReviewImgStoreNo(int storeNo);
 
     void deleteReviewWithStore(int storeNo);
+
+    BannerDTO getBanner(Long storeNo);
 }

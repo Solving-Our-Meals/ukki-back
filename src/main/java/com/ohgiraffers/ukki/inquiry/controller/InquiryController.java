@@ -90,37 +90,5 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
         .contentType(MediaType.APPLICATION_JSON)
         .body(category);
     }
-
-    public String fileController(MultipartFile file, String fileName){
-
-        //                파일이름에서 확장자 뽑아내기
-        String fileExtension = "";
-        String originalFileName =file.getOriginalFilename();
-        int dotIndex = originalFileName.lastIndexOf('.');
-        if (dotIndex > 0 && dotIndex < originalFileName.length() - 1){
-            fileExtension = originalFileName.substring(dotIndex);
-        }
-        //                최종파일 이름에 확장자 추가
-        String fileSetName = fileName+fileExtension;
-        try{
-//                경로설정
-            Path networkPath = Paths.get(SHARED_FOLDER);
-            if(!Files.exists(networkPath)){
-                Files.createDirectories(networkPath);
-            }
-
-//                파일 저장 - 경로에 파일이름 붙이기
-//                StandardCopyOption.REPLACE_EXISTING은 대상 경로에 동일한 이름의 파일이 이미 존재할 경우 그 카일을 덮어쓰도록하는 옵션
-            Path filePath = networkPath.resolve(fileSetName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            System.out.println(file.getInputStream());
-            System.out.println("파일 저장 성공: " + fileSetName);
-            return fileSetName;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }
 

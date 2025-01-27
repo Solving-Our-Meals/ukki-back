@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +20,13 @@ import org.springframework.http.MediaType;
 @RequestMapping("/admin/reviews")
 public class AdminReviewController {
 
-    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-//    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
-
+    private final GoogleDriveService googleDriveService;
     private final AdminReviewService adminReviewService;
 
     @Autowired
-    public AdminReviewController(AdminReviewService adminReviewService){
+    public AdminReviewController(AdminReviewService adminReviewService, GoogleDriveService googleDriveService){
         this.adminReviewService = adminReviewService;
+        this.googleDriveService = googleDriveService;
     }
 
     @GetMapping("/total")
@@ -97,16 +94,15 @@ public class AdminReviewController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("삭제왔당");
-            String reviewImg = mapper.readTree(content).get("reviewImg").asText()+".png";
+            String reviewImg = mapper.readTree(content).get("reviewImg").asText();
+            System.out.println(reviewImg);
 
             int result = adminReviewService.deleteReview(reviewNo);
 
 
             if(result > 0){
                 if(!reviewImg.equals("DEFAULT_REVIEW_IMG.png")) {
-                    System.out.println("리뷰이미지 삭제 왔당");
-                    Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
-                    Files.deleteIfExists(filePathProfile);
+                    googleDriveService.deleteFile(reviewImg);
                 }
             }
 

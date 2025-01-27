@@ -60,6 +60,15 @@
         <result property="categoryName" column="CATEGORY_NAME"/>
     </resultMap>
 
+    <resultMap id="banner" type="com.ohgiraffers.ukki.admin.store.model.dto.BannerDTO">
+        <id property="storeNo" column="STORE_NO"/>
+        <result property="banner1" column="BANNER1"/>
+        <result property="banner2" column="BANNER2"/>
+        <result property="banner3" column="BANNER3"/>
+        <result property="banner4" column="BANNER4"/>
+        <result property="banner5" column="BANNER5"/>
+    </resultMap>
+
 
     <select id="monthlyRegistStore" resultMap="month">
         SELECT
@@ -189,7 +198,7 @@
             <if test="longitude != 0.0">LONGITUDE = #{longitude},</if>
             <if test="storeProfile != null">STORE_PROFILE = #{storeProfile},</if>
             <if test="storeMenu != null">STORE_MENU = #{storeMenu},</if>
-            <if test="storeCategoryNo != null">STORE_CATEGORY_NO = #{storeCategoryNo},</if>
+            <if test="storeCategoryNo != 0">STORE_CATEGORY_NO = #{storeCategoryNo},</if>
             <if test="posNumber != null">POS_NUMBER = #{posNumber},</if>
         </set>
         WHERE STORE_NO = #{storeNo}
@@ -199,7 +208,6 @@
         UPDATE TBL_BANNER
         <set>
             <if test="banner1 != null">BANNER1 = #{banner1},</if>
-            <if test="banner1 == null">BANNER1 = NULL,</if>
             <if test="banner2 != null">BANNER2 = #{banner2},</if>
             <if test="banner2 == null">BANNER2 = NULL,</if>
             <if test="banner3 != null">BANNER3 = #{banner3},</if>
@@ -303,4 +311,8 @@
         DELETE FROM TBL_REVIEW
         WHERE STORE_NO = #{storeNo}
     </delete>
+
+    <select id="getBanner" resultMap="banner">
+        SELECT * FROM TBL_BANNER WHERE STORE_NO = #{storeNo}
+    </select>
 </mapper>
