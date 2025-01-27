@@ -9,14 +9,14 @@ import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -425,6 +425,7 @@ public class BossController {
                               @RequestParam("categoryNo") long categoryNo,
                               @RequestParam("params") String params,
                               @RequestParam("reviewNo") long reviewNo,
+                              @RequestParam("inquiryFileUrl") String inquiryFileUrl,
                               @RequestPart(value = "inquiryFile", required = false) MultipartFile singleFile){
 
         try {
@@ -485,8 +486,11 @@ public class BossController {
                     System.out.println("fileUrl = " + fileUrl);
                     inquiryDTO.setFile(fileUrl); // DB에 새로운 파일 이름 설정
                 } else {
+
+                    if(inquiryFileUrl != null && !"".equals(inquiryFileUrl)){
+                        inquiryDTO.setFile(inquiryFileUrl);
+                    } else if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
                     // 클라이언트가 파일을 첨부하지 않으면 기존 파일을 삭제하고, DB에서 파일 정보도 null로 설정
-                    if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
                         try {
                             String fileId = extractFileIdFromUrl(existingFileUrl);
                             googleDriveService.deleteFile(fileId); // Google Drive에서 파일 삭제
@@ -495,10 +499,11 @@ public class BossController {
                             System.out.println("파일 삭제 실패: " + e.getMessage());
                             e.printStackTrace();
                         }
+                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                     } else {
                         System.out.println("파일 제거 실패: 파일 ID가 없습니다.");
+                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                     }
-                    inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                 }
             }
 
@@ -525,21 +530,43 @@ public class BossController {
 
     }
 
-    @GetMapping("/downloadFile")
-    public ResponseEntity<byte[]> downloadFile(@RequestParam("fileName") String fileName) {
-        System.out.println("Download request received for file: " + fileName);
-        String fileId = extractFileIdFromUrl(fileName);
-        try {
-            // 파일 이름 URL 인코딩
-            byte[] fileResource = googleDriveService.downloadFile(fileId);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + fileId)
-                    .body(fileResource);  // fileResource 객체 반환
+//    @GetMapping("/downloadFile")
+//    public ResponseEntity<byte[]> downloadFile(@RequestParam("fileName") String fileName) {
+//        System.out.println("Download request received for file: " + fileName);
+//        String fileId = extractFileIdFromUrl(fileName);
+//        try {
+//            // 파일 이름 URL 인코딩
+//            byte[] fileResource = googleDriveService.downloadFile(fileId);
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + fileId)
+//                    .body(fileResource);  // fileResource 객체 반환
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 기타 예외 처리
+//        }
+//    }
 
+    @GetMapping("/downloadFile")
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String fileUrl) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            byte[] fileBytes = restTemplate.getForObject(fileUrl, byte[].class);
+            ByteArrayResource resource = new ByteArrayResource(fileBytes);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"downloaded_file.png\"");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(fileBytes.length)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 기타 예외 처리
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 }
