@@ -20,7 +20,7 @@
         <result property="monthlyNoShow" column="NOSHOW"/>
     </resultMap>
 
-    <resultMap id="resList" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationListDTO">
+    <resultMap id="resList" type="com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationListDTO">
         <result property="resNo" column="RES_NO"/>
         <result property="resDate" column="RES_DATE"/>
         <result property="userId" column="USER_ID"/>
@@ -36,7 +36,7 @@
         <result property="totalRandomRes" column="TOTAL_RANDOM"/>
     </resultMap>
 
-    <resultMap id="resInfo" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationInfoDTO">
+    <resultMap id="resInfo" type="com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationInfoDTO">
         <result property="resNo" column="RES_NO"/>
         <result property="resDate" column="RES_DATE"/>
         <result property="userNo" column="USER_NO"/>

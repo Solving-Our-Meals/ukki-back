@@ -1,8 +1,8 @@
 package com.ohgiraffers.ukki.admin.reservation.controller;
 
 import com.ohgiraffers.ukki.admin.reservation.model.dto.MonthlyNoShowDTO;
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationListDTO;
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationInfoDTO;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationListDTO;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationInfoDTO;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.admin.reservation.model.service.AdminReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,10 +106,10 @@ public class AdminReservationController {
             System.out.println(category);
             System.out.println(word);
 
-            List<ReservationListDTO> resTodayList = adminReservationService.searchRes(category, word);
-            List<ReservationListDTO> resEndList = adminReservationService.searchEndRes(category, word);
+            List<AdminReservationListDTO> resTodayList = adminReservationService.searchRes(category, word);
+            List<AdminReservationListDTO> resEndList = adminReservationService.searchEndRes(category, word);
 
-            List<ReservationListDTO> resList = new ArrayList<>(resTodayList);
+            List<AdminReservationListDTO> resList = new ArrayList<>(resTodayList);
 
             resList.addAll(resEndList);
 
@@ -150,7 +150,7 @@ public class AdminReservationController {
 
             System.out.println(resNo);
 
-            ReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
+            AdminReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +168,7 @@ public class AdminReservationController {
     public ResponseEntity<?> endResInfo(@PathVariable int resNo) {
         try {
 
-            ReservationInfoDTO resInfo = adminReservationService.endResInfo(resNo);
+            AdminReservationInfoDTO resInfo = adminReservationService.endResInfo(resNo);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -184,7 +184,7 @@ public class AdminReservationController {
     @DeleteMapping("/info/today/{resNo}")
     public ResponseEntity<?> deleteTodayRes(@PathVariable int resNo) {
         try{
-            ReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
+            AdminReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
             adminReservationService.deleteTodayRes(resNo);
             if(resInfo.getQr() != "expired"){
                 googleDriveService.deleteFile(resInfo.getQr());

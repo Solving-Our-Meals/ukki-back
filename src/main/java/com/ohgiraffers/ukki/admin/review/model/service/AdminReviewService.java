@@ -2,7 +2,7 @@ package com.ohgiraffers.ukki.admin.review.model.service;
 
 import com.ohgiraffers.ukki.admin.review.model.dao.AdminReviewMapper;
 import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewInfoDTO;
-import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
+import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewListDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class AdminReviewService {
         return adminReviewMapper.totalReview();
     }
 
-    public List<ReviewListDTO> searchReview(String category, String word) {
+    public List<AdminReviewListDTO> searchReview(String category, String word) {
         Map<String, String> params = new HashMap<>();
         params.put("category", category);
         params.put("word", word);

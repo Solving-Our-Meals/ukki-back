@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.ukki.admin.inquiry.model.dao.AdminInquiryMapper">
-    <resultMap id="inquiryInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO">
+    <resultMap id="inquiryInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryInfoDTO">
         <id property="inquiryNo" column="INQ_NO"/>
         <result property="inquiryTitle" column="INQ_TITLE"/>
         <result property="inquiryContent" column="INQ_CONTENT"/>
@@ -17,7 +17,7 @@
         <result property="file" column="FILE"/>
     </resultMap>
 
-    <resultMap id="inquiryList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO">
+    <resultMap id="inquiryList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryListDTO">
             <id property="inqNo" column="INQ_NO" />
             <result property="categoryName" column="CATEGORY_NAME" />
             <result property="inqDate" column="INQ_DATE" />
@@ -27,7 +27,7 @@
             <result property="isInquiry" column="IS_INQUIRY"/>
     </resultMap>
 
-    <resultMap id="reportInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO">
+    <resultMap id="reportInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminReportInfoDTO">
         <id property="reportNo" column="REPORT_NO"/>
         <result property="reportTitle" column="REPORT_TITLE"/>
         <result property="reportContent" column="REPORT_CONTENT"/>
@@ -39,7 +39,7 @@
         <result property="state" column="STATE"/>
     </resultMap>
 
-    <resultMap id="reportList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO">
+    <resultMap id="reportList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryListDTO">
         <id property="inqNo" column="REPORT_NO"/>
         <result property="inqTitle" column="REPORT_TITLE"/>
         <result property="inqContent" column="REPORT_CONTENT"/>

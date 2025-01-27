@@ -8,7 +8,7 @@
         <result property="totalReview" column="TOTAL_REVIEW"/>
     </resultMap>
 
-    <resultMap id="reviewList" type="com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO">
+    <resultMap id="reviewList" type="com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewListDTO">
         <id property="reviewNo" column="REVIEW_NO"/>
         <result property="reviewContent" column="REVIEW_CONTENT"/>
         <result property="reviewScope" column="REVIEW_SCOPE"/>

@@ -1,10 +1,10 @@
 package com.ohgiraffers.ukki.admin.reservation.model.dao;
 
 import com.ohgiraffers.ukki.admin.reservation.model.dto.MonthlyNoShowDTO;
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationListDTO;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationListDTO;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.admin.user.model.dto.AdminUserResDTO;
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ReservationInfoDTO;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.AdminReservationInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,17 +19,17 @@ public interface AdminReservationMapper {
 
     List<AdminUserResDTO> userResList();
 
-    List<ReservationListDTO> searchRes(String category, String word);
+    List<AdminReservationListDTO> searchRes(String category, String word);
 
     int totalTodayReservation();
 
     int totalEndReservation();
 
-    List<ReservationListDTO> searchEndRes(String category, String word);
+    List<AdminReservationListDTO> searchEndRes(String category, String word);
 
-    ReservationInfoDTO endResInfo(int resNo);
+    AdminReservationInfoDTO endResInfo(int resNo);
 
-    ReservationInfoDTO todayResInfo(int resNo);
+    AdminReservationInfoDTO todayResInfo(int resNo);
 
     void deleteTodayRes(int resNo);
 

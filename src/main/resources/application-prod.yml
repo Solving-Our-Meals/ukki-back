@@ -1,3 +1,13 @@
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.ohgiraffers.ukki.*.model.dto
+  configuration:
+    map-underscore-to-camel-case: true
+    type-handlers:
+      - java-type: com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO
+        handler: com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -48,11 +58,6 @@ jwt:
 server:
   port: 8080
 
-mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.ohgiraffers.ukki.*.model.dto
-  configuration:
-    map-underscore-to-camel-case: true 
     
 logging:
   level:

@@ -1,23 +1,27 @@
 package com.ohgiraffers.ukki.admin.reservation.model.dto;
 
-public class ReservationListDTO {
+public class AdminReservationInfoDTO {
     private int resNo;
     private String resDate;
+    private int userNo;
     private String userId;
+    private int storeNo;
     private String storeName;
     private String resTime;
-    private String isToday;
+    private String qr;
     private boolean qrConfirm;
 
-    public ReservationListDTO() {}
+    public AdminReservationInfoDTO(){}
 
-    public ReservationListDTO(int resNo, String resDate, String userId, String storeName, String resTime, String isToday, boolean qrConfirm) {
+    public AdminReservationInfoDTO(int resNo, String resDate, int userNo, String userId, int storeNo, String storeName, String resTime, String qr, boolean qrConfirm) {
         this.resNo = resNo;
         this.resDate = resDate;
+        this.userNo = userNo;
         this.userId = userId;
+        this.storeNo = storeNo;
         this.storeName = storeName;
         this.resTime = resTime;
-        this.isToday = isToday;
+        this.qr = qr;
         this.qrConfirm = qrConfirm;
     }
 
@@ -37,12 +41,28 @@ public class ReservationListDTO {
         this.resDate = resDate;
     }
 
+    public int getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(int userNo) {
+        this.userNo = userNo;
+    }
+
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getStoreNo() {
+        return storeNo;
+    }
+
+    public void setStoreNo(int storeNo) {
+        this.storeNo = storeNo;
     }
 
     public String getStoreName() {
@@ -65,12 +85,12 @@ public class ReservationListDTO {
         }
     }
 
-    public String getIsToday() {
-        return isToday;
+    public String getQr() {
+        return qr;
     }
 
-    public void setIsToday(String isToday) {
-        this.isToday = isToday;
+    public void setQr(String qr) {
+        this.qr = qr;
     }
 
     public boolean isQrConfirm() {
@@ -83,13 +103,15 @@ public class ReservationListDTO {
 
     @Override
     public String toString() {
-        return "ReservationListDTO{" +
+        return "ReservationInfoDTO{" +
                 "resNo=" + resNo +
                 ", resDate='" + resDate + '\'' +
+                ", userNo=" + userNo +
                 ", userId='" + userId + '\'' +
+                ", storeNo=" + storeNo +
                 ", storeName='" + storeName + '\'' +
                 ", resTime='" + resTime + '\'' +
-                ", isToday='" + isToday + '\'' +
+                ", qr='" + qr + '\'' +
                 ", qrConfirm=" + qrConfirm +
                 '}';
     }

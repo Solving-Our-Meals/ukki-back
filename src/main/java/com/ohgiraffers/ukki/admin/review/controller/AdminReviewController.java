@@ -2,7 +2,7 @@ package com.ohgiraffers.ukki.admin.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewInfoDTO;
-import com.ohgiraffers.ukki.admin.review.model.dto.ReviewListDTO;
+import com.ohgiraffers.ukki.admin.review.model.dto.AdminReviewListDTO;
 import com.ohgiraffers.ukki.admin.review.model.service.AdminReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +54,7 @@ public class AdminReviewController {
     @GetMapping("list")
     public ResponseEntity<?> searchReview(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
         try {
-            List<ReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
+            List<AdminReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
             System.out.println(reviewList);
 
             return ResponseEntity.ok()
