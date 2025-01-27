@@ -1,20 +1,23 @@
 package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
+import com.ohgiraffers.ukki.common.Controller.GoogleDriveController;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
+import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -22,15 +25,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.UrlResource;
@@ -46,7 +50,15 @@ public class BossController {
     @Autowired
     private BossMapper bossMapper;
 
-    private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
+//    private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
+    private final GoogleDriveService googleDriveService;
+    private final InquiryService inquiryService;
+    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+
+    public BossController(GoogleDriveService googleDriveService, InquiryService inquiryService){
+        this.googleDriveService = googleDriveService;
+        this.inquiryService = inquiryService;
+    }
 
     // 가게 정보 조회
     @GetMapping("/getStoreInfo")
@@ -65,6 +77,7 @@ public class BossController {
 
 
     // 예약 현황 조회
+// 예약 현황 조회
     @GetMapping("/reservation-status")
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
             @RequestParam Long storeNo,
@@ -75,11 +88,9 @@ public class BossController {
         List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
         System.out.println("reservations: " + reservations);  // 로그 추가
 
-        // 예약 정보가 없으면 기본값 5 반환
+        // 예약 정보가 없으면 빈 리스트 반환
         if (reservations == null || reservations.isEmpty()) {
-            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
-            defaultResponse.setResPosNumber(5);  // 기본값 5
-            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+            return ResponseEntity.ok(Collections.emptyList());
         }
 
         // 최신 예약 정보 가져오기
@@ -89,36 +100,54 @@ public class BossController {
 
 
 
+    @GetMapping("/reservations-list")
+    public ResponseEntity<List<ReservationDTO>> getReservationStatus(
+            @RequestParam long storeNo,
+            @RequestParam LocalDate reservationDate,  // String으로 받음
+            @RequestParam(required = false) LocalTime reservationTime) {
 
-
-
-
-
-
-
-    // 예약 인원 리스트 조회
-    @GetMapping("/reservation-people-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationPeopleList(@RequestParam long storeNo) {
         try {
-            List<ReservationDTO> reservations = bossService.getReservationPeopleList(storeNo);
 
-            // 바디를 밖으로 빼서 반환
-            return ResponseEntity.ok(reservations); // 이 부분을 분리
+            List<ReservationDTO> reservations = bossService.getReservationList(storeNo, reservationDate, reservationTime);
+            return ResponseEntity.ok(reservations);
+        } catch (DateTimeParseException e) {
+            // 날짜나 시간이 잘못된 형식일 경우
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
+            // 일반적인 예외 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
 
 
+
+
     @GetMapping("/weekly-reservation-count")
-    public ResponseEntity<WeeklyReservationCountDTO> getWeeklyReservationCount(@RequestParam long storeNo) {
+    public ResponseEntity<?> getWeeklyReservationCount(@RequestParam long storeNo) {
         try {
-            WeeklyReservationCountDTO count = bossService.getWeeklyReservationCount(storeNo);
-            return ResponseEntity.ok(count);
+            ThisWeekReservationDTO thisWeek = bossService.getWeeklyReservationCount(storeNo);
+            if(thisWeek==null){
+                thisWeek = new ThisWeekReservationDTO();
+                thisWeek.setMon(0);
+                thisWeek.setTue(0);
+                thisWeek.setWed(0);
+                thisWeek.setThu(0);
+                thisWeek.setFri(0);
+                thisWeek.setSat(0);
+                thisWeek.setSun(0);
+            }
+            System.out.println(thisWeek);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(thisWeek);
         } catch (Exception e) {
-            WeeklyReservationCountDTO emptyCount = new WeeklyReservationCountDTO();  // 빈 DTO를 별도로 분리
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyCount);
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("주간 예약 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -135,17 +164,6 @@ public class BossController {
     }
 
 
-    // 예약 가능 인원 조회
-//    @PostMapping("/getResPosNum")
-//    public ResponseEntity<List<DayResPosNumDTO>> getResPosNum(@RequestBody StoreResPosNumDTO storeResPosNumDTO) {
-//        try {
-//            List<DayResPosNumDTO> result = bossService.getResPosNum(storeResPosNumDTO);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
-//        }
-//    }
-
 
     // 예약 가능 인원 삽입
     @PostMapping("/insertAvailableSlots")
@@ -155,8 +173,6 @@ public class BossController {
         LocalTime reservationTime = storeResPosNumDTO.getReservationTime();
         int resPosNumber = storeResPosNumDTO.getResPosNumber();
 
-        // 디버깅: resPosNumber 값 확인
-//        System.out.println("서버에서 받은 예약 가능한 인원 수: " + resPosNumber);
 
         // storeNo가 없는 경우 처리
         if (storeNo == null) {
@@ -204,36 +220,6 @@ public class BossController {
 
 
 
-    // 예약 리스트 조회
-    @GetMapping("/reservations-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
-            @RequestParam long storeNo,
-            @RequestParam LocalDate reservationDate,
-            @RequestParam(required = false) LocalTime reservationTime) {
-
-        try {
-            List<ReservationDTO> reservations = bossService.getReservationListForTime(storeNo, reservationDate, reservationTime);
-            return ResponseEntity.ok(reservations);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
-        }
-    }
-
-
-    // 예약 가능한 슬롯 수 조회
-//    @GetMapping("/getAvailableSlots")
-//    public ResponseEntity<Map<String, Object>> getAvailableSlots(@RequestParam long storeNo) {
-//        try {
-//            int availableSlots = bossService.getAvailableSlots(storeNo);
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("availableSlots", availableSlots);  // 바디를 별도의 변수로 분리
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            Map<String, Object> errorResponse = new HashMap<>();
-//            errorResponse.put("error", "Failed to fetch available slots");  // 오류 메시지를 변수로 분리
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-//        }
-//    }
 
 
     // 최신 리뷰 받아오기
@@ -396,6 +382,12 @@ public class BossController {
         }
     }
 
+    public String extractFileIdFromUrl(String url){
+        Pattern pattern = Pattern.compile("[?&]id=([^&]+)");
+        Matcher matcher = pattern.matcher(url);
+        return matcher.find() ? matcher.group(1) : null;
+    }
+
     @DeleteMapping("/deleteInquiry")
     public ResponseEntity<?> deleteInquiry(@RequestParam("inquiryNo") long inquiryNo, @RequestParam("categoryNo") long categoryNo, @RequestParam("reviewNo") long reviewNo){
         try {
@@ -405,21 +397,23 @@ public class BossController {
                 // review에서 reportCount -1
                 bossService.decreaseReportCount(reviewNo);
             } else {
-                String existingFile = bossService.getFileName(inquiryNo);
+
+                String existingFileUrl = bossService.getFileName(inquiryNo);// DB에서 기존 파일 이름(fileUrl)을 가져옵니다.
+                System.out.println("existingFile = " + existingFileUrl);
 
                 bossService.deleteInquiry(inquiryNo);
 
-                // 여기 파일 삭제
-                if (existingFile != null && !existingFile.isEmpty()) {
-                    File fileToDelete = new File(INQUIRY_SHARE_DRIVE + "/" + existingFile);
-                    if (fileToDelete.exists()) {
-                        boolean deleted = fileToDelete.delete();
-                        if (!deleted) {
-                            throw new RuntimeException("파일 삭제 실패");
-                        }
+                // 파일 삭제
+                if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
+                    try {
+                        String fileId = extractFileIdFromUrl(existingFileUrl);
+                        googleDriveService.deleteFile(fileId); // Google Drive에서 파일 삭제
+                        System.out.println("구글 드라이브 파일에 있던 기존 파일 제거했습니다: " + fileId);
+                    } catch (Exception e) {
+                        System.out.println("파일 삭제 실패: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
-
             }
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("message", "문의 내역 삭제에 성공했습니다.");
@@ -440,13 +434,14 @@ public class BossController {
                               @RequestParam("categoryNo") long categoryNo,
                               @RequestParam("params") String params,
                               @RequestParam("reviewNo") long reviewNo,
+                              @RequestParam("inquiryFileUrl") String inquiryFileUrl,
                               @RequestPart(value = "inquiryFile", required = false) MultipartFile singleFile){
 
         try {
-
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> paramMap;
             InquiryDTO inquiryDTO = new InquiryDTO();
+            System.out.println("inquiryDTO = " + inquiryDTO);
 
             System.out.println("문의 수정입니다. = " + params);
 
@@ -471,60 +466,53 @@ public class BossController {
                 }
             });
 
-
             // 1. 기존 파일 삭제 로직 (파일이 존재하고 새 파일을 첨부하는 경우)
             if (categoryNo != 0) {
-                String existingFile = bossService.getFileName(inquiryNo);// DB에서 기존 파일 이름을 가져옵니다.
-                System.out.println("existingFile = " + existingFile);
+                String existingFileUrl = bossService.getFileName(inquiryNo);// DB에서 기존 파일 이름(fileUrl)을 가져옵니다.
+                System.out.println("existingFile = " + existingFileUrl);
+//                String fileId = extractFileIdFromUrl(existingFileUrl);
+
                 // 2. 클라이언트에서 새로운 파일을 첨부한 경우, 기존 파일 삭제 후 새로운 파일 저장
                 if (singleFile != null && !singleFile.isEmpty()) {
-                    if (existingFile != null && !existingFile.isEmpty()) {
+                    if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
                         // 기존 파일이 존재하면 드라이브에서 삭제
-                        File existingFileOnDisk = new File(INQUIRY_SHARE_DRIVE + "/" + existingFile);
-                        if (existingFileOnDisk.exists()) {
-                            boolean deleted = existingFileOnDisk.delete(); // 기존 파일 삭제
-                            if (!deleted) {
-                                System.out.println("기존 파일 삭제 실패: " + existingFileOnDisk.getPath());
-                                throw new RuntimeException("기존 파일 삭제 실패: " + existingFileOnDisk.getPath());
-                            } else {
-                                System.out.println("기존 파일 삭제 성공: " + existingFileOnDisk.getPath());
-                            }
+                        try {
+                            String fileId = extractFileIdFromUrl(existingFileUrl);
+                            googleDriveService.deleteFile(fileId); // Google Drive에서 파일 삭제
+                            System.out.println("구글 드라이브 파일에 있던 기존 파일 제거했습니다: " + fileId);
+                        } catch (Exception e) {
+                            System.out.println("파일 삭제 실패: " + e.getMessage());
+                            e.printStackTrace();
                         }
+                    } else {
+                        System.out.println("파일 제거 실패: 파일 ID가 없습니다.");
                     }
 
                     // 새로운 파일 업로드
-                    String filePath = INQUIRY_SHARE_DRIVE;
-                    File dir = new File(filePath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();  // 디렉토리가 없으면 생성
-                    }
-
-                    String originFileName = singleFile.getOriginalFilename();
-                    String fullPath = filePath + "/" + originFileName;
-
-                    try {
-                        singleFile.transferTo(new File(fullPath)); // 새로운 파일을 저장
-                        inquiryDTO.setFile(originFileName); // DB에 새로운 파일 이름 설정
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("파일 저장 오류", e);
-                    }
-
+                    String fileName = "inquiry" + (inquiryNo);
+                    String fileId = googleDriveService.uploadFile(singleFile, INQUIRY_FOLDER_ID, fileName);
+                    String fileUrl = googleDriveService.getFileUrl(fileId);
+                    System.out.println("fileUrl = " + fileUrl);
+                    inquiryDTO.setFile(fileUrl); // DB에 새로운 파일 이름 설정
                 } else {
+
+                    if(inquiryFileUrl != null && !"".equals(inquiryFileUrl)){
+                        inquiryDTO.setFile(inquiryFileUrl);
+                    } else if (existingFileUrl != null && !existingFileUrl.isEmpty()) {
                     // 클라이언트가 파일을 첨부하지 않으면 기존 파일을 삭제하고, DB에서 파일 정보도 null로 설정
-                    if (existingFile != null && !existingFile.isEmpty()) {
-                        File existingFileOnDisk = new File(INQUIRY_SHARE_DRIVE + "/" + existingFile);
-                        if (existingFileOnDisk.exists()) {
-                            boolean deleted = existingFileOnDisk.delete();  // 기존 파일 삭제
-                            if (!deleted) {
-                                System.out.println("기존 파일 삭제 실패: " + existingFileOnDisk.getPath());
-                                throw new RuntimeException("기존 파일 삭제 실패: " + existingFileOnDisk.getPath());
-                            } else {
-                                System.out.println("기존 파일 삭제 성공: " + existingFileOnDisk.getPath());
-                            }
+                        try {
+                            String fileId = extractFileIdFromUrl(existingFileUrl);
+                            googleDriveService.deleteFile(fileId); // Google Drive에서 파일 삭제
+                            System.out.println("구글 드라이브 파일에 있던 기존 파일 제거했습니다: " + fileId);
+                        } catch (Exception e) {
+                            System.out.println("파일 삭제 실패: " + e.getMessage());
+                            e.printStackTrace();
                         }
+                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
+                    } else {
+                        System.out.println("파일 제거 실패: 파일 ID가 없습니다.");
+                        inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                     }
-                    inquiryDTO.setFile(null);  // DB에서 파일 정보 삭제 (null로 설정)
                 }
             }
 
@@ -551,33 +539,43 @@ public class BossController {
 
     }
 
+//    @GetMapping("/downloadFile")
+//    public ResponseEntity<byte[]> downloadFile(@RequestParam("fileName") String fileName) {
+//        System.out.println("Download request received for file: " + fileName);
+//        String fileId = extractFileIdFromUrl(fileName);
+//        try {
+//            // 파일 이름 URL 인코딩
+//            byte[] fileResource = googleDriveService.downloadFile(fileId);
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + fileId)
+//                    .body(fileResource);  // fileResource 객체 반환
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 기타 예외 처리
+//        }
+//    }
+
     @GetMapping("/downloadFile")
-    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName) {
-        System.out.println("Download request received for file: " + fileName);
-
-        // 파일 경로 생성
-        Path filePath = Paths.get(INQUIRY_SHARE_DRIVE, fileName);
-        Resource resource;
-
-        System.out.println("filePath = " + filePath);
-
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String fileUrl) {
         try {
-            resource = new UrlResource(filePath.toUri());
-            if (resource.exists()) {
-                // 파일 이름 URL 인코딩
-                String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace('+', ' ');
+            RestTemplate restTemplate = new RestTemplate();
+            byte[] fileBytes = restTemplate.getForObject(fileUrl, byte[].class);
+            ByteArrayResource resource = new ByteArrayResource(fileBytes);
 
-                return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();  // 파일이 없으면 404 반환
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // URL 처리 오류시 500
-        } catch (UnsupportedEncodingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 인코딩 오류시 500
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"downloaded_file.png\"");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(fileBytes.length)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
 }

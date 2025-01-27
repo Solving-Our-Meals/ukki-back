@@ -34,7 +34,7 @@ public class AdminStoreService {
         return adminStoreMapper.searchBy(params);
     }
 
-    public AdminStoreInfoDTO searchStoreInfo(int storeNo) {
+    public AdminStoreInfoDTO searchStoreInfo(long storeNo) {
         return adminStoreMapper.searchStoreInfo(storeNo);
     }
 
@@ -132,5 +132,9 @@ public class AdminStoreService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteReviewWithStore(int storeNo) {
         adminStoreMapper.deleteReviewWithStore(storeNo);
+    }
+
+    public BannerDTO getBanner(Long storeNo) {
+        return adminStoreMapper.getBanner(storeNo);
     }
 }

@@ -60,20 +60,41 @@
         <result property="status" column="STATUS"/>
     </resultMap>
 
-
+    <resultMap id="week" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO">
+        <result property="mon" column="mon"/>
+        <result property="tue" column="tue"/>
+        <result property="wed" column="wed"/>
+        <result property="thu" column="thu"/>
+        <result property="fri" column="fri"/>
+        <result property="sat" column="sat"/>
+        <result property="sun" column="sun"/>
+    </resultMap>
     <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         SELECT
         RES_POS_NUMBER AS resPosNumber,
         STORE_NO AS storeNo,
         R_DATE AS reservationDate,
         R_OPER_TIME AS reservationTime
-        FROM TBL_RES_POS_NUMBER
-        WHERE STORE_NO = #{storeNo}
+        FROM TBL_RES_POS_NUMBER WHERE STORE_NO = #{storeNo}
         AND R_DATE = #{reservationDate}
         AND R_OPER_TIME = #{reservationTime}
-        ORDER BY R_DATE DESC, R_OPER_TIME DESC
-        LIMIT 1
+        ORDER BY R_DATE DESC,
+        R_OPER_TIME DESC LIMIT 1
     </select>
+
+    <select id="selectReservationList" parameterType="map" resultMap="reservationResultMap">
+        SELECT
+        r.RES_NO,
+        r.RES_DATE,
+        r.RES_TIME,
+        u.USER_NAME AS userName,
+        r.STORE_NO
+        FROM TBL_RESERVATION r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE r.STORE_NO = #{storeNo}
+        AND r.RES_DATE = #{reservationDate}
+    </select>
+
 
 
 
@@ -97,12 +118,6 @@
         WHERE USER_NO = #{userNo}
     </select>
 
-    <!--    &lt;!&ndash; 가게별 예약 현황 조회 &ndash;&gt;-->
-    <!--    <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.controller.ReservationDTO">-->
-    <!--        SELECT * FROM TBL_RESERVATION-->
-    <!--        WHERE store_no = #{storeNo}-->
-    <!--    </select>-->
-
 
     <!-- 예약 인원 리스트 조회 -->
     <select id="selectReservationPeopleList" resultType="map">
@@ -119,23 +134,20 @@
         WHERE r.STORE_NO = #{storeNo}
     </select>
 
-<!--    &lt;!&ndash; 예약 가능 인원 조회 &ndash;&gt;-->
-<!--    <select id="selectAvailableReservationPeople" resultType="integer">-->
-<!--        SELECT-->
-<!--        (s.MAX_PEOPLE - SUM(r.RESERVATION_PEOPLE)) AS AVAILABLE_PEOPLE-->
-<!--        FROM TBL_STORE s-->
-<!--        LEFT JOIN TBL_RESERVATION r ON s.STORE_NO = r.STORE_NO AND r.RES_DATE = #{reservationDate}-->
-<!--        WHERE s.STORE_NO = #{storeNo}-->
-<!--        GROUP BY s.STORE_NO, s.MAX_PEOPLE-->
-<!--    </select>-->
-
-
-    <select id="selectWeeklyReservationCount" resultType="integer">
+    <select id="getWeeklyReservationCount"  resultMap="week">
         SELECT
-        COUNT(*) AS WEEKLY_RESERVATION_COUNT
-        FROM TBL_RESERVATION r
-        WHERE r.STORE_NO = #{storeNo}
-        AND YEARWEEK(r.RES_DATE, 1) = YEARWEEK(CURDATE(), 1)
+        SUM(CASE WHEN DATE(res_date) = this_week_monday THEN 1 ELSE 0 END) AS mon,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS tue,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 2 DAY) THEN 1 ELSE 0 END) AS wed,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS thu,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 4 DAY) THEN 1 ELSE 0 END) AS fri,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 5 DAY) THEN 1 ELSE 0 END) AS sat,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 6 DAY) THEN 1 ELSE 0 END) AS sun
+        FROM
+        tbl_end_res,
+        (SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday) AS week_start
+        WHERE
+        DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
     </select>
 
     <!-- 오늘 예약 수 조회 -->
@@ -146,21 +158,6 @@
         WHERE r.STORE_NO = #{storeNo}
         AND r.RES_DATE = CURDATE()
     </select>
-
-
-
-
-    <!-- 예약 가능한 다음 시간 조회 -->
-<!--    <select id="getNextAvailableTime" resultType="string">-->
-<!--        SELECT RES_TIME-->
-<!--        FROM TBL_RESERVATION-->
-<!--        WHERE STORE_NO = #{storeNo}-->
-<!--        AND RES_DATE = #{resDate}-->
-<!--        AND RES_TIME > #{currentTime}-->
-<!--        ORDER BY RES_TIME ASC-->
-<!--        LIMIT 1-->
-<!--    </select>-->
-
 
 
 
@@ -189,38 +186,18 @@
         SET RES_POS_NUMBER = #{resPosNumber}
         WHERE STORE_NO = #{storeNo}
         AND R_DATE = #{reservationDate}
-        AND R_DAY = #{rDay}
         AND R_OPER_TIME = #{reservationTime}
     </update>
 
     <select id="getResPosNumByStoreAndDate" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
-        SELECT *
+        SELECT
+        *
         FROM TBL_RES_POS_NUMBER
         WHERE STORE_NO = #{storeNo}
         AND R_DATE = #{reservationDate}
         AND R_OPER_TIME = #{reservationTime}
     </select>
 
-
-
-
-    <!--    <select id="getResPosNum" parameterType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO" resultType="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">-->
-<!--        SELECT DISTINCT-->
-<!--        A.OPER_TIME,-->
-<!--        IFNULL(B.RES_POS_NUMBER, A.POS_NUMBER)-->
-<!--        - IFNULL((-->
-<!--        SELECT COUNT(1)-->
-<!--        FROM TBL_RESERVATION A_2-->
-<!--        WHERE A.STORE_NO = A_2.STORE_NO-->
-<!--        AND A.OPER_TIME = DATE_FORMAT(A_2.RES_TIME, '%H:%i')-->
-<!--        ), 0) AS RES_POS_NUMBER-->
-<!--        FROM ${day} A-->
-<!--        LEFT JOIN TBL_RES_POS_NUMBER B-->
-<!--        ON A.STORE_NO = B.STORE_NO-->
-<!--        AND A.OPER_TIME = DATE_FORMAT(B.R_OPER_TIME, '%H:%i')-->
-<!--        AND DATE_FORMAT(B.R_DATE, '%Y-%m-%d') = #{reservationDate}-->
-<!--        WHERE A.STORE_NO = #{storeNo};-->
-<!--    </select>-->
 
 
 
@@ -275,11 +252,6 @@
         WHERE A.REVIEW_NO = #{reviewNo}
     </select>
 
-<!--    <select id="findAvailableSlotsByStoreNo" resultType="int">-->
-<!--        SELECT POS_NUMBER-->
-<!--        FROM TBL_STORE-->
-<!--        WHERE STORE_NO = #{storeNo}-->
-<!--    </select>-->
 
     <!-- 7일간의 예약 정보 조회 -->
     <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
@@ -408,61 +380,63 @@
     <!-- 최근 리뷰 신고 내역 -->
     <select id="getRecentReportList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
         SELECT
-        A.REPORT_NO AS inquiryNo,
-        A.REPORT_TITLE AS inquiryTitle,
-        A.REPORT_CONTENT AS inquiryContent,
-        A.REPORT_DATE AS inquiryDate,
-        B.REVIEW_NO AS reviewNo,
-        NULL AS categoryNo,
-        NULL AS userNo,
-        A.ANS_TITLE AS answerTitle,
-        A.ANS_CONTENT AS answerContent,
-        A.ANS_DATE AS answerDate,
-        A.STATE AS state,
-        NULL AS file,
-        false AS isInquiry
-        FROM TBL_REVIEW_REPORT A
-        JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
-        WHERE B.STORE_NO = #{ storeNo }
+               A.REPORT_NO AS inquiryNo,
+               A.REPORT_TITLE AS inquiryTitle,
+               A.REPORT_CONTENT AS inquiryContent,
+               A.REPORT_DATE AS inquiryDate,
+               B.REVIEW_NO AS reviewNo,
+               NULL AS categoryNo,
+               NULL AS userNo,
+               A.ANS_TITLE AS answerTitle,
+               A.ANS_CONTENT AS answerContent,
+               A.ANS_DATE AS answerDate,
+               A.STATE AS state,
+               NULL AS file,
+               false AS isInquiry
+          FROM TBL_REVIEW_REPORT A
+          JOIN TBL_REVIEW B ON A.REVIEW_NO = B.REVIEW_NO
+         WHERE B.STORE_NO = #{ storeNo }
     </select>
 
     <select id="getInquiryInfo" parameterType="map" resultType="com.ohgiraffers.ukki.store.model.dto.InquiryDTO">
         <choose>
             <when test="table == 'TBL_REVIEW_REPORT'">
                 SELECT
-                REPORT_NO AS inquiryNo,
-                REPORT_TITLE AS inquiryTitle,
-                REPORT_CONTENT AS inquiryContent,
-                REPORT_DATE AS inquiryDate,
-                REVIEW_NO AS reviewNo,
-                NULL AS categoryNo,
-                NULL AS userNo,
-                ANS_TITLE AS answerTitle,
-                ANS_CONTENT AS answerContent,
-                ANS_DATE AS answerDate,
-                STATE AS state,
-                NULL AS file,
-                false AS isInquiry
-                FROM ${ table }
-                WHERE REPORT_NO = #{ inquiryNo }
+                       REPORT_NO AS inquiryNo,
+                       REPORT_TITLE AS inquiryTitle,
+                       REPORT_CONTENT AS inquiryContent,
+                       REPORT_DATE AS inquiryDate,
+                       REVIEW_NO AS reviewNo,
+                       NULL AS categoryNo,
+                       NULL AS userNo,
+                       ANS_TITLE AS answerTitle,
+                       ANS_CONTENT AS answerContent,
+                       ANS_DATE AS answerDate,
+                       STATE AS state,
+                       NULL AS file,
+                       false AS isInquiry
+                  FROM ${ table }
+                 WHERE REPORT_NO = #{ inquiryNo }
+                 ORDER BY REPORT_DATE DESC
             </when>
             <otherwise>
                 SELECT
-                INQ_NO AS inquiryNo
-                , INQ_TITLE AS inquiryTitle
-                , INQ_CONTENT AS inquiryContent
-                , INQ_DATE AS inquiryDate
-                , NULL AS reviewNo
-                , CATEGORY_NO AS categoryNo
-                , USER_NO AS userNo
-                , ANS_TITLE AS answerTitle
-                , ANS_CONTENT AS answerContent
-                , ANS_DATE AS answerDate
-                , STATE AS state
-                , FILE AS file
-                , true AS isInquiry
-                FROM ${ table }
-                WHERE INQ_NO = #{ inquiryNo }
+                       INQ_NO AS inquiryNo
+                     , INQ_TITLE AS inquiryTitle
+                     , INQ_CONTENT AS inquiryContent
+                     , INQ_DATE AS inquiryDate
+                     , NULL AS reviewNo
+                     , CATEGORY_NO AS categoryNo
+                     , USER_NO AS userNo
+                     , ANS_TITLE AS answerTitle
+                     , ANS_CONTENT AS answerContent
+                     , ANS_DATE AS answerDate
+                     , STATE AS state
+                     , FILE AS file
+                     , true AS isInquiry
+                  FROM ${ table }
+                 WHERE INQ_NO = #{ inquiryNo }
+                 ORDER BY INQ_DATE DESC
             </otherwise>
         </choose>
     </select>
