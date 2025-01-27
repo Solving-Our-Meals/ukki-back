@@ -36,6 +36,9 @@ jobs:
       - name: Create credentials.json
         run: |
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' | base64 --decode > src/main/resources/credentials.json
+          # 파일이 제대로 생성되었는지 확인
+          cat src/main/resources/credentials.json
+          ls -la src/main/resources/credentials.json
 
       - name: Build and push
         env:
@@ -53,9 +56,10 @@ jobs:
           host: ${{ env.EC2_HOST }}
           username: ${{ env.EC2_USERNAME }}
           key: ${{ env.EC2_PRIVATE_KEY }}
-          script: |
+          script: | 
             cd /home/ubuntu/ukki-project
+            docker-compose down
+            docker system prune -af
             aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-            docker-compose down || true
             docker-compose pull
             docker-compose up -d
