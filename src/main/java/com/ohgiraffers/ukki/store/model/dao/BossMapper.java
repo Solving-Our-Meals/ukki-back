@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.store.model.dao;
 
+import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.store.controller.ReservationDTO;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,7 +22,7 @@ public interface BossMapper {
 
 //    int selectAvailableReservationPeople(long storeNo, LocalDate reservationDate);
 
-    WeeklyReservationCountDTO selectWeeklyReservationCount(long storeNo);
+    ThisWeekReservationDTO getWeeklyReservationCount(long storeNo);
 
     int selectTodayReservationCount(long storeNo);
 
@@ -49,6 +50,7 @@ public interface BossMapper {
     void updateAvailableSlots(StoreResPosNumDTO storeResPosNum);
 
 
+
     // 7일간의 예약 정보 조회
     List<ReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
                                                        @Param("startDate") LocalDate startDate,
@@ -60,7 +62,7 @@ public interface BossMapper {
     List<ReservationDTO> getReservationsForDateAndTime(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
     List<ReservationDTO> getReservationsForDate(long storeNo, LocalDate reservationDate);
 
-//    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
+    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
 
     void updateReportCount(long reviewNo);
 

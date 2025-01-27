@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.store.model.service;
 
+import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.store.controller.ReservationDTO;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
@@ -10,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class BossService {
 
@@ -33,9 +37,17 @@ public class BossService {
         return bossMapper.selectReservationPeopleList(storeNo);
     }
 
-//    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
-//        return bossMapper.selectReservationList(storeNo, reservationDate, reservationTime);
-//    }
+    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("storeNo", storeNo);
+        params.put("reservationDate", reservationDate);
+        params.put("reservationTime", reservationTime);
+
+        return bossMapper.selectReservationList(storeNo,reservationDate,reservationTime);
+    }
+
+
+
 
     // 예약 가능 인원 조회
 //    public int getAvailableSlots(long storeNo) {
@@ -54,8 +66,8 @@ public class BossService {
 //    }
 
     // 기타 로직은 동일
-    public WeeklyReservationCountDTO getWeeklyReservationCount(long storeNo) {
-        return bossMapper.selectWeeklyReservationCount(storeNo);
+    public ThisWeekReservationDTO getWeeklyReservationCount(long storeNo) {
+        return bossMapper.getWeeklyReservationCount(storeNo);
     }
 
     public int getTodayReservationCount(long storeNo) {
@@ -147,14 +159,6 @@ public class BossService {
         }
     }
 
-
-
-
-
-
-//    public InquiryDTO getReviewReportInfo(long inquiryNo) {
-//        return bossMapper.getReviewReportInfo(inquiryNo);
-//    }
 
     public InquiryDTO getInquiryInfo(long inquiryNo, String table) {
         return bossMapper.getInquiryInfo(inquiryNo, table);
