@@ -33,7 +33,7 @@ public interface StoreMapper {
 
     ReviewDTO getReviewListByLowScope(long storeNo);
 
-    List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo);
+    List<StoreReservationInfoDTO> getUserReviewList(String userId, long storeNo);
 
     boolean checkReviewList(long resNo);
 

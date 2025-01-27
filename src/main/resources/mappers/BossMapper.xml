@@ -254,7 +254,7 @@
 
 
     <!-- 7일간의 예약 정보 조회 -->
-    <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+    <select id="findReservationsForPeriod" resultType="com.ohgiraffers.ukki.store.model.dto.StoreReservationInfoDTO">
         SELECT r.RES_DATE AS resDate, r.RES_TIME AS resTime, u.USER_NAME AS userName
         FROM TBL_RESERVATION r
         JOIN TBL_USER u ON r.USER_NO = u.USER_NO

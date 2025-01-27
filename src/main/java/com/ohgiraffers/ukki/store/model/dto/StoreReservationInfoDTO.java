@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.store.model.dto;
 
-public class ReservationInfoDTO {
+public class StoreReservationInfoDTO {
 
     private long resNo;  // 예약 번호
     private String resDate;  // 예약 날짜
@@ -11,9 +11,9 @@ public class ReservationInfoDTO {
     private byte qrConfirm;  // QR코드 확인 여부
     private String qr;  // QR코드
 
-    public ReservationInfoDTO(){}
+    public StoreReservationInfoDTO(){}
 
-    public ReservationInfoDTO(long resNo, String resDate, String resTime, byte isRandom, long userNo, long storeNo, byte qrConfirm, String qr) {
+    public StoreReservationInfoDTO(long resNo, String resDate, String resTime, byte isRandom, long userNo, long storeNo, byte qrConfirm, String qr) {
         this.resNo = resNo;
         this.resDate = resDate;
         this.resTime = resTime;
