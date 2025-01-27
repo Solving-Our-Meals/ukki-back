@@ -189,7 +189,6 @@ public class AuthController {
         }
     }
 
-    // 검증만을 위한 로직
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
         // 쿠키에서 엑세스 토큰 찾아서 유효한지 확인하는 과정입니다.
@@ -208,13 +207,14 @@ public class AuthController {
         if (userId != null) {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("Authenticated");  // 200 인증완료 (권한있음)
+                    .body(Map.of("message", "Authenticated", "userId", userId));  // 200 인증완료 (권한있음)
         }
 
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("Unauthorized"); // 401 인증실패 (권한없음)
+                .body(Map.of("message", "Unauthorized")); // 401 인증실패 (권한없음)
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
