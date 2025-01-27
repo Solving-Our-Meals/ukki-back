@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
@@ -22,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import java.io.UnsupportedEncodingException;
@@ -81,31 +83,54 @@ public class BossController {
 
 
 
+    @GetMapping("/reservations-list")
+    public ResponseEntity<List<ReservationDTO>> getReservationStatus(
+            @RequestParam long storeNo,
+            @RequestParam LocalDate reservationDate,  // String으로 받음
+            @RequestParam(required = false) LocalTime reservationTime) {
 
-
-    // 예약 인원 리스트 조회
-    @GetMapping("/reservation-people-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationPeopleList(@RequestParam long storeNo) {
         try {
-            List<ReservationDTO> reservations = bossService.getReservationPeopleList(storeNo);
 
-            // 바디를 밖으로 빼서 반환
-            return ResponseEntity.ok(reservations); // 이 부분을 분리
+            List<ReservationDTO> reservations = bossService.getReservationList(storeNo, reservationDate, reservationTime);
+            return ResponseEntity.ok(reservations);
+        } catch (DateTimeParseException e) {
+            // 날짜나 시간이 잘못된 형식일 경우
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
+            // 일반적인 예외 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
 
 
+
+
     @GetMapping("/weekly-reservation-count")
-    public ResponseEntity<WeeklyReservationCountDTO> getWeeklyReservationCount(@RequestParam long storeNo) {
+    public ResponseEntity<?> getWeeklyReservationCount(@RequestParam long storeNo) {
         try {
-            WeeklyReservationCountDTO count = bossService.getWeeklyReservationCount(storeNo);
-            return ResponseEntity.ok(count);
+            ThisWeekReservationDTO thisWeek = bossService.getWeeklyReservationCount(storeNo);
+            if(thisWeek==null){
+                thisWeek = new ThisWeekReservationDTO();
+                thisWeek.setMon(0);
+                thisWeek.setTue(0);
+                thisWeek.setWed(0);
+                thisWeek.setThu(0);
+                thisWeek.setFri(0);
+                thisWeek.setSat(0);
+                thisWeek.setSun(0);
+            }
+            System.out.println(thisWeek);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(thisWeek);
         } catch (Exception e) {
-            WeeklyReservationCountDTO emptyCount = new WeeklyReservationCountDTO();  // 빈 DTO를 별도로 분리
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyCount);
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("주간 예약 정보를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 
@@ -176,22 +201,6 @@ public class BossController {
         }
     }
 
-
-
-    // 예약 리스트 조회
-    @GetMapping("/reservations-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationListForTime(
-            @RequestParam long storeNo,
-            @RequestParam LocalDate reservationDate,
-            @RequestParam(required = false) LocalTime reservationTime) {
-
-        try {
-            List<ReservationDTO> reservations = bossService.getReservationListForTime(storeNo, reservationDate, reservationTime);
-            return ResponseEntity.ok(reservations);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
-        }
-    }
 
 
 

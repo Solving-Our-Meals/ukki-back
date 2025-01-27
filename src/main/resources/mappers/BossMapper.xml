@@ -60,7 +60,15 @@
         <result property="status" column="STATUS"/>
     </resultMap>
 
-
+    <resultMap id="week" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO">
+        <result property="mon" column="mon"/>
+        <result property="tue" column="tue"/>
+        <result property="wed" column="wed"/>
+        <result property="thu" column="thu"/>
+        <result property="fri" column="fri"/>
+        <result property="sat" column="sat"/>
+        <result property="sun" column="sun"/>
+    </resultMap>
     <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         SELECT
         RES_POS_NUMBER AS resPosNumber,
@@ -73,6 +81,20 @@
         ORDER BY R_DATE DESC,
         R_OPER_TIME DESC LIMIT 1
     </select>
+
+    <select id="selectReservationList" parameterType="map" resultMap="reservationResultMap">
+        SELECT
+        r.RES_NO,
+        r.RES_DATE,
+        r.RES_TIME,
+        u.USER_NAME AS userName,
+        r.STORE_NO
+        FROM TBL_RESERVATION r
+        JOIN TBL_USER u ON r.USER_NO = u.USER_NO
+        WHERE r.STORE_NO = #{storeNo}
+        AND r.RES_DATE = #{reservationDate}
+    </select>
+
 
 
 
@@ -112,12 +134,20 @@
         WHERE r.STORE_NO = #{storeNo}
     </select>
 
-    <select id="selectWeeklyReservationCount" resultType="integer">
+    <select id="getWeeklyReservationCount"  resultMap="week">
         SELECT
-        COUNT(*) AS WEEKLY_RESERVATION_COUNT
-        FROM TBL_RESERVATION r
-        WHERE r.STORE_NO = #{storeNo}
-        AND YEARWEEK(r.RES_DATE, 1) = YEARWEEK(CURDATE(), 1)
+        SUM(CASE WHEN DATE(res_date) = this_week_monday THEN 1 ELSE 0 END) AS mon,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS tue,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 2 DAY) THEN 1 ELSE 0 END) AS wed,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS thu,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 4 DAY) THEN 1 ELSE 0 END) AS fri,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 5 DAY) THEN 1 ELSE 0 END) AS sat,
+        SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 6 DAY) THEN 1 ELSE 0 END) AS sun
+        FROM
+        tbl_end_res,
+        (SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday) AS week_start
+        WHERE
+        DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
     </select>
 
     <!-- 오늘 예약 수 조회 -->
