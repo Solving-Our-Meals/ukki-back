@@ -7,6 +7,9 @@ WORKDIR /app
 COPY build.gradle settings.gradle ./
 COPY gradle gradle
 
+# credentials.json 복사 추가
+COPY src/main/resources/credentials.json src/main/resources/credentials.json
+
 # 의존성 다운로드
 RUN gradle dependencies --no-daemon
 
