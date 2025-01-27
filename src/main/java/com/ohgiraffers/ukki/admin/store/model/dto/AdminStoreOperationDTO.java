@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.admin.store.model.dto;
 
-public class OperationDTO {
+public class AdminStoreOperationDTO {
 
     private long storeNo;
     private String monday;
@@ -12,9 +12,9 @@ public class OperationDTO {
     private String sunday;
     private String breakTime;
 
-    public OperationDTO(){}
+    public AdminStoreOperationDTO(){}
 
-    public OperationDTO(long storeNo, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday, String breakTime) {
+    public AdminStoreOperationDTO(long storeNo, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday, String breakTime) {
         this.storeNo = storeNo;
         this.monday = monday;
         this.tuesday = tuesday;

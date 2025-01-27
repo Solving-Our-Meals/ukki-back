@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.admin.review.model.dto;
 
-public class ReviewInfoDTO {
+public class AdminReviewInfoDTO {
 
     private int reviewNo;
     private String reviewContent;
@@ -15,9 +15,9 @@ public class ReviewInfoDTO {
     private String userProfile;
     private String userId;
 
-    public ReviewInfoDTO() {}
+    public AdminReviewInfoDTO() {}
 
-    public ReviewInfoDTO(int reviewNo, String reviewContent, int reviewScope, String reviewDate, String reviewImage, int reportCount, int storeNo, String storeName, int userNo, String userName, String userProfile, String userId) {
+    public AdminReviewInfoDTO(int reviewNo, String reviewContent, int reviewScope, String reviewDate, String reviewImage, int reportCount, int storeNo, String storeName, int userNo, String userName, String userProfile, String userId) {
         this.reviewNo = reviewNo;
         this.reviewContent = reviewContent;
         this.reviewScope = reviewScope;

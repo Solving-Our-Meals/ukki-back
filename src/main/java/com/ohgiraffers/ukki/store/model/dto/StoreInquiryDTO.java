@@ -3,7 +3,7 @@ package com.ohgiraffers.ukki.store.model.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class InquiryDTO {
+public class StoreInquiryDTO {
 
     private long inquiryNo;
     private String inquiryTitle;
@@ -19,9 +19,9 @@ public class InquiryDTO {
     private String file;
     private boolean isInquiry;
 
-    public InquiryDTO(){}
+    public StoreInquiryDTO(){}
 
-    public InquiryDTO(long inquiryNo, String inquiryTitle, String inquiryContent, String inquiryDate, long reviewNo, int categoryNo, long userNo, String answerTitle, String answerContent, String answerDate, String state, String file, boolean isInquiry) {
+    public StoreInquiryDTO(long inquiryNo, String inquiryTitle, String inquiryContent, String inquiryDate, long reviewNo, int categoryNo, long userNo, String answerTitle, String answerContent, String answerDate, String state, String file, boolean isInquiry) {
         this.inquiryNo = inquiryNo;
         this.inquiryTitle = inquiryTitle;
         this.inquiryContent = inquiryContent;

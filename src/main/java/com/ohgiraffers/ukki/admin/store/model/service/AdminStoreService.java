@@ -38,24 +38,24 @@ public class AdminStoreService {
         return adminStoreMapper.searchStoreInfo(storeNo);
     }
 
-    public KeywordDTO getKeyword(long storeNo) {
+    public AdminStoreKeywordDTO getKeyword(long storeNo) {
         return adminStoreMapper.getKeyword(storeNo);
     }
 
-    public OperationDTO getOperation(long storeNo) {
+    public AdminStoreOperationDTO getOperation(long storeNo) {
         return adminStoreMapper.getOperation(storeNo);
     }
 
-    public List<CategoryDTO> getCategory() { return adminStoreMapper.getCategory();
+    public List<AdminStoreCategoryDTO> getCategory() { return adminStoreMapper.getCategory();
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void editOperationTime(OperationDTO operationTime) {
+    public void editOperationTime(AdminStoreOperationDTO operationTime) {
             adminStoreMapper.editOperationTime(operationTime);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void editKeyword(KeywordDTO storeKeyword) {
+    public void editKeyword(AdminStoreKeywordDTO storeKeyword) {
         adminStoreMapper.editKeyword(storeKeyword);
     }
 
@@ -82,8 +82,8 @@ public class AdminStoreService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void editBanner(BannerDTO bannerDTO) {
-        adminStoreMapper.editBanner(bannerDTO);
+    public void editBanner(AdminStoreBannerDTO adminStoreBannerDTO) {
+        adminStoreMapper.editBanner(adminStoreBannerDTO);
     }
 
     public int lastStoreNo() {
@@ -91,18 +91,18 @@ public class AdminStoreService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertOperationTime(OperationDTO operationDTO) {
-        return adminStoreMapper.insertOperationTime(operationDTO);
+    public int insertOperationTime(AdminStoreOperationDTO adminStoreOperationDTO) {
+        return adminStoreMapper.insertOperationTime(adminStoreOperationDTO);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertKeyword(KeywordDTO keywordDTO) {
-        return adminStoreMapper.insertKeyword(keywordDTO);
+    public int insertKeyword(AdminStoreKeywordDTO adminStoreKeywordDTO) {
+        return adminStoreMapper.insertKeyword(adminStoreKeywordDTO);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertBanner(BannerDTO bannerDTO) {
-        return adminStoreMapper.insertBanner(bannerDTO);
+    public int insertBanner(AdminStoreBannerDTO adminStoreBannerDTO) {
+        return adminStoreMapper.insertBanner(adminStoreBannerDTO);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -134,7 +134,7 @@ public class AdminStoreService {
         adminStoreMapper.deleteReviewWithStore(storeNo);
     }
 
-    public BannerDTO getBanner(Long storeNo) {
+    public AdminStoreBannerDTO getBanner(Long storeNo) {
         return adminStoreMapper.getBanner(storeNo);
     }
 }

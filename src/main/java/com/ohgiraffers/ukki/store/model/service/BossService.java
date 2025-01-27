@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -117,19 +116,19 @@ public class BossService {
         bossMapper.updateReportCount(reviewNo);
     }
 
-    public List<InquiryDTO> getInquiryList(long userNo, String searchWord) {
+    public List<StoreInquiryDTO> getInquiryList(long userNo, String searchWord) {
         return bossMapper.getInquiryList(userNo, searchWord);
     }
 
-    public List<InquiryDTO> getReportList(long storeNo, String searchWord) {
+    public List<StoreInquiryDTO> getReportList(long storeNo, String searchWord) {
         return bossMapper.getReportList(storeNo, searchWord);
     }
 
-    public List<InquiryDTO> getRecentInquiryList(long userNo) {
+    public List<StoreInquiryDTO> getRecentInquiryList(long userNo) {
         return bossMapper.getRecentInquiryList(userNo);
     }
 
-    public List<InquiryDTO> getRecentReportList(long storeNo) {
+    public List<StoreInquiryDTO> getRecentReportList(long storeNo) {
         return bossMapper.getRecentReportList(storeNo);
     }
 
@@ -160,7 +159,7 @@ public class BossService {
     }
 
 
-    public InquiryDTO getInquiryInfo(long inquiryNo, String table) {
+    public StoreInquiryDTO getInquiryInfo(long inquiryNo, String table) {
         return bossMapper.getInquiryInfo(inquiryNo, table);
     }
 
@@ -177,12 +176,12 @@ public class BossService {
     }
 
 
-    public void updateReviewReport(InquiryDTO inquiryDTO, long inquiryNo) {
-        bossMapper.updateReviewReport(inquiryDTO, inquiryNo);
+    public void updateReviewReport(StoreInquiryDTO storeInquiryDTO, long inquiryNo) {
+        bossMapper.updateReviewReport(storeInquiryDTO, inquiryNo);
     }
 
-    public void updateInquiry(InquiryDTO inquiryDTO, long inquiryNo) {
-        bossMapper.updateInquiry(inquiryDTO, inquiryNo);
+    public void updateInquiry(StoreInquiryDTO storeInquiryDTO, long inquiryNo) {
+        bossMapper.updateInquiry(storeInquiryDTO, inquiryNo);
     }
 
     public String getFileName(long inquiryNo) {

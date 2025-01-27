@@ -1,13 +1,13 @@
 package com.ohgiraffers.ukki.admin.store.model.dto;
 
-public class CategoryDTO {
+public class AdminStoreCategoryDTO {
 
     private int categoryNo;
     private String categoryName;
 
-    public CategoryDTO(){}
+    public AdminStoreCategoryDTO(){}
 
-    public CategoryDTO(int categoryNo, String categoryName) {
+    public AdminStoreCategoryDTO(int categoryNo, String categoryName) {
         this.categoryNo = categoryNo;
         this.categoryName = categoryName;
     }

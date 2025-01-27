@@ -100,15 +100,15 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             AdminStoreInfoDTO storeInfo = adminStoreService.searchStoreInfo(storeNo);
 
             // keywordDB 연결
-            KeywordDTO keywordDTO = adminStoreService.getKeyword(storeInfo.getStoreNo());
-            storeInfo.setStoreKeyword(keywordDTO);
+            AdminStoreKeywordDTO adminStoreKeywordDTO = adminStoreService.getKeyword(storeInfo.getStoreNo());
+            storeInfo.setStoreKeyword(adminStoreKeywordDTO);
 
             // operationDB 연결
-            OperationDTO operationDTO = adminStoreService.getOperation(storeInfo.getStoreNo());
-            storeInfo.setOperationTime(operationDTO);
+            AdminStoreOperationDTO adminStoreOperationDTO = adminStoreService.getOperation(storeInfo.getStoreNo());
+            storeInfo.setOperationTime(adminStoreOperationDTO);
 
-            List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
-            storeInfo.setStoreCategory(categoryDTO);
+            List<AdminStoreCategoryDTO> adminStoreCategoryDTO = adminStoreService.getCategory();
+            storeInfo.setStoreCategory(adminStoreCategoryDTO);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +195,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             // JSON 문자열을 객체로 변환
 
             AdminStoreInfoDTO storeInfo = adminStoreService.searchStoreInfo(storeNo);
-            BannerDTO bannerInfo = adminStoreService.getBanner(storeNo);
+            AdminStoreBannerDTO bannerInfo = adminStoreService.getBanner(storeNo);
             ObjectMapper mapper = new ObjectMapper();
             AdminStoreInfoDTO storeData = new AdminStoreInfoDTO();
             if (storeDataJson != null) {
@@ -283,10 +283,10 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             }
 
             // 배너 정보 업데이트
-            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], 
+            AdminStoreBannerDTO adminStoreBannerDTO = new AdminStoreBannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1],
                 bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
-            System.out.println("bannerDTO : "+bannerDTO);
-            adminStoreService.editBanner(bannerDTO);
+            System.out.println("bannerDTO : "+ adminStoreBannerDTO);
+            adminStoreService.editBanner(adminStoreBannerDTO);
 
             if (storeData != null) {
                 adminStoreService.editStore(storeData);
@@ -334,7 +334,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         System.out.println(session.getAttribute("userPassword"));
         System.out.println(session.getAttribute("userName"));
         System.out.println(session.getAttribute("email"));
-        List<CategoryDTO> categoryDTO = adminStoreService.getCategory();
+        List<AdminStoreCategoryDTO> adminStoreCategoryDTO = adminStoreService.getCategory();
         AdminStoreUserDTO userDTO = new AdminStoreUserDTO();
         userDTO.setUserId(session.getAttribute("userId").toString());
         userDTO.setUserPassword(session.getAttribute("userPassword").toString());
@@ -342,7 +342,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         userDTO.setEmail(session.getAttribute("email").toString());
 
         Map<String, Object> response = new HashMap<>();
-        response.put("categoryDTO", categoryDTO);
+        response.put("categoryDTO", adminStoreCategoryDTO);
         response.put("userDTO", userDTO);
 
 
@@ -383,8 +383,8 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             AdminStoreInfoDTO storeData = new AdminStoreInfoDTO();
             storeData = mapper.readValue(storeDataJson, AdminStoreInfoDTO.class);
 
-            OperationDTO operationDTO = storeData.getOperationTime();
-            operationDTO.setStoreNo(storeNo);
+            AdminStoreOperationDTO adminStoreOperationDTO = storeData.getOperationTime();
+            adminStoreOperationDTO.setStoreNo(storeNo);
 
             String menuName = storeNo+"menu";
 
@@ -417,9 +417,9 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
 
             }
-            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            AdminStoreBannerDTO adminStoreBannerDTO = new AdminStoreBannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
 
-            int bannerResult = adminStoreService.insertBanner(bannerDTO);
+            int bannerResult = adminStoreService.insertBanner(adminStoreBannerDTO);
             if(bannerResult > 0){
             }else{
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -437,16 +437,16 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             storeData.setStoreNo(storeNo);
 
             storeData.setUserNo(userNo);
-            int operationResult = adminStoreService.insertOperationTime(operationDTO);
+            int operationResult = adminStoreService.insertOperationTime(adminStoreOperationDTO);
             if(operationResult > 0){
             }else{
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("운영시간 업데이트 중 오류가 발생했습니다.");
             }
 
-            KeywordDTO keywordDTO = storeData.getStoreKeyword();
-            keywordDTO.setStoreNo(storeNo);
-            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
+            AdminStoreKeywordDTO adminStoreKeywordDTO = storeData.getStoreKeyword();
+            adminStoreKeywordDTO.setStoreNo(storeNo);
+            int keywordResult = adminStoreService.insertKeyword(adminStoreKeywordDTO);
             if(keywordResult > 0){
             }else{
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
