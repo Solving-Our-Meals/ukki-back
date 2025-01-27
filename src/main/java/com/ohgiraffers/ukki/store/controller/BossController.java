@@ -8,7 +8,6 @@ import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,9 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -36,7 +33,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.UrlResource;
@@ -79,6 +75,7 @@ public class BossController {
 
 
     // 예약 현황 조회
+// 예약 현황 조회
     @GetMapping("/reservation-status")
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
             @RequestParam Long storeNo,
@@ -89,22 +86,15 @@ public class BossController {
         List<StoreResPosNumDTO> reservations = bossService.getReservationStatus(storeNo, reservationDate, reservationTime);
         System.out.println("reservations: " + reservations);  // 로그 추가
 
-        // 예약 정보가 없으면 기본값 5 반환
+        // 예약 정보가 없으면 빈 리스트 반환
         if (reservations == null || reservations.isEmpty()) {
-            StoreResPosNumDTO defaultResponse = new StoreResPosNumDTO();
-            defaultResponse.setResPosNumber(5);  // 기본값 5
-            return ResponseEntity.ok(Collections.singletonList(defaultResponse));
+            return ResponseEntity.ok(Collections.emptyList());
         }
 
         // 최신 예약 정보 가져오기
         StoreResPosNumDTO latestReservation = reservations.get(0);  // 내림차순 정렬로 최신값이 첫 번째
         return ResponseEntity.ok(Collections.singletonList(latestReservation));
     }
-
-
-
-
-
 
 
 
@@ -149,17 +139,6 @@ public class BossController {
     }
 
 
-    // 예약 가능 인원 조회
-//    @PostMapping("/getResPosNum")
-//    public ResponseEntity<List<DayResPosNumDTO>> getResPosNum(@RequestBody StoreResPosNumDTO storeResPosNumDTO) {
-//        try {
-//            List<DayResPosNumDTO> result = bossService.getResPosNum(storeResPosNumDTO);
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // 본문을 null로 처리
-//        }
-//    }
-
 
     // 예약 가능 인원 삽입
     @PostMapping("/insertAvailableSlots")
@@ -169,8 +148,6 @@ public class BossController {
         LocalTime reservationTime = storeResPosNumDTO.getReservationTime();
         int resPosNumber = storeResPosNumDTO.getResPosNumber();
 
-        // 디버깅: resPosNumber 값 확인
-//        System.out.println("서버에서 받은 예약 가능한 인원 수: " + resPosNumber);
 
         // storeNo가 없는 경우 처리
         if (storeNo == null) {
