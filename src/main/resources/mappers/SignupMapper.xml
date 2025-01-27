@@ -17,7 +17,7 @@
     </select>
 
     <insert id="signup" parameterType="com.ohgiraffers.ukki.user.model.dto.SignupUserDTO">
-        INSERT IGNORE INTO TBL_USER
+        INSERT INTO TBL_USER
         (
         USER_ID,
         USER_PWD,
