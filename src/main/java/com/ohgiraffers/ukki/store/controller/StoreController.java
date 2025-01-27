@@ -4,8 +4,6 @@ import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
 import com.ohgiraffers.ukki.store.model.service.StoreService;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -504,7 +497,7 @@ public class StoreController {
             //        System.out.println("리뷰 권한 넘어옴");
             //        System.out.println("userId : " + userId + " , storeNo : " + storeNo);
 
-            List<ReservationInfoDTO> reservationList = new ArrayList<>();
+            List<StoreReservationInfoDTO> reservationList = new ArrayList<>();
 
             reservationList = storeService.getUserReviewList(userId, storeNo);
 

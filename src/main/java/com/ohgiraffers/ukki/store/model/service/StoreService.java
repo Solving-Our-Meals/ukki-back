@@ -64,7 +64,7 @@ public class StoreService {
         return storeMapper.getReviewListByLowScope(storeNo);
     }
 
-    public List<ReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
+    public List<StoreReservationInfoDTO> getUserReviewList(String userId, long storeNo) {
         return storeMapper.getUserReviewList(userId, storeNo);
     }
 

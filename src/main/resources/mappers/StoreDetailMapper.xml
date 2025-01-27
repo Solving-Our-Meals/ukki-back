@@ -91,7 +91,7 @@
         <result property="resNo" column="RES_NO"/>
     </resultMap>
 
-    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.ReservationInfoDTO">
+    <resultMap id="reservationInfoDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.StoreReservationInfoDTO">
         <id property="resNo" column="RES_NO"/>
         <result property="resDate" column="RES_DATE"/>
         <result property="resTime" column="RES_TIME"/>

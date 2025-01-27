@@ -52,9 +52,9 @@ public interface BossMapper {
 
 
     // 7일간의 예약 정보 조회
-    List<ReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
-                                                       @Param("startDate") LocalDate startDate,
-                                                       @Param("endDate") LocalDate endDate);
+    List<StoreReservationInfoDTO> findReservationsForPeriod(@Param("storeNo") long storeNo,
+                                                            @Param("startDate") LocalDate startDate,
+                                                            @Param("endDate") LocalDate endDate);
 
     StoreResPosNumDTO getResPosNumByStoreAndDate(@Param("storeNo") long storeNo, @Param("reservationDate") LocalDate reservationDate, @Param("reservationTime") LocalTime reservationTime);
 
