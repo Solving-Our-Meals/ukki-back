@@ -589,4 +589,11 @@ public class MypageService {
         }
     }
 
+    public MypageDTO getDefaultUserInfo() {
+        MypageDTO defaultUserInfo = new MypageDTO();
+        defaultUserInfo.setUserRole(null);
+        // 필요한 기본 정보를 추가합니다
+        return defaultUserInfo;
+    }
+
 }
