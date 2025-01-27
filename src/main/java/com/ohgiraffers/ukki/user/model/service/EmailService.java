@@ -40,7 +40,7 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject("ukki(우리들의 끼니해결) 인증메일");
             helper.setText("<html><body>" +
-                    "<p style='font-weight: bold; font-size: 40px; width:auto;'>우끼 인증번호 : " + authCode + "</p>" +
+                    "<p style='font-weight: bold; font-size: 39px; width:auto;'>우끼 인증번호 : " + authCode + "</p>" +
                     "<img src='cid:logoImage' style='width: 400px; height: auto;' alt='Logo' />" +
                     "</body></html>", true);
 

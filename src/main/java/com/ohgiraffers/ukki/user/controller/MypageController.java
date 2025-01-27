@@ -2,6 +2,7 @@ package com.ohgiraffers.ukki.user.controller;
 
 import com.ohgiraffers.ukki.auth.model.service.JwtService;
 import com.ohgiraffers.ukki.common.InquiryState;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import com.ohgiraffers.ukki.user.model.service.CookieService;
 import com.ohgiraffers.ukki.user.model.service.MypageService;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -28,15 +31,19 @@ import java.util.*;
 @RequestMapping("/user/mypage")
 public class MypageController {
 
+    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+
     private final JwtService jwtService;
     private MypageService mypageService;
     private CookieService cookieService;
+    private GoogleDriveService googleDriveService;
 
     @Autowired
-    public MypageController (MypageService mypageService, CookieService cookieService, JwtService jwtService) {
+    public MypageController (MypageService mypageService, CookieService cookieService, JwtService jwtService, GoogleDriveService googleDriveService) {
         this.mypageService = mypageService;
         this.cookieService = cookieService;
         this.jwtService = jwtService;
+        this.googleDriveService = googleDriveService;
     }
 
 /*     해당 방법은 헤더로 보냈을 때 사용하는 방식으로 우리는 헤더 방식이 아닙니다. 참고해주세요 !
@@ -188,8 +195,6 @@ public class MypageController {
                 .body(reviewDetail);
     }
 
-
-
     @DeleteMapping("/review/delete")
     public ResponseEntity<String> deleteReview(@RequestBody MypageReviewDTO mypageReviewDTO) {
         int reviewNo = mypageReviewDTO.getReviewNo();
@@ -317,8 +322,6 @@ public class MypageController {
 
         List<MypageInquiryDTO> inquiries = mypageService.getUserInquiryFromToken(jwtToken, userId);
 
-        System.out.println("zz");
-
         MypageInquiryDTO inquiryToUpdate = inquiries.stream()
                 .filter(i -> i.getInquiryNo() == inquiryNo)
                 .findFirst()
@@ -326,7 +329,6 @@ public class MypageController {
 
         if (inquiryToUpdate == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
                     .body(Collections.singletonMap("message", "해당 문의를 찾을 수 없습니다."));
         }
 
@@ -338,13 +340,11 @@ public class MypageController {
                 boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
                 if (!updated) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
                             .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .contentType(MediaType.APPLICATION_JSON)
                         .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
             }
         }
@@ -395,29 +395,20 @@ public class MypageController {
         }
     }
 
-    // 스프링 프레임워크 리소스 사용 ! // 서비스까지 갈 필요 없는 구간이라 서비스 부분은 제거했습니다.
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
+
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Object> downloadFile(@PathVariable String fileId) {
         try {
-            // 파일 경로 설정 (파일 경로는 서버상의 경로로 지정)
-            Path path = Paths.get("C:/Temp/inquiry/").resolve(fileName);
-            Resource resource = new FileSystemResource(path);
-
-            // 파일이 존재하는지 확인
-            if (!resource.exists()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .build(); // 파일이 존재하지 않으면 404 상태 반환
-            }
-
-            // 다운로드 응답 설정
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                    .body(resource);  // 파일을 응답 본문에 담아서 반환
+            String fileDownloadUrl = googleDriveService.getFileUrl(fileId); // 파일 다운로드 URL 가져오기
+            return ResponseEntity.ok("{\"fileName\":\"문의 파일\",\"fileDownloadUrl\":\"" + fileDownloadUrl + "\"}");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 서버 오류 처리
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"fileName\":\"문의 파일\",\"error\":\"파일 다운로드 중 오류가 발생했습니다.\"}");
         }
     }
+
+
 
     @PostMapping("/confirm")
     public ResponseEntity<Map<String, String>> confirmPassword(
