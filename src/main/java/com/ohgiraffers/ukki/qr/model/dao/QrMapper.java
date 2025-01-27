@@ -5,7 +5,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface QrMapper {
 
-    String resStoreUserName(String qr);
+    String resStoreUserName(int resNo);
 
-    void editQrConfirmRes(String qr);
+    void editQrConfirmRes(int resNo);
+
+    Integer getLastReservationNo();
+
+    String searchQr(int resNo);
 }

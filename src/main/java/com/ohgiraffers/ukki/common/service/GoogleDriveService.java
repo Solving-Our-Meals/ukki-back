@@ -85,8 +85,18 @@ public class GoogleDriveService {
 
     // 파일 삭제
     public void deleteFile(String fileId) {
+        if (fileId == null || fileId.isEmpty()) {
+            return; // 파일 ID가 없으면 그냥 리턴
+        }
+        
         try {
             driveService.files().delete(fileId).execute();
+        } catch (GoogleJsonResponseException e) {
+            if (e.getStatusCode() == 404) {
+                // 파일이 없는 경우 무시하고 진행
+                return;
+            }
+            throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
         }

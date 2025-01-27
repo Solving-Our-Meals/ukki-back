@@ -9,6 +9,7 @@
         u.USER_ID AS userId,
         u.USER_NO AS userNo,
         u.USER_NAME AS nickname,
+        u.USER_ROLE AS userRole,
         u.USER_PROFILE AS profileImage,
         r.RES_COUNT AS reservationCount,
         r.REVIEW_COUNT AS reviewCount,

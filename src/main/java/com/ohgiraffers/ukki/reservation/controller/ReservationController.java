@@ -11,11 +11,9 @@ import com.ohgiraffers.ukki.reservation.model.service.ReservationService;
 import org.apache.coyote.Response;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -56,23 +54,34 @@ public class ReservationController {
     }
 
     @GetMapping(value ="/api/repPhoto")
-    public ResponseEntity<Resource> getRepPhoto(@RequestParam("repPhotoName") String repPhotoName){
-
+    public ResponseEntity<byte[]> getRepPhoto(@RequestParam("repPhotoName") String repPhotoName){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(repPhotoName + ".png");
-            //디버깅 확인
-//            System.out.println("배너 파일 경로" + file);
-            Resource resource = new UrlResource(file.toUri());
-
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; repPhotoName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            if (repPhotoName == null || repPhotoName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 가게 배너 파일명입니다.".getBytes());
             }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + repPhotoName;
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("배너 이미지를 불러오는 도중에 오류가 발생했습니다.".getBytes());
         }
     }
 
@@ -96,23 +105,35 @@ public class ReservationController {
     }
 
     @GetMapping(value = "/api/profile")
-    public ResponseEntity<Resource> getProfile(@RequestParam("profileName") String profileName){
-
+    public ResponseEntity<byte[]> getProfile(@RequestParam("profileName") String profileName){
         try {
-            Path file = Paths.get(SHARED_FOLDER).resolve(profileName + ".png");
-            Resource resource = new UrlResource(file.toUri());
-
-            if(resource.exists() && resource.isReadable()){
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; profileName=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            if (profileName == null || profileName.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("유효하지 않은 가게 배너 파일명입니다.".getBytes());
             }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
 
+            String imageUrlWithId = "https://drive.google.com/uc?id=" + profileName;
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            String contentType = response.getHeaders().getContentType() != null ?
+                    response.getHeaders().getContentType().toString() :
+                    "application/octet-stream";
+
+            headers.set("Content-Type", contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(response.getBody());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("배너 이미지를 불러오는 도중에 오류가 발생했습니다.".getBytes());
+        }
     }
 
     // 예약 DB에 insert

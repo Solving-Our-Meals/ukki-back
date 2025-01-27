@@ -10,7 +10,6 @@
     </select>
 
     <select id="getUserByUserId" parameterType="String" resultType="com.ohgiraffers.ukki.auth.model.dto.AuthDTO">
-<!--   AS 사용해서 매칭 X     -->
         SELECT
         USER_NO AS userNo,
         USER_ID AS userId,
@@ -21,7 +20,6 @@
     </select>
 
     <select id="findUserRoleAndUserNoById" parameterType="String" resultType="com.ohgiraffers.ukki.auth.model.dto.ForJwtDTO">
-        <!--   AS 사용해서 매칭 X     -->
         SELECT
         USER_NO AS userNo,
         USER_ROLE AS userRole

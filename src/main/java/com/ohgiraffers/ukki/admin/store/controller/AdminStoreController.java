@@ -3,6 +3,7 @@ package com.ohgiraffers.ukki.admin.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import com.ohgiraffers.ukki.admin.store.model.service.AdminStoreService;
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,11 +30,14 @@ public class AdminStoreController {
 private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
-
+    private final GoogleDriveService googleDriveService;
+//    private static final String STORE_FOLDER_ID = "19mb-5n8hNjrdRAksh4hTKcFY-Gp0Aaoz";
+    private static final String STORE_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
     @Autowired
-    public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder) {
+    public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder, GoogleDriveService googleDriveService) {
         this.adminStoreService = adminStoreService;
         this.passwordEncoder = passwordEncoder;
+        this.googleDriveService = googleDriveService;
     }
 
     @GetMapping("/monthly")
@@ -189,6 +193,9 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         ) {
             try {
             // JSON 문자열을 객체로 변환
+
+            AdminStoreInfoDTO storeInfo = adminStoreService.searchStoreInfo(storeNo);
+            BannerDTO bannerInfo = adminStoreService.getBanner(storeNo);
             ObjectMapper mapper = new ObjectMapper();
             AdminStoreInfoDTO storeData = new AdminStoreInfoDTO();
             if (storeDataJson != null) {
@@ -202,37 +209,35 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             }
             
             String[] bannerStatusParse = null;
-            int count = 0;
             if (bannerStatus != null) {
                 bannerStatusParse = mapper.readValue(bannerStatus, String[].class);
-                count = (int) Arrays.stream(bannerStatusParse)
-                       .filter(banner -> banner.contains("/store/" + storeNo + "/api/files?filename="))
-                       .count();
             }
 
             
             if(menuImage != null){
+                googleDriveService.deleteFile(storeInfo.getStoreMenu());
                 String fileName = storeNo+"menu";
-                int result = fileController(menuImage, fileName);
-                if(result == 2){
-                    storeData.setStoreMenu(fileName);
+                String menuResult = googleDriveService.uploadFile(menuImage, STORE_FOLDER_ID, fileName);
+                if(menuResult != null){
+                    storeData.setStoreMenu(menuResult);
                 }else{
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("메뉴 이미지 업데이트 중 오류가 발생했습니다.");
                 }
             }
             if(profileImage != null){
+                googleDriveService.deleteFile(storeInfo.getStoreProfile());
                 String fileName = storeNo+"profile";
-                int result = fileController(profileImage, fileName);
-                if(result == 2){
-                    storeData.setStoreProfile(fileName);
+                String profileResult = googleDriveService.uploadFile(profileImage, STORE_FOLDER_ID, fileName);
+                if(profileResult != null){
+                    storeData.setStoreProfile(profileResult);
                 }else{
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("프로필 이미지 업데이트 중 오류가 발생했습니다.");
                 }
             }
 
-            // 배너 이미지 리스트 생성
+            // 배너 이미지 처리
             Map<Integer, MultipartFile> bannerUpdates = new HashMap<>();
             if (banner1 != null) bannerUpdates.put(1, banner1);
             if (banner2 != null) bannerUpdates.put(2, banner2);
@@ -240,44 +245,47 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
             if (banner4 != null) bannerUpdates.put(4, banner4);
             if (banner5 != null) bannerUpdates.put(5, banner5);
 
-
-            int maxBannerKey = 0;
-            if (!bannerUpdates.isEmpty()) { // bannerUpdates가 존재할 때만 진행
-                maxBannerKey = count+bannerUpdates.size();
-            }else{
-                maxBannerKey = count;
-            }
-            if (maxBannerKey < 5) {
-                for (int i = maxBannerKey+1; i <= 5; i++) {
-                    String fileToDelete = storeNo + "banner" + i + ".png";
-                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
-                    Files.deleteIfExists(filePath);
-                }
-            }
-
             String[] bannerNameArr = new String[5];
-            for(int i = 0; i < count; i++){
-                bannerNameArr[i] = storeNo+"banner"+(i+1);
+
+            // 기존 배너 정보 유지 (클라이언트가 삭제하지 않은 배너)
+            if (bannerStatusParse != null) {
+                bannerNameArr[0] = bannerStatusParse[0] != null ? bannerInfo.getBanner1() : null;
+                bannerNameArr[1] = bannerStatusParse[1] != null ? bannerInfo.getBanner2() : null;
+                bannerNameArr[2] = bannerStatusParse[2] != null ? bannerInfo.getBanner3() : null;
+                bannerNameArr[3] = bannerStatusParse[3] != null ? bannerInfo.getBanner4() : null;
+                bannerNameArr[4] = bannerStatusParse[4] != null ? bannerInfo.getBanner5() : null;
             }
+
+            // 새로운 배너 이미지 업로드
             for (Map.Entry<Integer, MultipartFile> entry : bannerUpdates.entrySet()) {
                 int key = entry.getKey();
                 MultipartFile file = entry.getValue();
-
-                // 파일 이름 생성
-                String fileName = storeNo + "banner" + key;
-                bannerNameArr[key-1] = fileName;
-                // fileController 호출하여 파일 저장
-                int result = fileController(file, fileName);
-                if (result == 2) {
-
-                } else {
-
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("배너 이미지 업데이트 중 오류가 발생했습니다.");
+                
+                // 기존 배너 삭제 로직
+                String existingBannerId = null;
+                switch(key) {
+                    case 1: existingBannerId = bannerInfo.getBanner1(); break;
+                    case 2: existingBannerId = bannerInfo.getBanner2(); break;
+                    case 3: existingBannerId = bannerInfo.getBanner3(); break;
+                    case 4: existingBannerId = bannerInfo.getBanner4(); break;
+                    case 5: existingBannerId = bannerInfo.getBanner5(); break;
                 }
+
+                // 기존 배너가 있으면 삭제
+                if (existingBannerId != null && !existingBannerId.isEmpty()) {
+                    googleDriveService.deleteFile(existingBannerId);
+                }
+
+                // 새 이미지 업로드 - fileId 직접 저장
+                String fileName = storeNo + "banner" + key;
+                String fileId = googleDriveService.uploadFile(file, STORE_FOLDER_ID, fileName);
+                bannerNameArr[key-1] = fileId;  // URL이 아닌 fileId 저장
             }
 
-            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            // 배너 정보 업데이트
+            BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], 
+                bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
+            System.out.println("bannerDTO : "+bannerDTO);
             adminStoreService.editBanner(bannerDTO);
 
             if (storeData != null) {
@@ -310,10 +318,10 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         System.out.println(session.getAttribute("userPassword"));
         System.out.println(session.getAttribute("userName"));
         System.out.println(session.getAttribute("email"));
+        System.out.println(session.getId());
         
         Map<String, String> response = new HashMap<>();
         response.put("message", "User registered and session created successfully");
-
             return ResponseEntity.ok()
             .body(response);
     }
@@ -321,6 +329,7 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     @GetMapping("regist/store")
     public ResponseEntity<?> ShowStoreInfoRegistPage(HttpSession session) {
 
+        System.out.println(session.getId());
         System.out.println(session.getAttribute("userId"));
         System.out.println(session.getAttribute("userPassword"));
         System.out.println(session.getAttribute("userName"));
@@ -376,47 +385,15 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
             OperationDTO operationDTO = storeData.getOperationTime();
             operationDTO.setStoreNo(storeNo);
-            int operationResult = adminStoreService.insertOperationTime(operationDTO);
-            if(operationResult > 0){
-
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("운영시간 업데이트 중 오류가 발생했습니다.");
-            }
-
-            KeywordDTO keywordDTO = storeData.getStoreKeyword();
-            keywordDTO.setStoreNo(storeNo);
-            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
-            if(keywordResult > 0){
-
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("키워드 업데이트 중 오류가 발생했습니다.");
-            }
 
             String menuName = storeNo+"menu";
 
-            int menuResult = fileController(menuImage, menuName);
-            if(menuResult == 2){
-
-                storeData.setStoreMenu(menuName);
-            }else{
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("메뉴 이미지 업데이트 중 오류가 발생했습니다.");
-            }
+            String menuResult = googleDriveService.uploadFile(menuImage, STORE_FOLDER_ID, menuName);
+            storeData.setStoreMenu(menuResult);
 
             String fileName = storeNo+"profile";
-            int profileResult = fileController(profileImage, fileName);
-            if(profileResult == 2){
-                storeData.setStoreProfile(fileName);
-            }else{
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("프로필 이미지 업데이트 중 오류가 발생했습니다.");
-            }
-
+            String profileResult = googleDriveService.uploadFile(profileImage, STORE_FOLDER_ID, fileName);
+            storeData.setStoreProfile(profileResult);
 
             // 배너 이미지 리스트 생성
             Map<Integer, MultipartFile> bannerUpdates = new HashMap<>();
@@ -433,15 +410,12 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
                 MultipartFile file = entry.getValue();
                 String bannerName = storeNo + "banner" + key;
 
-                bannerNameArr[key-1] = bannerName;
+                String result = googleDriveService.uploadFile(file, STORE_FOLDER_ID ,bannerName);
+                bannerNameArr[key-1] = result;
 
                 // fileController 호출하여 파일 저장
-                int result = fileController(file, bannerName);
-                if (result == 2) {
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("배너 이미지 업데이트 중 오류가 발생했습니다.");
-                }
+
+
             }
             BannerDTO bannerDTO = new BannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1], bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
 
@@ -459,8 +433,25 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
             adminStoreService.insertStoreUser(userData);
             int userNo = adminStoreService.searchCurrentStoreUser(userData.getUserId());
+
             storeData.setStoreNo(storeNo);
+
             storeData.setUserNo(userNo);
+            int operationResult = adminStoreService.insertOperationTime(operationDTO);
+            if(operationResult > 0){
+            }else{
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("운영시간 업데이트 중 오류가 발생했습니다.");
+            }
+
+            KeywordDTO keywordDTO = storeData.getStoreKeyword();
+            keywordDTO.setStoreNo(storeNo);
+            int keywordResult = adminStoreService.insertKeyword(keywordDTO);
+            if(keywordResult > 0){
+            }else{
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("키워드 업데이트 중 오류가 발생했습니다.");
+            }
             adminStoreService.insertStore(storeData);
 
 

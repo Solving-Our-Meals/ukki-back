@@ -10,13 +10,21 @@
         FROM TBL_RESERVATION a
         LEFT JOIN TBL_STORE b ON a.STORE_NO = b.STORE_NO
         LEFT JOIN TBL_USER c ON b.USER_NO = c.USER_NO
-        WHERE QR = #{qr}
+        WHERE RESERVATION_NO = #{resNo}
     </select>
 
     <update id="editQrConfirmRes">
         UPDATE TBL_RESERVATION SET
         QR_CONFIRM = true,
         QR = 'expired'
-        WHERE QR = #{qr}
+        WHERE RESERVATION_NO = #{resNo}
     </update>
+
+    <select id="getLastReservationNo" resultType="Integer">
+        SELECT COALESCE(MAX(RES_NO), 0) FROM TBL_RESERVATION
+    </select>
+
+    <select id="searchQr" resultType="String">
+        SELECT QR FROM TBL_RESERVATION WHERE RESERVATION_NO = #{resNo}
+    </select>
 </mapper>
