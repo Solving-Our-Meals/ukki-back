@@ -4,7 +4,7 @@ import com.ohgiraffers.ukki.common.InquiryState;
 
 import java.time.LocalDate;
 
-public class ReportInfoDTO {
+public class AdminReportInfoDTO {
     private int reportNo;
     private String reportTitle;
     private String reportContent;
@@ -15,9 +15,9 @@ public class ReportInfoDTO {
     private LocalDate answerDate;
     private InquiryState state;
 
-    public ReportInfoDTO(){}
+    public AdminReportInfoDTO(){}
 
-    public ReportInfoDTO(int reportNo, String reportTitle, String reportContent, LocalDate reportDate, int reviewNo, String answerTitle, String answerContent, LocalDate answerDate, InquiryState state) {
+    public AdminReportInfoDTO(int reportNo, String reportTitle, String reportContent, LocalDate reportDate, int reviewNo, String answerTitle, String answerContent, LocalDate answerDate, InquiryState state) {
         this.reportNo = reportNo;
         this.reportTitle = reportTitle;
         this.reportContent = reportContent;

@@ -1,9 +1,9 @@
 package com.ohgiraffers.ukki.admin.inquiry.model.dao;
 
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryInfoDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryListDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminReportInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -12,17 +12,17 @@ import java.util.List;
 public interface AdminInquiryMapper {
     int processingInquiry();
 
-    List<InquiryListDTO> searchUserInquiry(String category, String word);
+    List<AdminInquiryListDTO> searchUserInquiry(String category, String word);
 
     int totalInquiry();
 
-    List<InquiryListDTO> searchStoreInquiry(String category, String word);
+    List<AdminInquiryListDTO> searchStoreInquiry(String category, String word);
 
-    List<InquiryListDTO> searchStoreReportInquiry(String category, String word);
+    List<AdminInquiryListDTO> searchStoreReportInquiry(String category, String word);
 
-    InquiryInfoDTO inquiryInfo(int inquiryNo);
+    AdminInquiryInfoDTO inquiryInfo(int inquiryNo);
 
-    ReportInfoDTO reportInfo(int reportNo);
+    AdminReportInfoDTO reportInfo(int reportNo);
 
     void inquiryAnswer(AnswerDTO answer);
 

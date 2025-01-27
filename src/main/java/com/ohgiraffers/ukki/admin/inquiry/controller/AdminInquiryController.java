@@ -4,9 +4,9 @@ import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import org.springframework.http.MediaType;
 
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryInfoDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO;
-import com.ohgiraffers.ukki.admin.inquiry.model.dto.ReportInfoDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryInfoDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryListDTO;
+import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminReportInfoDTO;
 import com.ohgiraffers.ukki.admin.inquiry.model.service.AdminInquiryService;
 import com.ohgiraffers.ukki.common.InquiryState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public class AdminInquiryController {
             if ("STATE".equals(category) && word != null) {
                 word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
             }
-            List<InquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
+            List<AdminInquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -95,12 +95,12 @@ public class AdminInquiryController {
             if ("STATE".equals(category) && word != null) {
                 word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
             }
-            List<InquiryListDTO> storeInquiryList = adminInquiryService.searchStoreInquiry(category, word);
-            List<InquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
+            List<AdminInquiryListDTO> storeInquiryList = adminInquiryService.searchStoreInquiry(category, word);
+            List<AdminInquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
 
             storeInquiryList.addAll(storeReportList);
 
-            storeInquiryList.sort(Comparator.comparing(InquiryListDTO::getInqDate));
+            storeInquiryList.sort(Comparator.comparing(AdminInquiryListDTO::getInqDate));
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +119,7 @@ public class AdminInquiryController {
     public ResponseEntity<?> inquiryInfo(@PathVariable int inquiryNo) {
         try {
             System.out.println("왔당");
-            InquiryInfoDTO inquiryInfo = adminInquiryService.inquiryInfo(inquiryNo);
+            AdminInquiryInfoDTO inquiryInfo = adminInquiryService.inquiryInfo(inquiryNo);
             System.out.println(inquiryInfo);
 
             return ResponseEntity.ok()
@@ -139,7 +139,7 @@ public class AdminInquiryController {
     public ResponseEntity<?> reportInfo(@PathVariable int reportNo) {
         try {
             System.out.println("리뷰신고왔다");
-            ReportInfoDTO reportInfo = adminInquiryService.reportInfo(reportNo);
+            AdminReportInfoDTO reportInfo = adminInquiryService.reportInfo(reportNo);
             System.out.println(reportInfo);
 
             return ResponseEntity.ok()
@@ -183,7 +183,7 @@ public class AdminInquiryController {
     @DeleteMapping("/info/{inquiryNo}")
     public ResponseEntity<?> inquiryDelete(@PathVariable int inquiryNo){
         try {
-            InquiryInfoDTO inquiryDTO = adminInquiryService.inquiryInfo(inquiryNo);
+            AdminInquiryInfoDTO inquiryDTO = adminInquiryService.inquiryInfo(inquiryNo);
             String fileUrl = inquiryDTO.getFile();
 
             if(fileUrl != null && !fileUrl.isEmpty()) {

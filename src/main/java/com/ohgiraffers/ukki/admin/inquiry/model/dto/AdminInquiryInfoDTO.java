@@ -4,7 +4,7 @@ import com.ohgiraffers.ukki.common.InquiryState;
 
 import java.time.LocalDate;
 
-public class InquiryInfoDTO {
+public class AdminInquiryInfoDTO {
     private int inquiryNo;
     private String inquiryTitle;
     private String inquiryContent;
@@ -17,9 +17,9 @@ public class InquiryInfoDTO {
     private InquiryState state;
     private String file;
 
-    public InquiryInfoDTO(){};
+    public AdminInquiryInfoDTO(){};
 
-    public InquiryInfoDTO(int inquiryNo, String inquiryTitle, String inquiryContent, LocalDate inquiryDate, int categoryNo, int userNo, String answerTitle, String answerContent, LocalDate answerDate, InquiryState state, String file) {
+    public AdminInquiryInfoDTO(int inquiryNo, String inquiryTitle, String inquiryContent, LocalDate inquiryDate, int categoryNo, int userNo, String answerTitle, String answerContent, LocalDate answerDate, InquiryState state, String file) {
         this.inquiryNo = inquiryNo;
         this.inquiryTitle = inquiryTitle;
         this.inquiryContent = inquiryContent;

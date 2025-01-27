@@ -2,7 +2,7 @@ package com.ohgiraffers.ukki.admin.inquiry.model.dto;
 
 import com.ohgiraffers.ukki.common.InquiryState;
 
-public class InquiryListDTO {
+public class AdminInquiryListDTO {
 
     private int inqNo;
     private String categoryName;
@@ -12,9 +12,9 @@ public class InquiryListDTO {
     private InquiryState state;
     private boolean isInquiry;
 
-    public InquiryListDTO(){}
+    public AdminInquiryListDTO(){}
 
-    public InquiryListDTO(int inqNo, String categoryName, String inqDate, String inqTitle, String inqContent, InquiryState state, boolean isInquiry) {
+    public AdminInquiryListDTO(int inqNo, String categoryName, String inqDate, String inqTitle, String inqContent, InquiryState state, boolean isInquiry) {
         this.inqNo = inqNo;
         this.categoryName = categoryName;
         this.inqDate = inqDate;
