@@ -526,43 +526,4 @@ public class BossController {
 
     }
 
-//    @GetMapping("/downloadFile")
-//    public ResponseEntity<byte[]> downloadFile(@RequestParam("fileName") String fileName) {
-//        System.out.println("Download request received for file: " + fileName);
-//        String fileId = extractFileIdFromUrl(fileName);
-//        try {
-//            // 파일 이름 URL 인코딩
-//            byte[] fileResource = googleDriveService.downloadFile(fileId);
-//            return ResponseEntity.ok()
-//                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + fileId)
-//                    .body(fileResource);  // fileResource 객체 반환
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 기타 예외 처리
-//        }
-//    }
-
-    @GetMapping("/downloadFile")
-    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String fileUrl) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            byte[] fileBytes = restTemplate.getForObject(fileUrl, byte[].class);
-            ByteArrayResource resource = new ByteArrayResource(fileBytes);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"downloaded_file.png\"");
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(fileBytes.length)
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resource);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
 }
