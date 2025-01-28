@@ -46,6 +46,9 @@ dependencies {
     implementation 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
     implementation 'com.google.auth:google-auth-library-credentials:1.20.0'
     implementation 'org.springframework:spring-test'
+    // 웹 클라이언트
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

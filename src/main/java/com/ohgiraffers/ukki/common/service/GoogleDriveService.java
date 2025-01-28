@@ -88,7 +88,7 @@ public class GoogleDriveService {
         if (fileId == null || fileId.isEmpty()) {
             return; // 파일 ID가 없으면 그냥 리턴
         }
-        
+
         try {
             driveService.files().delete(fileId).execute();
         } catch (GoogleJsonResponseException e) {
@@ -100,29 +100,5 @@ public class GoogleDriveService {
         } catch (Exception e) {
             throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
         }
-    }
-
-    public byte[] downloadFile(String fileId) {
-        try {
-            // 구글 드라이브에서 파일을 가져옴
-            File file = driveService.files().get(fileId).execute();
-            java.io.File downloadedFile = new java.io.File("temp_" + file.getName());
-
-            OutputStream outputStream = new FileOutputStream(downloadedFile);
-            driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
-
-            // 다운로드한 파일을 byte[]로 변환
-            return Files.readAllBytes(downloadedFile.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String extractFileIdFromUrl(String url) {
-        // 정규 표현식을 사용하여 fileId 추출
-        Pattern pattern = Pattern.compile("[?&]id=([^&]+)");
-        Matcher matcher = pattern.matcher(url);
-        return matcher.find() ? matcher.group(1) : null;
     }
 }
