@@ -1,16 +1,20 @@
 package com.ohgiraffers.ukki.common.Controller;
 
+import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 public class GoogleDriveController {
 
-    private static final String IMAGE_URL_TEMPLATE = "https://drive.google.com/uc?id=%s";
+    private final GoogleDriveService googleDriveService;
+
+    // GoogleDriveService 주입
+    public GoogleDriveController(GoogleDriveService googleDriveService) {
+        this.googleDriveService = googleDriveService;
+    }
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> getImage(@RequestParam String fileId) {
@@ -19,38 +23,50 @@ public class GoogleDriveController {
                     .body("유효하지 않은 fileId입니다.".getBytes());
         }
 
-        String imageUrlWithId = String.format(IMAGE_URL_TEMPLATE, fileId);
-        RestTemplate restTemplate = new RestTemplate();
-
         try {
-            ResponseEntity<byte[]> response = restTemplate.exchange(imageUrlWithId, HttpMethod.GET, null, byte[].class);
+            // GoogleDriveService를 통해 이미지 다운로드
+            byte[] imageBytes = googleDriveService.downloadFile(fileId);
 
-            // HTTP 상태 코드가 200 OK일 때만 진행
-            if (response.getStatusCode() == HttpStatus.OK) {
-                HttpHeaders headers = new HttpHeaders();
-                String contentType = response.getHeaders().getContentType() != null ?
-                        response.getHeaders().getContentType().toString() :
-                        "application/octet-stream";
-                headers.set("Content-Type", contentType);
-
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(response.getBody());
-            } else {
-                return handleErrorResponse("이미지 요청이 실패했습니다. 상태 코드: " + response.getStatusCode());
+            // 이미지가 없거나 비어 있으면 오류 처리
+            if (imageBytes == null || imageBytes.length == 0) {
+                return handleErrorResponse("이미지 데이터가 없습니다.");
             }
 
-        } catch (HttpClientErrorException.NotFound e) {
-            // 404 오류 발생 시
-            return handleErrorResponse("이미지를 찾을 수 없습니다. (404 Not Found)");
-        } catch (HttpClientErrorException.Forbidden e) {
-            // 403 오류 발생 시
-            return handleErrorResponse("이미지에 접근할 수 없습니다. (403 Forbidden)");
+            // 이미지 확장자 확인하여 Content-Type 설정
+            String contentType = getImageContentType(imageBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(imageBytes);
+
         } catch (Exception e) {
-            // 기타 예외 처리
-            e.printStackTrace();
+            e.printStackTrace();  // 예외 로그 출력
             return handleErrorResponse("이미지 다운로드 중 오류가 발생했습니다.");
         }
+    }
+
+    // 이미지를 가져와서 Content-Type을 설정
+    private String getImageContentType(byte[] imageBytes) {
+        if (imageBytes == null || imageBytes.length < 1) {
+            return "octet-stream";  // 기본값
+        }
+
+        // PNG는 파일 시작 부분이 137 80 78 71 (0x89 0x50 0x4E 0x47) 이므로 이를 체크
+        if (imageBytes[0] == (byte) 0x89 && imageBytes[1] == (byte) 0x50 && imageBytes[2] == (byte) 0x4E && imageBytes[3] == (byte) 0x47) {
+            return "image/png";
+        }
+        // JPEG는 파일 시작 부분이 FF D8 FF (0xFF 0xD8 0xFF) 이므로 이를 체크
+        else if (imageBytes[0] == (byte) 0xFF && imageBytes[1] == (byte) 0xD8 && imageBytes[2] == (byte) 0xFF) {
+            return "image/jpeg";
+        }
+        // GIF는 파일 시작 부분이 47 49 46 (0x47 0x49 0x46) 이므로 이를 체크
+        else if (imageBytes[0] == (byte) 0x47 && imageBytes[1] == (byte) 0x49 && imageBytes[2] == (byte) 0x46) {
+            return "image/gif";
+        }
+
+        return "application/octet-stream";  // 기본값
     }
 
     // 오류 응답 처리 공통 메서드

@@ -8,9 +8,7 @@ import com.google.api.services.drive.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -100,5 +98,23 @@ public class GoogleDriveService {
         } catch (Exception e) {
             throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
         }
+    }
+
+    public byte[] downloadFile(String fileId) throws IOException {
+        // 파일 다운로드
+        File file = driveService.files().get(fileId).execute();
+
+        // 파일 스트림으로 다운로드
+        InputStream inputStream = driveService.files().get(fileId).executeMediaAsInputStream();
+
+        // byte[]로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+
+        return outputStream.toByteArray();  // 파일의 byte 배열 반환
     }
 }
