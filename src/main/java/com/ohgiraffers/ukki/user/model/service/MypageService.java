@@ -555,30 +555,31 @@ public class MypageService {
         return mypageMapper.findUserInquiryByUserIdWithSearch(userId, search);
     }
 
-    private static final String QR_FILE_PATH = "\\\\192.168.0.138\\ukki_nas\\qr\\";
-
     public boolean deleteReservation(Long resNo) {
         try {
             MypageReservationQRDTO reservationQR = mypageMapper.findReservationQRById(resNo);
             System.out.println(reservationQR);
 
             if (reservationQR != null && reservationQR.getQr() != null && !reservationQR.getQr().isEmpty()) {
-                String qrFilePath = QR_FILE_PATH + reservationQR.getQr() + ".png";
+                String qrFileId = reservationQR.getQr();
 
-                File file = new File(qrFilePath);
-
-                if (file.exists()) {
-                    System.out.println("파일 있어요.");
-                    file.delete();
-                } else {
-                    System.out.println("파일 없어요.");
+                if (qrFileId != null && !qrFileId.isEmpty()) {
+                    try {
+                        googleDriveService.deleteFile(qrFileId);
+                        System.out.println("QR 이미지 삭제 성공, 파일 ID: " + qrFileId);
+                    } catch (Exception e) {
+                        System.out.println("QR 이미지 삭제 실패: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             }
 
             int deletedRows = mypageMapper.deleteReservation(resNo);
             if (deletedRows > 0) {
-                Long userNo = reservationQR.getUserNo();
-                int updatedCount = mypageMapper.countReservation(userNo);
+                Long userNo = reservationQR != null ? reservationQR.getUserNo() : null;
+                if (userNo != null) {
+                    mypageMapper.countReservation(userNo);
+                }
 
                 return true;
             }
@@ -587,6 +588,14 @@ public class MypageService {
             e.printStackTrace();
             return false;
         }
+    }
+
+
+    public MypageDTO getDefaultUserInfo() {
+        MypageDTO defaultUserInfo = new MypageDTO();
+        defaultUserInfo.setUserRole(null);
+        // 필요한 기본 정보를 추가합니다
+        return defaultUserInfo;
     }
 
 }

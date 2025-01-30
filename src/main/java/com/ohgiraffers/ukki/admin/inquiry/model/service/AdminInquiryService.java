@@ -8,6 +8,7 @@ import com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminReportInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,11 +21,14 @@ public class AdminInquiryService {
     }
 
     public int processingInquiry() {
-        return adminInquiryMapper.processingInquiry();
+        return adminInquiryMapper.processingInquiry() != 0 ? 
+            adminInquiryMapper.processingInquiry() : 
+            0;
     }
 
     public List<AdminInquiryListDTO> searchUserInquiry(String category, String word) {
-        return adminInquiryMapper.searchUserInquiry(category, word);
+        List<AdminInquiryListDTO> result = adminInquiryMapper.searchUserInquiry(category, word);
+        return result != null ? result : new ArrayList<>();
     }
 
     public int totalInquiry() {

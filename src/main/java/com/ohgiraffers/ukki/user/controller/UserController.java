@@ -30,16 +30,16 @@ public class UserController {
     public MypageDTO getUserInfo(HttpServletRequest request) {
         String jwtToken = cookieService.getJWTCookie(request);
 
-        if (jwtToken == null) {
-            throw new IllegalArgumentException("토큰이 일치하지 않음");
+        if (jwtToken != null) {
+            String userId = jwtService.getUserInfoFromTokenId(jwtToken);
+
+            if (userId != null) {
+                return mypageService.getUserInfoFromToken(jwtToken, userId);
+            }
         }
 
-        String userId = jwtService.getUserInfoFromTokenId(jwtToken);
-
-        if (userId == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-
-        return mypageService.getUserInfoFromToken(jwtToken, userId);
+        // 로그인하지 않은 경우 기본 사용자 정보 반환
+        return mypageService.getDefaultUserInfo();
     }
+
 }

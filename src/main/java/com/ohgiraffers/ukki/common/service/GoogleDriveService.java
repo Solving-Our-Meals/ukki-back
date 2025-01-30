@@ -8,9 +8,7 @@ import com.google.api.services.drive.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -88,7 +86,7 @@ public class GoogleDriveService {
         if (fileId == null || fileId.isEmpty()) {
             return; // 파일 ID가 없으면 그냥 리턴
         }
-        
+
         try {
             driveService.files().delete(fileId).execute();
         } catch (GoogleJsonResponseException e) {
@@ -102,27 +100,21 @@ public class GoogleDriveService {
         }
     }
 
-    public byte[] downloadFile(String fileId) {
-        try {
-            // 구글 드라이브에서 파일을 가져옴
-            File file = driveService.files().get(fileId).execute();
-            java.io.File downloadedFile = new java.io.File("temp_" + file.getName());
+    public byte[] downloadFile(String fileId) throws IOException {
+        // 파일 다운로드
+        File file = driveService.files().get(fileId).execute();
 
-            OutputStream outputStream = new FileOutputStream(downloadedFile);
-            driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+        // 파일 스트림으로 다운로드
+        InputStream inputStream = driveService.files().get(fileId).executeMediaAsInputStream();
 
-            // 다운로드한 파일을 byte[]로 변환
-            return Files.readAllBytes(downloadedFile.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        // byte[]로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
         }
-    }
 
-    public String extractFileIdFromUrl(String url) {
-        // 정규 표현식을 사용하여 fileId 추출
-        Pattern pattern = Pattern.compile("[?&]id=([^&]+)");
-        Matcher matcher = pattern.matcher(url);
-        return matcher.find() ? matcher.group(1) : null;
+        return outputStream.toByteArray();  // 파일의 byte 배열 반환
     }
 }

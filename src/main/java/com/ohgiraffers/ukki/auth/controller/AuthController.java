@@ -87,16 +87,23 @@ public class AuthController {
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
 
+            // 로그인 성공 후 유저 역할 정보도 함께 반환
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", true, "message", "ⓘ 로그인 성공 !", "token", token));
+                    .body(Map.of(
+                            "success", true,
+                            "message", "ⓘ 로그인 성공 !",
+                            "token", token,
+                            "userRole", userRole.name() // 유저의 역할 정보 추가
+                    ));
         } catch (Exception e) {
-            e.printStackTrace(); // 에러가 뭔지 전혀 모르겠으면 사용 -> 사용해보고 에러 보니까 HS512가 512bit수준의 SECRET_KEY를 원하는데 내가 너무 짧게 설정해서 오류가난거임 -> yml에서 해결완료
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
         }
     }
+
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
@@ -189,7 +196,6 @@ public class AuthController {
         }
     }
 
-    // 검증만을 위한 로직
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
         // 쿠키에서 엑세스 토큰 찾아서 유효한지 확인하는 과정입니다.
@@ -208,13 +214,14 @@ public class AuthController {
         if (userId != null) {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("Authenticated");  // 200 인증완료 (권한있음)
+                    .body(Map.of("message", "Authenticated", "userId", userId));  // 200 인증완료 (권한있음)
         }
 
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("Unauthorized"); // 401 인증실패 (권한없음)
+                .body(Map.of("message", "Unauthorized")); // 401 인증실패 (권한없음)
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {

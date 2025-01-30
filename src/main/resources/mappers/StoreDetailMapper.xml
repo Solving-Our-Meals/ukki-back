@@ -102,6 +102,10 @@
         <result property="qr" column="QR"/>
     </resultMap>
 
+<!--    <resultMap id="noReviewReservDTOResultMap" type="com.ohgiraffers.ukki.store.model.dto.NoReviewReservListDTO">-->
+<!--        <id property="resNo" column="RES_NO"/>-->
+<!--    </resultMap>-->
+
     <resultMap id="resPosNumByDay" type="com.ohgiraffers.ukki.store.model.dto.DayResPosNumDTO">
         <result property="operTime" column="OPER_TIME"/>
         <result property="resPosNum" column="RES_POS_NUMBER"/>
@@ -308,24 +312,44 @@
              , A.STORE_NO
              , A.QR_CONFIRM
              , A.QR
-          FROM TBL_RESERVATION A
-         WHERE A.USER_NO = (SELECT
+          FROM TBL_END_RES A
+         WHERE 1=1
+           AND A.USER_NO = (SELECT
                                    USER_NO
                               FROM TBL_USER
                              WHERE USER_ID = #{ userId })
-               AND
-               A.STORE_NO = #{ storeNo }
+           AND A.STORE_NO = #{ storeNo }
     </select>
 
-    <select id="checkReviewList" parameterType="long" resultType="boolean">
-        SELECT CASE
-                    WHEN EXISTS
-                                ( SELECT
-                                         *
-                                    FROM TBL_REVIEW
-                                   WHERE RES_NO = #{ resNo })THEN FALSE
-                    ELSE TRUE
-                END AS result;
+    <select id="checkReviewList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.NoReviewReservListDTO">
+<!--        SELECT RES_NO CASE-->
+<!--                    WHEN EXISTS-->
+<!--                                ( SELECT-->
+<!--                                         *-->
+<!--                                    FROM TBL_REVIEW-->
+<!--                                   WHERE RES_NO = #{ resNo })THEN FALSE-->
+<!--                    ELSE TRUE-->
+<!--                END AS result;-->
+        SELECT #{ resNo } AS resNo,
+        CASE
+        WHEN EXISTS
+        ( SELECT 1
+        FROM TBL_REVIEW
+        WHERE RES_NO = #{ resNo }) THEN FALSE
+        ELSE TRUE
+        END AS isWriteReview
+    </select>
+
+    <select id="getReviewReservationList" parameterType="list" resultMap="reservationInfoDTOResultMap">
+        SELECT
+               RES_NO
+             , RES_DATE
+             , RES_TIME
+          FROM TBL_END_RES
+        WHERE RES_NO IN
+            <foreach item="resNo" collection="list" open="(" separator="," close=")">
+                #{resNo}
+            </foreach>
     </select>
 
     <!-- 리뷰 작성 완료 시 유저 활동 + 1 -->

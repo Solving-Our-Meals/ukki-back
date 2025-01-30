@@ -35,7 +35,7 @@ public interface StoreMapper {
 
     List<StoreReservationInfoDTO> getUserReviewList(String userId, long storeNo);
 
-    boolean checkReviewList(long resNo);
+    NoReviewReservListDTO checkReviewList(long resNo);
 
     void increaseReview(long userNo);
 
@@ -62,5 +62,7 @@ public interface StoreMapper {
     int selectAvailableReservationPeople(int storeNo, String reservationDate);
 
     List<Map<String, Object>> selectReservationStatusByStore(int storeNo);
+
+    List<StoreReservationInfoDTO> getReviewReservationList(List<Long> resNo);
 }
 

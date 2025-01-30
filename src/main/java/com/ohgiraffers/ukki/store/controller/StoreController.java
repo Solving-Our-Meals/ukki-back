@@ -355,9 +355,10 @@ public class StoreController {
     // 리뷰 등록하기
     @PostMapping(value="/{storeNo}/review", consumes = "multipart/form-data")
     @ResponseBody
-    public ResponseEntity<?> createReview(@PathVariable("storeNo") long storeNo, @RequestParam("params") String params, @RequestPart(value = "reviewImage", required = false) MultipartFile singleFile) {
+    public ResponseEntity<?> createReview(@PathVariable("storeNo") long storeNo, @RequestParam("params") String params, @RequestParam("resNo") long resNo, @RequestPart(value = "reviewImage", required = false) MultipartFile singleFile) {
         try{
             System.out.println("리뷰 등록하러 왔다.");
+            System.out.println("리뷰 예약 번호 : " + resNo);
 
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> paramMap;
@@ -417,7 +418,7 @@ public class StoreController {
 
                 String reviewDate = simpleDateFormat2.format(nowDate).toString();
 
-                String reviewImageValue = "REVIEW" + reviewDate;
+                String reviewImageValue = "REVIEW" + reviewDate + reviewImageCount;
 
                 String fileId = googleDriveService.uploadFile(singleFile, INQUIRY_FOLDER_ID, reviewImageValue);
 //                String fileId = googleDriveService.uploadFile(singleFile, REVIEW_FOLDER_ID, reviewImageValue);
@@ -501,7 +502,7 @@ public class StoreController {
 
             reservationList = storeService.getUserReviewList(userId, storeNo);
 
-            //        System.out.println("reservationList = " + reservationList);
+            System.out.println("reservationList = " + reservationList);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -519,7 +520,8 @@ public class StoreController {
         try {
             //        System.out.println("리뷰 권한2 넘어옴");
 
-            boolean result = storeService.checkReviewList(resNo);
+            NoReviewReservListDTO result = storeService.checkReviewList(resNo);
+            System.out.println("result = " + result);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -528,6 +530,26 @@ public class StoreController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰 작성 권환 확인 도중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("getReservationList")
+    public ResponseEntity<?> getReservationList(@RequestParam("resNo") List<Long> resNo){
+        try{
+            System.out.println("여기 왔니??");
+            System.out.println("resNo : " + resNo);
+            List<StoreReservationInfoDTO> canWriteReviewReservationList = new ArrayList<>();
+            canWriteReviewReservationList = storeService.getReviewReservationList(resNo);
+
+            System.out.println("canWriteReviewReservationList = " + canWriteReviewReservationList);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(canWriteReviewReservationList);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰 작성 가능한 예약 리스트 불러오는 도중에 에러가 발생했습니다.");
         }
     }
 
@@ -587,12 +609,19 @@ public class StoreController {
 
     // 메인
     @GetMapping("/{storeNo}")
-    public String viewStorePage(@PathVariable("storeNo") int storeNo) {
-        // storeNo에 해당하는 가게 정보 조회
+    public String viewStorePage(@PathVariable("storeNo") long storeNo, Model model) {
+        // storeNo에 해당하는 가게 정보를 조회 (예: DB에서)
+        StoreInfoDTO store = storeService.getStoreInfo(storeNo);  // DB에서 storeNo로 가게 정보 조회
 
-        // 해당 가게의 예약 페이지를 보여주는 뷰 반환
-        return "storePage";
+        if (store != null) {
+            model.addAttribute("store", store);  // 가게 정보 model에 추가
+            return "store/{storeNo}";  // 가게 페이지로 이동
+        } else {
+            // 가게 정보가 없으면 오류 처리
+            return "storeNotFound";  // 예: 404 페이지로 리디렉션
+        }
     }
+
 
 
     @GetMapping("/search")

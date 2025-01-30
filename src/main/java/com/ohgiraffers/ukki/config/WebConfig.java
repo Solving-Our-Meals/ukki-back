@@ -29,8 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                  // .allowedOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost", "http://localhost:80")
-             .allowedOrigins("http://3.39.119.249:3000", "http://3.39.119.249", "http://3.39.119.249:80", "http://3.39.119.249:8080")
+                    // .allowedOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost", "http://localhost:80")
+           .allowedOrigins("http://3.39.119.249:3000", "http://3.39.119.249", "http://3.39.119.249:80", "http://3.39.119.249:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true)
@@ -40,6 +40,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        
+        // null 값 처리를 위한 설정
+        mapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);  // null 값도 포함
         mapper.configure(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS, true);
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

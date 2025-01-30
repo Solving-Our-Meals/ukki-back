@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgiraffers.ukki.admin.store.model.dto.*;
 import com.ohgiraffers.ukki.admin.store.model.service.AdminStoreService;
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
+import com.ohgiraffers.ukki.store.model.dto.StoreInfoDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,12 +29,13 @@ import org.springframework.http.MediaType;
 public class AdminStoreController {
 
 //    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
-private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
+//private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final GoogleDriveService googleDriveService;
-//    private static final String STORE_FOLDER_ID = "19mb-5n8hNjrdRAksh4hTKcFY-Gp0Aaoz";
-    private static final String STORE_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    @Value("${google.drive.inquiry-folder-id}")
+    private String STORE_FOLDER_ID;
+    
     @Autowired
     public AdminStoreController(AdminStoreService adminStoreService, BCryptPasswordEncoder passwordEncoder, GoogleDriveService googleDriveService) {
         this.adminStoreService = adminStoreService;
@@ -78,18 +81,32 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> searchAllStores(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
+    public ResponseEntity<?> searchStores(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String word) {
+        
         try {
-            List<AdminStoreListDTO> storeList = adminStoreService.searchStores(category, word);
+            List<AdminStoreListDTO> stores = adminStoreService.searchStores(category, word);
+            
+            // 검색 결과가 없는 경우
+            if (stores.isEmpty()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "검색 결과가 없습니다.");
+                return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+            }
 
             return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(storeList);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(stores);
+            
         } catch (Exception e) {
-            e.printStackTrace();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "검색 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body("가게리스트를 불러오는 도중 에러가 발생했습니다.");
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
         }
     }
 
@@ -126,6 +143,12 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         Map<String, String> response = new HashMap<>();
         String message = "";
         try {
+            long storeNoLong = (long) storeNo;
+            AdminStoreInfoDTO storeData = adminStoreService.searchStoreInfo(storeNoLong);
+            String menu = storeData.getStoreMenu();
+            String profile = storeData.getStoreProfile();
+            AdminStoreBannerDTO bannerData = adminStoreService.getBanner(storeNoLong);
+            String[] banner = bannerData.getBannerList().toArray(new String[0]);
 
             int result = adminStoreService.deleteStoreInfo(storeNo);
 
@@ -133,19 +156,19 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
                 message = "삭제에 성공했습니다.";
                 adminStoreService.deleteStoreBanner(storeNo);
                 for (int i = 1; i <= 5; i++) {
-                    String fileToDelete = storeNo + "banner" + i + ".png";
-                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
-                    Files.deleteIfExists(filePath);
+//                    String fileToDelete = storeNo + "banner" + i + ".png";
+//                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
+//                    Files.deleteIfExists(filePath);
                 }
-                String fileToDeleteProfile = storeNo + "profile" + ".png";
-                Path filePathProfile = Paths.get(SHARED_FOLDER, fileToDeleteProfile);
-                Files.deleteIfExists(filePathProfile);
-                String fileToDeleteMenu = storeNo + "menu" + ".png";
-                Path filePathMenu = Paths.get(SHARED_FOLDER, fileToDeleteMenu);
-                Files.deleteIfExists(filePathMenu);
-                adminStoreService.deleteStoreKeyword(storeNo);
-                adminStoreService.deleteStoreOperation(storeNo);
-                deleteReviewWithStore(storeNo);
+//                String fileToDeleteProfile = storeNo + "profile" + ".png";
+//                Path filePathProfile = Paths.get(SHARED_FOLDER, fileToDeleteProfile);
+//                Files.deleteIfExists(filePathProfile);
+//                String fileToDeleteMenu = storeNo + "menu" + ".png";
+//                Path filePathMenu = Paths.get(SHARED_FOLDER, fileToDeleteMenu);
+//                Files.deleteIfExists(filePathMenu);
+//                adminStoreService.deleteStoreKeyword(storeNo);
+//                adminStoreService.deleteStoreOperation(storeNo);
+//                deleteReviewWithStore(storeNo);
             }else{
                 message = "삭제에 실패했습니다.";
             }
@@ -170,8 +193,8 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
         String[] reviewImgArray = adminStoreService.getReviewImgStoreNo(storeNo);
         for(int i = 0; i < reviewImgArray.length; i++){
             String reviewImg = reviewImgArray[i]+".png";
-            Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
-            Files.deleteIfExists(filePathProfile);
+//            Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
+//            Files.deleteIfExists(filePathProfile);
         }
         adminStoreService.deleteReviewWithStore(storeNo);
 
@@ -468,24 +491,4 @@ private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
 
     }
 
-    public int fileController(MultipartFile file, String fileName){
-
-        String fileSetName = fileName+".png";
-        try{
-//                경로설정
-            Path networkPath = Paths.get(SHARED_FOLDER);
-            if(!Files.exists(networkPath)){
-                Files.createDirectories(networkPath);
-            }
-
-//                파일 저장 - 경로에 파일이름 붙이기
-//                StandardCopyOption.REPLACE_EXISTING은 대상 경로에 동일한 이름의 파일이 이미 존재할 경우 그 카일을 덮어쓰도록하는 옵션
-            Path filePath = networkPath.resolve(fileSetName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return 2;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 1;   
-        }
-    }
 }
