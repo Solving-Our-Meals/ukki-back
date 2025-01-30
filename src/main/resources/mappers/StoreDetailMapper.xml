@@ -313,12 +313,12 @@
              , A.QR_CONFIRM
              , A.QR
           FROM TBL_END_RES A
-         WHERE A.USER_NO = (SELECT
+         WHERE 1=1
+           AND A.USER_NO = (SELECT
                                    USER_NO
                               FROM TBL_USER
                              WHERE USER_ID = #{ userId })
-               AND
-               A.STORE_NO = #{ storeNo }
+           AND A.STORE_NO = #{ storeNo }
     </select>
 
     <select id="checkReviewList" parameterType="long" resultType="com.ohgiraffers.ukki.store.model.dto.NoReviewReservListDTO">
