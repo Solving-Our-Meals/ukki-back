@@ -6,6 +6,7 @@ import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +24,11 @@ import java.util.Map;
 @Service
 public class MypageService {
 
-    private static final String PROFILE_IMAGE_FOLDER_ID = "1gxTNO0bbEGV-VeLlzMV76N1jGI03neUM";
-    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    @Value("${google.drive.inquiry-folder-id}")
+    private String Inquiry_FOLDER_ID;
 
+    @Value("${google.drive.profile-image-folder-id}")
+    private String PROFILE_IMAGE_FOLDER_ID;
 
     private final JwtService jwtService;
     private final MypageMapper mypageMapper;
