@@ -68,7 +68,7 @@ public class StoreService {
         return storeMapper.getUserReviewList(userId, storeNo);
     }
 
-    public boolean checkReviewList(long resNo) {
+    public NoReviewReservListDTO checkReviewList(long resNo) {
         return storeMapper.checkReviewList(resNo);
     }
 
@@ -139,4 +139,7 @@ public class StoreService {
         return storeMapper.selectReservationStatusByStore(storeNo);  // Fetch reservation list
     }
 
+    public List<StoreReservationInfoDTO> getReviewReservationList(List<Long> resNo) {
+        return storeMapper.getReviewReservationList(resNo);
+    }
 }
