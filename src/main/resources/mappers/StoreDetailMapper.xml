@@ -308,7 +308,7 @@
              , A.STORE_NO
              , A.QR_CONFIRM
              , A.QR
-          FROM TBL_RESERVATION A
+          FROM TBL_END_RES A
          WHERE A.USER_NO = (SELECT
                                    USER_NO
                               FROM TBL_USER

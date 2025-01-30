@@ -501,7 +501,7 @@ public class StoreController {
 
             reservationList = storeService.getUserReviewList(userId, storeNo);
 
-            //        System.out.println("reservationList = " + reservationList);
+            System.out.println("reservationList = " + reservationList);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
