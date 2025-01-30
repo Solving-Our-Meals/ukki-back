@@ -20,15 +20,21 @@ public class AdminReservationService {
     }
 
     public ThisWeekReservationDTO weeklyReservation() {
-        return adminReservationMapper.weeklyReservation();
+        return adminReservationMapper.weeklyReservation() != null ? 
+            adminReservationMapper.weeklyReservation() : 
+            new ThisWeekReservationDTO();
     }
 
     public int todayReservation() {
-        return adminReservationMapper.todayReservation();
+        return adminReservationMapper.todayReservation() != 0 ? 
+            adminReservationMapper.todayReservation() : 
+            0;
     }
 
     public MonthlyNoShowDTO monthlyNoShowReservation() {
-        return adminReservationMapper.monthlyNoShowReservation();
+        return adminReservationMapper.monthlyNoShowReservation() != null ? 
+            adminReservationMapper.monthlyNoShowReservation() : 
+            new MonthlyNoShowDTO();
     }
 
     public List<AdminUserResDTO> userResList() { return adminReservationMapper.userResList();

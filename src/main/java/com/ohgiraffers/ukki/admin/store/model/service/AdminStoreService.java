@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,18 +21,26 @@ public class AdminStoreService {
     }
 
     public List<MonthlyRegistStoreDTO> monthlyRegistStore() {
-        return adminStoreMapper.monthlyRegistStore();
+        return adminStoreMapper.monthlyRegistStore() != null ? 
+            adminStoreMapper.monthlyRegistStore() : 
+            new ArrayList<>();
     }
 
     public int totalRegistStore() {
-        return adminStoreMapper.totalRegistStore();
+        return adminStoreMapper.totalRegistStore() != 0 ? 
+            adminStoreMapper.totalRegistStore() : 
+            0;
     }
 
     public List<AdminStoreListDTO> searchStores(String category, String word) {
         Map<String, String> params = new HashMap<>();
         params.put("category", category);
         params.put("word", word);
-        return adminStoreMapper.searchBy(params);
+        
+        // null이 아닌 빈 리스트 반환
+        return adminStoreMapper.searchBy(params) != null ? 
+            adminStoreMapper.searchBy(params) : 
+            new ArrayList<>();
     }
 
     public AdminStoreInfoDTO searchStoreInfo(long storeNo) {

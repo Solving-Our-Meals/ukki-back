@@ -18,13 +18,14 @@
     </resultMap>
 
     <resultMap id="inquiryList" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminInquiryListDTO">
-            <id property="inqNo" column="INQ_NO" />
-            <result property="categoryName" column="CATEGORY_NAME" />
-            <result property="inqDate" column="INQ_DATE" />
-            <result property="inqTitle" column="INQ_TITLE" />
-            <result property="inqContent" column="INQ_CONTENT" />
-            <result property="state" column="STATE" typeHandler="com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler" />
-            <result property="isInquiry" column="IS_INQUIRY"/>
+        <id property="inqNo" column="INQ_NO" jdbcType="INTEGER"/>
+        <result property="categoryName" column="CATEGORY_NAME" jdbcType="VARCHAR"/>
+        <result property="inqDate" column="INQ_DATE" jdbcType="VARCHAR"/>
+        <result property="inqTitle" column="INQ_TITLE" jdbcType="VARCHAR"/>
+        <result property="inqContent" column="INQ_CONTENT" jdbcType="VARCHAR"/>
+        <result property="state" column="STATE" jdbcType="VARCHAR" 
+                typeHandler="com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler"/>
+        <result property="isInquiry" column="IS_INQUIRY" jdbcType="BOOLEAN"/>
     </resultMap>
 
     <resultMap id="reportInfo" type="com.ohgiraffers.ukki.admin.inquiry.model.dto.AdminReportInfoDTO">
@@ -66,13 +67,13 @@
 
     <select id="searchUserInquiry" resultMap="inquiryList">
         SELECT
-            a.INQ_NO,
-            b.CATEGORY_NAME,
-            a.INQ_DATE,
-            a.INQ_TITLE,
-            a.INQ_CONTENT,
-            a.STATE,
-            true AS IS_INQUIRY
+            COALESCE(a.INQ_NO, 0) as INQ_NO,
+            COALESCE(b.CATEGORY_NAME, '') as CATEGORY_NAME,
+            COALESCE(a.INQ_DATE, CURRENT_DATE) as INQ_DATE,
+            COALESCE(a.INQ_TITLE, '') as INQ_TITLE,
+            COALESCE(a.INQ_CONTENT, '') as INQ_CONTENT,
+            COALESCE(a.STATE, 'PROCESSING') as STATE,
+            true as IS_INQUIRY
         FROM TBL_INQUIRY a
         LEFT JOIN TBL_INQUIRY_CATEGORY b ON a.CATEGORY_NO = b.CATEGORY_NO
         <where>
