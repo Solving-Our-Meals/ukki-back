@@ -609,12 +609,19 @@ public class StoreController {
 
     // 메인
     @GetMapping("/{storeNo}")
-    public String viewStorePage(@PathVariable("storeNo") int storeNo) {
-        // storeNo에 해당하는 가게 정보 조회
+    public String viewStorePage(@PathVariable("storeNo") long storeNo, Model model) {
+        // storeNo에 해당하는 가게 정보를 조회 (예: DB에서)
+        StoreInfoDTO store = storeService.getStoreInfo(storeNo);  // DB에서 storeNo로 가게 정보 조회
 
-        // 해당 가게의 예약 페이지를 보여주는 뷰 반환
-        return "storePage";
+        if (store != null) {
+            model.addAttribute("store", store);  // 가게 정보 model에 추가
+            return "store/{storeNo}";  // 가게 페이지로 이동
+        } else {
+            // 가게 정보가 없으면 오류 처리
+            return "storeNotFound";  // 예: 404 페이지로 리디렉션
+        }
     }
+
 
 
     @GetMapping("/search")
