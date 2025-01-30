@@ -1,12 +1,10 @@
 mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.ohgiraffers.ukki.*.model.dto
+  mapper-locations: classpath:mappers/**/*.xml
+  type-aliases-package: com.ohgiraffers.ukki
   configuration:
     map-underscore-to-camel-case: true
-    type-handlers:
-      - java-type: com.ohgiraffers.ukki.admin.inquiry.model.dto.InquiryListDTO
-        handler: com.ohgiraffers.ukki.common.handler.InquiryStateTypeHandler
-
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    jdbc-type-for-null: NULL
 
 spring:
   datasource:
@@ -58,8 +56,15 @@ jwt:
 server:
   port: 8080
 
-    
+google:
+  drive:
+    inquiry-folder-id: ${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}
+
 logging:
   level:
-    com.ohgiraffers.ukki: DEBUG
-    org.mybatis: DEBUG 
+    root: OFF
+    org.springframework: OFF
+    org.mybatis: OFF
+    com.ohgiraffers: OFF
+  pattern:
+    console:     # 콘솔 로깅 패턴 비우기

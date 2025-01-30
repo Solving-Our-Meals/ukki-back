@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.admin.inquiry.model.dto;
 
 import com.ohgiraffers.ukki.common.InquiryState;
+import java.time.LocalDate;
 
 public class AdminInquiryListDTO {
 

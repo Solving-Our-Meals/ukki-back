@@ -51,3 +51,12 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// resources 포함 확인
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+        }
+    }
+}

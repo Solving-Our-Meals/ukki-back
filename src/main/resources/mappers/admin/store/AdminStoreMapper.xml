@@ -76,7 +76,7 @@
         MONTH(STORE_REGIST_DATE) AS MON,
         COUNT(*) AS value
         FROM
-        tbl_store
+        TBL_STORE
         GROUP BY
         YEAR, MON
         ORDER BY
@@ -84,9 +84,7 @@
     </select>
 
     <select id="totalRegistStore" resultType="int">
-        SELECT
-        COUNT(*)
-        FROM TBL_STORE;
+        SELECT COUNT(*) FROM TBL_STORE
     </select>
 
     <select id="searchBy" resultMap="storeListResultMap" parameterType="map">

@@ -20,7 +20,7 @@ COPY src/main/resources/credentials.json src/main/resources/credentials.json
 RUN gradle build --no-daemon -x test
 
 # Production stage
-FROM openjdk:17-slim
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
@@ -33,11 +33,23 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN addgroup --system spring && adduser --system spring --ingroup spring
 USER spring:spring
 
-# JAR 파일 복사
+# JAR 파일과 매퍼 파일 복사 시 권한 설정
 COPY --from=builder --chown=spring:spring /app/build/libs/*.jar app.jar
+COPY --from=builder --chown=spring:spring /app/src/main/resources/mappers/ /app/mappers/
+
+# 파일 권한 수정
+USER root
+RUN chmod 644 /app/mappers/**/*.xml
+USER spring:spring
 
 EXPOSE 8080
 
 ENV SPRING_PROFILES_ACTIVE=prod
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 매퍼 위치를 명시적으로 지정
+ENV MYBATIS_MAPPER_LOCATIONS=file:/app/mappers/**/*.xml
+
+# 매퍼 파일 복사 로깅 추가
+RUN ls -la /app/mappers/admin/store/
+
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Dlogging.level.org.mybatis=DEBUG", "-jar", "app.jar"]
