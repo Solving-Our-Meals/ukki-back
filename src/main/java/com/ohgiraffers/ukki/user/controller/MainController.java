@@ -39,7 +39,7 @@ public class MainController {
         try {
             String url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "KakaoAK 1d0bf0e6ccf05d20983add3f6153007d"); // 카카오 API 키
+            headers.set("Authorization", "KakaoAK REACT_APP_KAKAOMAP_APP_KEY"); // 카카오 API 키
 
             HttpEntity<String> entity = new HttpEntity<>(request.toJson(), headers);
 
