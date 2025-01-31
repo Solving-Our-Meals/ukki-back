@@ -6,6 +6,7 @@ import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.user.model.dao.MypageMapper;
 import com.ohgiraffers.ukki.user.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +24,11 @@ import java.util.Map;
 @Service
 public class MypageService {
 
-    private static final String PROFILE_IMAGE_FOLDER_ID = "1gxTNO0bbEGV-VeLlzMV76N1jGI03neUM";
-    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    @Value("${google.drive.inquiry-folder-id}")
+    private String Inquiry_FOLDER_ID;
 
+    @Value("${google.drive.profile-image-folder-id}")
+    private String PROFILE_IMAGE_FOLDER_ID;
 
     private final JwtService jwtService;
     private final MypageMapper mypageMapper;
@@ -169,44 +172,37 @@ public class MypageService {
 
     public boolean updateInquiry(MypageInquiryDTO inquiryToUpdate, MultipartFile file, String userId) {
         try {
-            // DB에서 저장된 파일 ID 가져오기
             String existingFileId = inquiryToUpdate.getFile();
 
-            // 기존 파일이 있으면 Google Drive에서 삭제
-            if (existingFileId != null && !existingFileId.isEmpty()) {
+            if (file != null && !file.isEmpty() && existingFileId != null && !existingFileId.isEmpty()) {
                 try {
                     System.out.println(existingFileId);
-                    // 구글 드라이브에서 파일 삭제
                     googleDriveService.deleteFile(existingFileId);
                     System.out.println("기존 파일 삭제 성공, 파일 ID: " + existingFileId);
                 } catch (Exception e) {
                     System.out.println("기존 파일 삭제 실패: " + e.getMessage());
-                    // 예외 발생 시에도 계속 진행하려면 여기서 true를 반환하도록 설정
                 }
             } else {
-                System.out.println("기존 파일이 드라이브에 존재하지 않거나 파일 ID가 잘못되었습니다.");
+                System.out.println("기존 파일이 없거나 새로운 파일이 없어서 파일 삭제를 건너뛰었습니다.");
             }
 
             if (file != null && !file.isEmpty()) {
-                // 폴더 이름을 폴더 ID로 변경 (Inquiry 폴더 ID 사용)
-                String folderId = Inquiry_FOLDER_ID;  // Inquiry 폴더 ID
+                String folderId = Inquiry_FOLDER_ID;
 
-                // 파일 업로드 및 파일 ID 반환
                 String fileId = googleDriveService.uploadFile(file, folderId, userId + "_inquiry_files");
 
-                // 파일 URL을 DB에 저장 (구글 드라이브 URL 형식으로)
                 String fileUrl = googleDriveService.getFileUrl(fileId);
                 inquiryToUpdate.setFile(fileId);
             }
 
-            // DB 업데이트
             int updatedRows = mypageMapper.updateInquiry(inquiryToUpdate);
-            return updatedRows > 0;  // 업데이트된 행이 있으면 true 반환
+            return updatedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;  // 예외 발생 시 false 반환
+            return false;
         }
     }
+
 
 
     public boolean deleteInquiry(int inquiryNo) {
@@ -253,43 +249,32 @@ public class MypageService {
         return userInfo;
     }
 
-    private final String profileImageDirectory = "\\\\192.168.0.138\\ukki_nas"; // 업로드 디렉토리 경로
-
-    public boolean updateUserInfo(String userId, String userName, String userPass, MultipartFile profileImage) {
+    public boolean updateUserInfo(String userId, String userName, String userPass) {
         try {
             MypageUpdateUserInfoDTO updateUserInfoDTO = new MypageUpdateUserInfoDTO();
             updateUserInfoDTO.setUserId(userId);
 
-            // 1.
-            if (profileImage != null && !profileImage.isEmpty()) {
-                // 파일을 저장할 경로 생성
-                String filename = userId + "_" + profileImage.getOriginalFilename();
-                File targetFile = new File(profileImageDirectory, filename);
-                profileImage.transferTo(targetFile); // 파일 저장
-
-                // 파일 경로를 DTO에 설정
-                updateUserInfoDTO.setFile(filename);
-            }
-
-            // 2. 닉네임 업데이트
+            // 1. 닉네임 업데이트
             if (userName != null && !userName.isEmpty()) {
                 updateUserInfoDTO.setUserName(userName);
             }
 
-            // 3. 비밀번호 업데이트
+            // 2. 비밀번호 업데이트
             if (userPass != null && !userPass.isEmpty()) {
                 String encodedPassword = passwordEncoder.encode(userPass);  // 비밀번호를 암호화
                 updateUserInfoDTO.setUserPass(encodedPassword);
             }
 
+            // 3. 사용자 정보 업데이트
             int updatedRows = mypageMapper.updateUserInfo(updateUserInfoDTO);
 
             return updatedRows > 0;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
 
     public MypageReviewDTO getUserReviewDetailFromToken(String jwtToken, String userId, Long reviewNo) {
         if (!jwtService.validateToken(jwtToken)) {

@@ -5,15 +5,13 @@ public class MypageUpdateUserInfoDTO {
     private String userId;
     private String userName;
     private String userPass;
-    private String File;
 
     public MypageUpdateUserInfoDTO() {}
 
-    public MypageUpdateUserInfoDTO(String userId, String userName, String userPass, String file) {
+    public MypageUpdateUserInfoDTO(String userId, String userName, String userPass) {
         this.userId = userId;
         this.userName = userName;
         this.userPass = userPass;
-        File = file;
     }
 
     public String getUserId() {
@@ -40,21 +38,12 @@ public class MypageUpdateUserInfoDTO {
         this.userPass = userPass;
     }
 
-    public String getFile() {
-        return File;
-    }
-
-    public void setFile(String file) {
-        File = file;
-    }
-
     @Override
     public String toString() {
         return "MypageUpdateUserInfoDTO{" +
                 "userId='" + userId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userPass='" + userPass + '\'' +
-                ", File='" + File + '\'' +
                 '}';
     }
 }

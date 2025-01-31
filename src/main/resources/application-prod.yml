@@ -59,6 +59,7 @@ server:
 google:
   drive:
     inquiry-folder-id: ${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}
+    profile-image-folder-id: ${GOOGLE_DRIVE_PROFILE_FOLDER_ID}
 
 logging:
   level:

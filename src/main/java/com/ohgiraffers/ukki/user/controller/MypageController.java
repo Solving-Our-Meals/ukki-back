@@ -10,6 +10,7 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +32,8 @@ import java.util.*;
 @RequestMapping("/user/mypage")
 public class MypageController {
 
-    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    @Value("${google.drive.inquiry-folder-id}")
+    private String Inquiry_FOLDER_ID;
 
     private final JwtService jwtService;
     private MypageService mypageService;
@@ -45,27 +47,6 @@ public class MypageController {
         this.jwtService = jwtService;
         this.googleDriveService = googleDriveService;
     }
-
-/*     해당 방법은 헤더로 보냈을 때 사용하는 방식으로 우리는 헤더 방식이 아닙니다. 참고해주세요 !
-    @GetMapping("/{userId}")
-    public MypageDTO getUserInfo(@PathVariable String userId, @RequestHeader("Authorization") String token) {
-        String jwtToken = token.replace("Bearer ", "");
-        return mypageService.getUserInfoFromToken(jwtToken, userId);
-    }
-
-     쿠키로만 보냈을 땐 이 방법을 사용해야하고 우리는 쿠키로 검증하는 방식을 사용할겁니다. 쿠키서비스에 getJWTCookie 메소드를 통해 검증하시고 사용하시면 됩니다 !
-     마이페이지 프로필의 닉네임을 불러오는 컨트롤러
-    @GetMapping("/{userId}")
-    public MypageDTO getUserInfo(@PathVariable String userId, HttpServletRequest request) {
-        String jwtToken = cookieService.getJWTCookie(request);
-
-        if (jwtToken == null) {
-            throw new IllegalArgumentException("토큰 일치 안함");
-        }
-
-        return mypageService.getUserInfoFromToken(jwtToken, userId);
-    }*/
-
 
     @GetMapping("/reservation")
     public ResponseEntity<List<MypageReservationDTO>> getUserReservation(
@@ -335,6 +316,9 @@ public class MypageController {
         inquiryToUpdate.setTitle(title);
         inquiryToUpdate.setText(text);
 
+        System.out.println(title);
+        System.out.println(text);
+
         if (file != null && !file.isEmpty()) {
             try {
                 boolean updated = mypageService.updateInquiry(inquiryToUpdate, file, userId);
@@ -346,6 +330,12 @@ public class MypageController {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Collections.singletonMap("message", "파일 업로드 실패: " + e.getMessage()));
+            }
+        } else {
+            boolean updated = mypageService.updateInquiry(inquiryToUpdate, null, userId);  // null로 파일을 넘겨 파일 업데이트를 건너뛰고 내용만 수정
+            if (!updated) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("message", "문의 수정에 실패했습니다."));
             }
         }
 
@@ -396,19 +386,21 @@ public class MypageController {
     }
 
 
+/*  없어도 됨 (프론트에서 아이디로 직접 다운로드 요청함)
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<Object> downloadFile(@PathVariable String fileId) {
+    public ResponseEntity<String> downloadFile(@PathVariable String fileId) {
         try {
-            String fileDownloadUrl = googleDriveService.getFileUrl(fileId); // 파일 다운로드 URL 가져오기
-            return ResponseEntity.ok("{\"fileName\":\"문의 파일\",\"fileDownloadUrl\":\"" + fileDownloadUrl + "\"}");
+            // 파일 다운로드 URL을 생성
+            String fileDownloadUrl = googleDriveService.getFileUrl(fileId);
+
+            // URL을 바로 응답으로 반환 (사용자는 이 URL을 통해 파일을 다운로드)
+            return ResponseEntity.ok(fileDownloadUrl);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"fileName\":\"문의 파일\",\"error\":\"파일 다운로드 중 오류가 발생했습니다.\"}");
+                    .body("파일 다운로드 중 오류가 발생했습니다.");
         }
-    }
-
-
+    }*/
 
     @PostMapping("/confirm")
     public ResponseEntity<Map<String, String>> confirmPassword(
@@ -465,10 +457,16 @@ public class MypageController {
 
     @PutMapping("/update")
     public ResponseEntity<Map<String, String>> updateUserInfo(
-            @RequestParam(required = false) MultipartFile profileImage,
-            @RequestParam(required = false) String userName,
-            @RequestParam(required = false) String userPass,
+            @RequestBody MypageUpdateUserInfoDTO updateUserInfoDTO,
             HttpServletRequest request) {
+
+        // 디버깅용 로그 출력
+            // DTO가 null이면 예외 발생
+            if (updateUserInfoDTO == null) {
+                System.out.println("updateUserInfoDTO is null");
+            } else {
+                System.out.println(updateUserInfoDTO);
+            }
 
         String jwtToken = cookieService.getJWTCookie(request);
         if (jwtToken == null || jwtService.getUserInfoFromTokenId(jwtToken) == null) {
@@ -480,7 +478,7 @@ public class MypageController {
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
 
         try {
-            boolean updated = mypageService.updateUserInfo(userId, userName, userPass, profileImage);
+            boolean updated = mypageService.updateUserInfo(userId, updateUserInfoDTO.getUserName(), updateUserInfoDTO.getUserPass());
 
             if (updated) {
                 return ResponseEntity.ok()
@@ -495,6 +493,7 @@ public class MypageController {
                     .body(Collections.singletonMap("message", "아무것도 변경하지 않았습니다."));
         }
     }
+
 
     @PostMapping("/profile-image")
     public ResponseEntity<String> uploadProfileImage(HttpServletRequest request,
