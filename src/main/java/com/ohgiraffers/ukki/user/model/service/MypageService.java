@@ -249,7 +249,7 @@ public class MypageService {
         return userInfo;
     }
 
-    public boolean updateUserInfo(String userId, String userName, String userPass) {
+/*    public boolean updateUserInfo(String userId, String userName, String userPass) {
         try {
             MypageUpdateUserInfoDTO updateUserInfoDTO = new MypageUpdateUserInfoDTO();
             updateUserInfoDTO.setUserId(userId);
@@ -273,7 +273,7 @@ public class MypageService {
             e.printStackTrace();
             return false;
         }
-    }
+    }*/
 
 
     public MypageReviewDTO getUserReviewDetailFromToken(String jwtToken, String userId, Long reviewNo) {
