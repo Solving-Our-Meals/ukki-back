@@ -1,9 +1,9 @@
 package com.ohgiraffers.ukki.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.util.Value;
 import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
-import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
@@ -37,14 +37,12 @@ public class BossController {
     @Autowired
     private BossMapper bossMapper;
 
-//    private final String INQUIRY_SHARE_DRIVE = "\\\\I7E-74\\ukki_nas\\inquiry";
+    @Value("${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}")
+    private String INQUIRY_FOLDER_ID;
     private final GoogleDriveService googleDriveService;
-    private final InquiryService inquiryService;
-    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
 
-    public BossController(GoogleDriveService googleDriveService, InquiryService inquiryService){
+    public BossController(GoogleDriveService googleDriveService){
         this.googleDriveService = googleDriveService;
-        this.inquiryService = inquiryService;
     }
 
     // 가게 정보 조회

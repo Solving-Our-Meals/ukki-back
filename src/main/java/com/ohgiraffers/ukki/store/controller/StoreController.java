@@ -1,5 +1,6 @@
 package com.ohgiraffers.ukki.store.controller;
 
+import com.google.api.client.util.Value;
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import com.ohgiraffers.ukki.store.model.service.BossService;
@@ -24,14 +25,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin(origins = "http://localhost:3000")
 public class StoreController {
 
+    @Value("${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}")
+    private String INQUIRY_FOLDER_ID;
     private final StoreService storeService;
-//    private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
-    private final String SHARED_FOLDER = "\\\\Desktop-43runa1\\images\\store";
     private final GoogleDriveService googleDriveService;
 
-    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
-    private static final String STORE_FOLDER_ID = "19mb-5n8hNjrdRAksh4hTKcFY-Gp0Aaoz";
-    private static final String REVIEW_FOLDER_ID = "1wJz5yiUrtwNiK3tk1rN1vGSrly8NiIQr";
 
     public StoreController(StoreService storeService, BossService bossService, GoogleDriveService googleDriveService){
         this.storeService = storeService;
