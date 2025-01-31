@@ -62,7 +62,7 @@ public interface BossMapper {
     List<ReservationDTO> getReservationsForDateAndTime(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
     List<ReservationDTO> getReservationsForDate(long storeNo, LocalDate reservationDate);
 
-    List<ReservationDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
+    List<StoreResPosNumDTO> selectReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime);
 
     void updateReportCount(long reviewNo);
 
