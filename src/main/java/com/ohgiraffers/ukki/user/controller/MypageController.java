@@ -10,6 +10,7 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +32,8 @@ import java.util.*;
 @RequestMapping("/user/mypage")
 public class MypageController {
 
-    private static final String Inquiry_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+    @Value("${google.drive.inquiry-folder-id}")
+    private String Inquiry_FOLDER_ID;
 
     private final JwtService jwtService;
     private MypageService mypageService;
