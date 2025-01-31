@@ -69,6 +69,8 @@
         <result property="sat" column="sat"/>
         <result property="sun" column="sun"/>
     </resultMap>
+
+
     <select id="selectReservationStatusByStore" resultType="com.ohgiraffers.ukki.store.model.dto.StoreResPosNumDTO">
         SELECT
         RES_POS_NUMBER AS resPosNumber,
@@ -94,8 +96,6 @@
         WHERE r.STORE_NO = #{storeNo}
         AND r.RES_DATE = #{reservationDate}
     </select>
-
-
 
 
 

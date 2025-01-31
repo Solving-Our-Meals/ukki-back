@@ -61,12 +61,10 @@ public class BossController {
     }
 
 
-    // 예약 현황 조회
-// 예약 현황 조회
     @GetMapping("/reservation-status")
     public ResponseEntity<List<StoreResPosNumDTO>> getReservationStatus(
-            @RequestParam Long storeNo,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate reservationDate,
+            @RequestParam long storeNo,
+            @RequestParam @DateTimeFormat(pattern = "YYYY-MM-DD") LocalDate reservationDate,
             @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime) {
 
         // DB에서 예약 가능한 인원 수 조회
@@ -78,22 +76,22 @@ public class BossController {
             return ResponseEntity.ok(Collections.emptyList());
         }
 
-        // 최신 예약 정보 가져오기
-        StoreResPosNumDTO latestReservation = reservations.get(0);  // 내림차순 정렬로 최신값이 첫 번째
-        return ResponseEntity.ok(Collections.singletonList(latestReservation));
+        // 여러 예약 정보를 모두 반환
+        return ResponseEntity.ok(reservations);
     }
 
 
 
+
     @GetMapping("/reservations-list")
-    public ResponseEntity<List<ReservationDTO>> getReservationStatus(
+    public ResponseEntity<List<StoreResPosNumDTO>> getReservationList(
             @RequestParam long storeNo,
-            @RequestParam LocalDate reservationDate,  // String으로 받음
-            @RequestParam(required = false) LocalTime reservationTime) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate reservationDate,
+            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime reservationTime) {
 
         try {
 
-            List<ReservationDTO> reservations = bossService.getReservationList(storeNo, reservationDate, reservationTime);
+            List<StoreResPosNumDTO> reservations = bossService.getReservationList(storeNo, reservationDate, reservationTime);
             return ResponseEntity.ok(reservations);
         } catch (DateTimeParseException e) {
             // 날짜나 시간이 잘못된 형식일 경우

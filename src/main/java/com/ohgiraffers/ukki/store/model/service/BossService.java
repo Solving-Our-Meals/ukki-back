@@ -31,12 +31,9 @@ public class BossService {
     }
 
 
-    // 예약 인원 리스트 조회
-    public List<ReservationDTO> getReservationPeopleList(long storeNo) {
-        return bossMapper.selectReservationPeopleList(storeNo);
-    }
 
-    public List<ReservationDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
+
+    public List<StoreResPosNumDTO> getReservationList(long storeNo, LocalDate reservationDate, LocalTime reservationTime) {
         Map<String, Object> params = new HashMap<>();
         params.put("storeNo", storeNo);
         params.put("reservationDate", reservationDate);
