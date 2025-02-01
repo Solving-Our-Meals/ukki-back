@@ -52,7 +52,7 @@ public class QrController {
         if(isConfirm!=0) {
             String QR = qrService.searchQr(resNo);
             qrService.editQrConfirmRes(QR, resNo);
-            if(QR != "expired"){
+            if(!QR.equals("expired")){
                 googleDriveService.deleteFile(QR);
             }
             Map<String, Object> data = new HashMap<>();
