@@ -43,8 +43,17 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/auth/**", "/users/**", "/admin/**", "/bosses/**", "/store/**", "/**").permitAll()
-                        .anyRequest().authenticated()) // 인증된 사용자
+                        .requestMatchers("/main", "/", "/store", "/info", "/auth/**", "/user/info", "/image/**", "/css/**", "/**").permitAll()
+
+                        .requestMatchers("/user/**", "/main", "/", "/store/**").hasRole("USER")
+                        .requestMatchers("/admin/**", "/boss/**").denyAll()
+
+                        .requestMatchers("/boss/**").hasRole("STORE")
+
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        .anyRequest().authenticated())
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
                 .addFilterBefore(logoutFilter, JwtFilter.class) // 로그아웃 필터 추가 (JwtFilter 전)
                 .cors(withDefaults())
@@ -66,9 +75,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//            configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:3000"));
+            configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:3000"));
 //  configuration.setAllowedOrigins(Arrays.asList("http://3.39.119.249:3000", "http://3.39.119.249", "http://3.39.119.249:80", "http://3.39.119.249:8080"));
-          configuration.setAllowedOrigins(Arrays.asList("http://43.200.92.61:3000", "http://43.200.92.61", "http://43.200.92.61:80", "http://43.200.92.61:8080"));
+//          configuration.setAllowedOrigins(Arrays.asList("http://43.200.92.61:3000", "http://43.200.92.61", "http://43.200.92.61:80", "http://43.200.92.61:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
