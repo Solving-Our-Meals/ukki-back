@@ -39,6 +39,7 @@ public class QrService {
 
       String storeUserName = qrMapper.resStoreUserName(resNo);
         System.out.println(storeUserName);
+        System.out.println(userId);
 
         if(storeUserName.equals(userId)) {
             return 1;
