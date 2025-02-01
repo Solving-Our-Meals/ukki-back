@@ -36,8 +36,10 @@ public class QrService {
 
     public int qrConfirmation(int resNo, String userId) {
 //    qr로 가게 사장 아이디 불러오기
+
       String storeUserName = qrMapper.resStoreUserName(resNo);
         System.out.println(storeUserName);
+        System.out.println(userId);
 
         if(storeUserName.equals(userId)) {
             return 1;
@@ -81,6 +83,7 @@ public class QrService {
     public void editQrConfirmRes(String qr, int resNo) {
         googleDriveService.deleteFile(qr);
         qrMapper.editQrConfirmRes(resNo);
+        qrMapper.moveResToEndRes(resNo);
 
     }
 
