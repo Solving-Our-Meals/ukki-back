@@ -55,6 +55,8 @@ jwt:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api
 
 google:
   drive:
@@ -63,9 +65,8 @@ google:
 
 logging:
   level:
-    root: OFF
-    org.springframework: OFF
-    org.mybatis: OFF
-    com.ohgiraffers: OFF
+    root: error
+    org.springframework: error
+    org.mybatis: error
   pattern:
     console:     # 콘솔 로깅 패턴 비우기
