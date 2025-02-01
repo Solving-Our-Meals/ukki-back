@@ -36,14 +36,14 @@ public class QrController {
 
         if (jwtToken == null) {
             System.out.println("토큰 일치안함");
-            throw new IllegalArgumentException("토큰이 일치하지 않음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
 
         if (userId == null) {
             System.out.println("유효토큰 아님");
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         System.out.println("토큰 통과");
@@ -52,7 +52,7 @@ public class QrController {
         if(isConfirm!=0) {
             String QR = qrService.searchQr(resNo);
             qrService.editQrConfirmRes(QR, resNo);
-            if(QR != "expired"){
+            if(!QR.equals("expired")){
                 googleDriveService.deleteFile(QR);
             }
             Map<String, Object> data = new HashMap<>();

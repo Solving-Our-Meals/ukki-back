@@ -36,8 +36,10 @@ public class QrService {
 
     public int qrConfirmation(int resNo, String userId) {
 //    qr로 가게 사장 아이디 불러오기
+
       String storeUserName = qrMapper.resStoreUserName(resNo);
         System.out.println(storeUserName);
+        System.out.println(userId);
 
         if(storeUserName.equals(userId)) {
             return 1;
@@ -51,7 +53,7 @@ public class QrService {
             // QR 코드에 예약번호를 포함한 URL 생성
             Integer reservationNo = qrMapper.getLastReservationNo();
             reservationNo = (reservationNo == null || reservationNo == 0) ? 1 : reservationNo + 1;
-            String url = "http://localhost:3000/qr/" + reservationNo;  // 실제 운영 URL로 변경 필요
+            String url = "https:/ukki.site/qr/" + reservationNo;
             
             // QR 코드 생성
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -81,6 +83,7 @@ public class QrService {
     public void editQrConfirmRes(String qr, int resNo) {
         googleDriveService.deleteFile(qr);
         qrMapper.editQrConfirmRes(resNo);
+        qrMapper.moveResToEndRes(resNo);
 
     }
 

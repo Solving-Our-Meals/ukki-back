@@ -207,7 +207,12 @@ public class AdminReservationController {
     @DeleteMapping("/info/end/{resNo}")
     public ResponseEntity<?> deleteEndRes(@PathVariable int resNo) {
         try{
+            AdminReservationInfoDTO resInfo = adminReservationService.endResInfo(resNo);
             adminReservationService.deleteEndRes(resNo);
+            if(resInfo.getQr() != "expired"){
+                googleDriveService.deleteFile(resInfo.getQr());
+            }
+
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "삭제 성공");

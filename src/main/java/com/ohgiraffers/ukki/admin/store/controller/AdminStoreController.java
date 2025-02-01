@@ -21,6 +21,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.http.MediaType;
 
@@ -155,20 +161,18 @@ public class AdminStoreController {
             if(result > 0){
                 message = "삭제에 성공했습니다.";
                 adminStoreService.deleteStoreBanner(storeNo);
-                for (int i = 1; i <= 5; i++) {
-//                    String fileToDelete = storeNo + "banner" + i + ".png";
-//                    Path filePath = Paths.get(SHARED_FOLDER, fileToDelete);
-//                    Files.deleteIfExists(filePath);
+                adminStoreService.deleteStoreKeyword(storeNo);
+                adminStoreService.deleteStoreOperation(storeNo);
+                deleteReviewWithStore(storeNo);
+                googleDriveService.deleteFile(menu);
+                googleDriveService.deleteFile(profile);
+                if(banner.length > 1){
+                    for(int i = 0; i < banner.length; i++){
+                        googleDriveService.deleteFile(banner[i]);
+                    }
+                }else{
+                    googleDriveService.deleteFile(banner[0]);
                 }
-//                String fileToDeleteProfile = storeNo + "profile" + ".png";
-//                Path filePathProfile = Paths.get(SHARED_FOLDER, fileToDeleteProfile);
-//                Files.deleteIfExists(filePathProfile);
-//                String fileToDeleteMenu = storeNo + "menu" + ".png";
-//                Path filePathMenu = Paths.get(SHARED_FOLDER, fileToDeleteMenu);
-//                Files.deleteIfExists(filePathMenu);
-//                adminStoreService.deleteStoreKeyword(storeNo);
-//                adminStoreService.deleteStoreOperation(storeNo);
-//                deleteReviewWithStore(storeNo);
             }else{
                 message = "삭제에 실패했습니다.";
             }
@@ -192,7 +196,8 @@ public class AdminStoreController {
     public void deleteReviewWithStore(int storeNo) throws IOException {
         String[] reviewImgArray = adminStoreService.getReviewImgStoreNo(storeNo);
         for(int i = 0; i < reviewImgArray.length; i++){
-            String reviewImg = reviewImgArray[i]+".png";
+            String reviewImg = reviewImgArray[i];
+            googleDriveService.deleteFile(reviewImg);
 //            Path filePathProfile = Paths.get(SHARED_FOLDER, reviewImg);
 //            Files.deleteIfExists(filePathProfile);
         }
@@ -477,6 +482,54 @@ public class AdminStoreController {
             }
             adminStoreService.insertStore(storeData);
 
+            // 운영 시간 처리
+            AdminStoreOperationDTO operationDTO = storeData.getOperationTime();
+            
+            String[] days = {
+                operationDTO.getMonday(),
+                operationDTO.getTuesday(),
+                operationDTO.getWednesday(),
+                operationDTO.getThursday(),
+                operationDTO.getFriday(),
+                operationDTO.getSaturday(),
+                operationDTO.getSunday()
+            };
+
+            for (int dayIndex = 0; dayIndex < days.length; dayIndex++) {
+                String timeRange = days[dayIndex];
+                if (!"휴무".equals(timeRange)) {
+                    List<String> timeSlots = parseTimeRange(timeRange);
+                    for (String time : timeSlots) {
+                        switch(dayIndex) {
+                            case 0:
+                                adminStoreService.insertMondayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+                                break;
+                            case 1:
+                                adminStoreService.insertTuesdayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+
+                                break;
+                            case 2:
+                                adminStoreService.insertWednesdayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+                                break;
+                            case 3:
+                                adminStoreService.insertThursdayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+
+                                break;
+                            case 4:
+                                adminStoreService.insertFridayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+                                break;
+                            case 5:
+                                adminStoreService.insertSaturdayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+
+                                break;
+                            case 6:
+                                adminStoreService.insertSundayTime(new DayTimeDTO(storeNo, time, storeData.getPosNumber()));
+                                break;
+                        }
+                    }
+
+                }
+            }
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -489,6 +542,22 @@ public class AdminStoreController {
             .body("가게 정보 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
 
+    }
+
+    private List<String> parseTimeRange(String timeRange) {
+        List<String> timeSlots = new ArrayList<>();
+        String[] parts = timeRange.split("~");
+        if (parts.length == 2) {
+            LocalTime startTime = LocalTime.parse(parts[0].trim(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime = LocalTime.parse(parts[1].trim(), DateTimeFormatter.ofPattern("HH:mm"));
+            
+            LocalTime currentTime = startTime;
+            while (!currentTime.isAfter(endTime)) {
+                timeSlots.add(currentTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+                currentTime = currentTime.plusMinutes(30);
+            }
+        }
+        return timeSlots;
     }
 
 }
