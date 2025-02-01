@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = {"/", "/main"})
+@CrossOrigin(origins = "http://localhost:3000")
 public class MainController {
 
     private final StoreService storeService;
