@@ -43,8 +43,17 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/auth/**", "/users/**", "/admin/**", "/bosses/**", "/store/**", "/**").permitAll()
-                        .anyRequest().authenticated()) // 인증된 사용자
+                        .requestMatchers("/main", "/", "/store", "/info", "/auth/**", "/user/info", "/image/**", "/css/**", "/**").permitAll()
+
+                        .requestMatchers("/user/**", "/main", "/", "/store/**").hasRole("USER")
+                        .requestMatchers("/admin/**", "/boss/**").denyAll()
+
+                        .requestMatchers("/boss/**").hasRole("STORE")
+
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        .anyRequest().authenticated())
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
                 .addFilterBefore(logoutFilter, JwtFilter.class) // 로그아웃 필터 추가 (JwtFilter 전)
                 .cors(withDefaults())
