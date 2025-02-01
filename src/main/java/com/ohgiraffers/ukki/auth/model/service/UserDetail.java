@@ -31,9 +31,9 @@ public class UserDetail implements UserDetailsService {
 
         // Spring Security에서 제공하는 User 객체로 변환하여 반환
         return User.builder()
-                .username(user.getUserId())  // 사용자 아이디
-                .password(user.getUserPass())  // 사용자 비밀번호
-                .roles("USER")  // 역할을 필요한대로 설정 (예: "USER" 역할)
+                .username(user.getUserId())
+                .password(user.getUserPass())
+                .roles(user.getUserRole().toString())
                 .build();
     }
 }

@@ -146,4 +146,32 @@ public class AdminStoreService {
     public AdminStoreBannerDTO getBanner(Long storeNo) {
         return adminStoreMapper.getBanner(storeNo);
     }
+
+    public void insertMondayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertMondayTime(dayTimeDTO);
+    }
+
+    public void insertTuesdayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertTuesdayTime(dayTimeDTO);
+    }
+
+    public void insertWednesdayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertWednesdayTime(dayTimeDTO);
+    }
+
+    public void insertThursdayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertThursdayTime(dayTimeDTO);
+    }
+
+    public void insertFridayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertFridayTime(dayTimeDTO);
+    }
+
+    public void insertSaturdayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertSaturdayTime(dayTimeDTO);
+    }
+
+    public void insertSundayTime(DayTimeDTO dayTimeDTO) {
+        adminStoreMapper.insertSundayTime(dayTimeDTO);
+    }
 }

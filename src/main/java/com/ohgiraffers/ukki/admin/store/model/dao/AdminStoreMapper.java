@@ -57,4 +57,18 @@ public interface AdminStoreMapper {
     void deleteReviewWithStore(int storeNo);
 
     AdminStoreBannerDTO getBanner(Long storeNo);
+    
+    void insertMondayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertTuesdayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertWednesdayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertThursdayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertFridayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertSaturdayTime(DayTimeDTO dayTimeDTO);
+    
+    void insertSundayTime(DayTimeDTO dayTimeDTO);
 }

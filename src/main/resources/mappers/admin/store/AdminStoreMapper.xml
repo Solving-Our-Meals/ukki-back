@@ -313,4 +313,39 @@
     <select id="getBanner" resultMap="banner">
         SELECT * FROM TBL_BANNER WHERE STORE_NO = #{storeNo}
     </select>
+
+    <insert id="insertMondayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_MONDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertTuesdayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_TUESDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertWednesdayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_WEDNESDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertThursdayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_THURSDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertFridayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_FRIDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertSaturdayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_SATURDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert>
+
+<insert id="insertSundayTime" parameterType="com.ohgiraffers.ukki.admin.store.model.dto.DayTimeDTO">
+    INSERT INTO TBL_SUNDAY(STORE_NO, OPER_TIME, POS_NUMBER)
+    VALUES (#{storeNo}, #{operTime}, #{posNumber})
+</insert> 
 </mapper>

@@ -12,4 +12,6 @@ public interface QrMapper {
     Integer getLastReservationNo();
 
     String searchQr(int resNo);
+
+    void moveResToEndRes(int resNo);
 }
