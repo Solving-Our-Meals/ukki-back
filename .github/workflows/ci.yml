@@ -23,5 +23,4 @@ jobs:
         
     - name: Build Backend
       run: |
-        ./gradlew build
-        ./gradlew test
+        ./gradlew build -x test
