@@ -185,11 +185,11 @@ public class AdminReservationController {
     public ResponseEntity<?> deleteTodayRes(@PathVariable int resNo) {
         try{
             AdminReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
-            adminReservationService.deleteTodayRes(resNo);
             if(resInfo.getQr() != "expired"){
                 googleDriveService.deleteFile(resInfo.getQr());
             }
 
+            adminReservationService.deleteTodayRes(resNo);
             Map<String, String> response = new HashMap<>();
             response.put("message", "삭제 성공");
 
@@ -207,24 +207,33 @@ public class AdminReservationController {
     @DeleteMapping("/info/end/{resNo}")
     public ResponseEntity<?> deleteEndRes(@PathVariable int resNo) {
         try{
+            System.out.println("왔다 " + resNo);
             AdminReservationInfoDTO resInfo = adminReservationService.endResInfo(resNo);
-            adminReservationService.deleteEndRes(resNo);
-            if(resInfo.getQr() != "expired"){
+            System.out.println(resInfo);
+            
+            if (resInfo == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("해당 예약 정보를 찾을 수 없습니다.");
+            }
+
+            String qr = resInfo.getQr();
+            if(qr != null && !"expired".equals(qr)){
                 googleDriveService.deleteFile(resInfo.getQr());
             }
 
-
+            adminReservationService.deleteEndRes(resNo);
             Map<String, String> response = new HashMap<>();
             response.put("message", "삭제 성공");
 
             return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(response);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body("예약정보 삭제 도중 에러가 발생했습니다.");
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("예약정보 삭제 도중 에러가 발생했습니다.");
         }
     }
 }

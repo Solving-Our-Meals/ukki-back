@@ -92,6 +92,14 @@
                 AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
             </if>
         </where>
+        ORDER BY 
+            CASE STATE 
+                WHEN 'PROCESSING' THEN 1
+                WHEN 'COMPLETE' THEN 2 
+                WHEN 'CHECK' THEN 3
+                ELSE 4
+            END,
+            INQ_DATE;
     </select>
 
     <select id="totalInquiry">
@@ -130,6 +138,14 @@
                 AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
             </if>
         </where>
+        ORDER BY 
+            CASE STATE 
+                WHEN 'PROCESSING' THEN 1
+                WHEN 'COMPLETE' THEN 2 
+                WHEN 'CHECK' THEN 3
+                ELSE 4
+            END,
+            INQ_DATE;
     </select>
 
     <select id="searchStoreReportInquiry" resultMap="reportList">
@@ -161,6 +177,14 @@
                 </otherwise>
             </choose>
         </where>
+        ORDER BY 
+            CASE STATE 
+                WHEN 'PROCESSING' THEN 1
+                WHEN 'COMPLETE' THEN 2 
+                WHEN 'CHECK' THEN 3
+                ELSE 4
+            END,
+            REPORT_DATE;
     </select>
 
     <select id="inquiryInfo" resultMap="inquiryInfo">

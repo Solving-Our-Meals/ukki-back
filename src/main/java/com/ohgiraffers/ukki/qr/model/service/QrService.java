@@ -84,6 +84,7 @@ public class QrService {
         googleDriveService.deleteFile(qr);
         qrMapper.editQrConfirmRes(resNo);
         qrMapper.moveResToEndRes(resNo);
+        qrMapper.deleteResToEndRes(resNo);
 
     }
 

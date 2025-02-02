@@ -71,4 +71,6 @@ public interface AdminStoreMapper {
     void insertSaturdayTime(DayTimeDTO dayTimeDTO);
     
     void insertSundayTime(DayTimeDTO dayTimeDTO);
+
+    void deleteStoreUser(int storeNo);
 }
