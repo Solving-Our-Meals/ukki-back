@@ -51,9 +51,11 @@ public class QrController {
 
         if(isConfirm!=0) {
             String QR = qrService.searchQr(resNo);
-            qrService.editQrConfirmRes(QR, resNo);
-            if(!QR.equals("expired")){
-                googleDriveService.deleteFile(QR);
+            try {
+                qrService.editQrConfirmRes(QR, resNo);
+            }catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
             }
             Map<String, Object> data = new HashMap<>();
             data.put("message", "예약 확인에 성공했습니다.");

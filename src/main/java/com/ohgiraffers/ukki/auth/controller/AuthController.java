@@ -180,16 +180,18 @@ public class AuthController {
         }
     }
 
-
-
-
     private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
+                    // 쿠키 삭제를 위한 설정
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
+                    cookie.setDomain("ukki.site");
+                    cookie.setSecure(true);
+                    cookie.setHttpOnly(true);
+
                     response.addCookie(cookie);
                 }
             }

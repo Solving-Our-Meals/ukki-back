@@ -75,6 +75,7 @@ public class AdminInquiryController {
                 word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
             }
             List<AdminInquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
+            System.out.println(userInquiryList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -99,8 +100,7 @@ public class AdminInquiryController {
             List<AdminInquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
 
             storeInquiryList.addAll(storeReportList);
-
-            storeInquiryList.sort(Comparator.comparing(AdminInquiryListDTO::getInqDate));
+            System.out.println(storeInquiryList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
