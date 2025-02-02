@@ -14,4 +14,6 @@ public interface QrMapper {
     String searchQr(int resNo);
 
     void moveResToEndRes(int resNo);
+
+    void deleteResToEndRes(int resNo);
 }

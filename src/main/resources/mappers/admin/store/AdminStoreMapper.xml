@@ -239,6 +239,11 @@
         WHERE STORE_NO = #{storeNo}
     </delete>
 
+    <delete id="deleteStoreUser">
+        DELETE FROM TBL_USER
+        WHERE USER_NO = (SELECT USER_NO FROM TBL_STORE WHERE STORE_NO = #{storeNo})
+    </delete>
+
     <select id="lastStoreNo">
         SELECT
             MAX(STORE_NO)

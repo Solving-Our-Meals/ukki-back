@@ -55,8 +55,10 @@
         FROM TBL_RESERVATION
 
         WHERE RES_NO = #{resNo};
-        
+    </insert>
+
+    <delete id="deleteResToEndRes">
         DELETE FROM TBL_RESERVATION
         WHERE RES_NO = #{resNo}
-    </insert>
+    </delete>
 </mapper>

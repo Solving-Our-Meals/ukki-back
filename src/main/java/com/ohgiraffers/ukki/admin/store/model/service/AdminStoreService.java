@@ -174,4 +174,8 @@ public class AdminStoreService {
     public void insertSundayTime(DayTimeDTO dayTimeDTO) {
         adminStoreMapper.insertSundayTime(dayTimeDTO);
     }
+
+    public void deleteStoreUser(int storeNo) {
+        adminStoreMapper.deleteStoreUser(storeNo);
+    }
 }

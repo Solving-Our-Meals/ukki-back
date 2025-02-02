@@ -151,37 +151,53 @@ public class AdminStoreController {
         try {
             long storeNoLong = (long) storeNo;
             AdminStoreInfoDTO storeData = adminStoreService.searchStoreInfo(storeNoLong);
+            
+            // 가게 정보가 없는 경우 처리
+            if (storeData == null) {
+                message = "가게 정보를 찾을 수 없습니다.";
+                response.put("message", message);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+            }
+
             String menu = storeData.getStoreMenu();
             String profile = storeData.getStoreProfile();
             AdminStoreBannerDTO bannerData = adminStoreService.getBanner(storeNoLong);
-            String[] banner = bannerData.getBannerList().toArray(new String[0]);
+
+            // 먼저 연관된 데이터 삭제
+            adminStoreService.deleteStoreBanner(storeNo);
+            adminStoreService.deleteStoreKeyword(storeNo);
+            adminStoreService.deleteStoreOperation(storeNo);
+            adminStoreService.deleteStoreUser(storeNo);
+            adminStoreService.deleteReviewWithStore(storeNo);
+            deleteReviewWithStore(storeNo);
 
             int result = adminStoreService.deleteStoreInfo(storeNo);
 
             if(result > 0){
                 message = "삭제에 성공했습니다.";
-                adminStoreService.deleteStoreBanner(storeNo);
-                adminStoreService.deleteStoreKeyword(storeNo);
-                adminStoreService.deleteStoreOperation(storeNo);
-                deleteReviewWithStore(storeNo);
-                googleDriveService.deleteFile(menu);
-                googleDriveService.deleteFile(profile);
-                if(banner.length > 1){
-                    for(int i = 0; i < banner.length; i++){
-                        googleDriveService.deleteFile(banner[i]);
+
+                // 파일 삭제
+                if (menu != null) googleDriveService.deleteFile(menu);
+                if (profile != null) googleDriveService.deleteFile(profile);
+                
+                // 배너 이미지 삭제
+                if (bannerData != null && bannerData.getBannerList() != null) {
+                    for (String banner : bannerData.getBannerList()) {
+                        if (banner != null) {
+                            googleDriveService.deleteFile(banner);
+                        }
                     }
-                }else{
-                    googleDriveService.deleteFile(banner[0]);
                 }
             }else{
                 message = "삭제에 실패했습니다.";
             }
 
             response.put("message", message);
-
             return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(response);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
         } catch (Exception e) {
             e.printStackTrace();
             message = "가게 정보를 삭제하는 도중 에러가 발생했습니다.";
@@ -277,11 +293,17 @@ public class AdminStoreController {
 
             // 기존 배너 정보 유지 (클라이언트가 삭제하지 않은 배너)
             if (bannerStatusParse != null) {
-                bannerNameArr[0] = bannerStatusParse[0] != null ? bannerInfo.getBanner1() : null;
-                bannerNameArr[1] = bannerStatusParse[1] != null ? bannerInfo.getBanner2() : null;
-                bannerNameArr[2] = bannerStatusParse[2] != null ? bannerInfo.getBanner3() : null;
-                bannerNameArr[3] = bannerStatusParse[3] != null ? bannerInfo.getBanner4() : null;
-                bannerNameArr[4] = bannerStatusParse[4] != null ? bannerInfo.getBanner5() : null;
+                System.out.println("bannerStatus = " + bannerStatusParse.length);
+                System.out.println("bannerStatus = " + bannerStatus);
+                String[] temp = new String[5];
+                for(int i = 0; i < bannerStatusParse.length; i++){
+                    temp[i] = bannerStatusParse[i];
+                }
+                bannerNameArr[0] = temp[0] != null ? bannerInfo.getBanner1() : null;
+                bannerNameArr[1] = temp[1] != null ? bannerInfo.getBanner2() : null;
+                bannerNameArr[2] = temp[2] != null ? bannerInfo.getBanner3() : null;
+                bannerNameArr[3] = temp[3] != null ? bannerInfo.getBanner4() : null;
+                bannerNameArr[4] = temp[4] != null ? bannerInfo.getBanner5() : null;
             }
 
             // 새로운 배너 이미지 업로드
