@@ -66,4 +66,8 @@ public class AdminInquiryService {
     public void reportDelete(int reportNo) {
         adminInquiryMapper.reportDelete(reportNo);
     }
+
+    public int searchStoreNoByUserNo(int userNo) {
+        return adminInquiryMapper.searchStoreNoByUserNo(userNo);
+    }
 }

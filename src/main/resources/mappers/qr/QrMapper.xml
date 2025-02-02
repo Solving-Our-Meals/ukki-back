@@ -22,9 +22,17 @@
     </update>
     
     <select id="getLastReservationNo" resultType="Integer">
-        SELECT 
-            (SELECT COUNT(*) FROM TBL_RESERVATION) +
-            (SELECT COUNT(*) FROM TBL_END_RES) as total_count
+        SELECT COALESCE(
+        (
+            SELECT MAX(max_res_no)
+            FROM (
+                SELECT MAX(RES_NO) as max_res_no FROM TBL_RESERVATION
+                UNION ALL
+                SELECT MAX(RES_NO) as max_res_no FROM TBL_END_RES
+            ) combined
+        ), 
+        0
+    ) as last_res_no
     </select>
 
 
