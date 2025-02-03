@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseCookie;
 
 import java.util.Map;
 
@@ -153,51 +154,55 @@ public class AuthController {
     }
 
     // 로그아웃 관련
+// 로그아웃 처리 예시
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // 세션 무효화
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();  // 세션 종료
-            }
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 삭제를 위한 설정
+        Cookie authTokenCookie = new Cookie("authToken", null);
+        authTokenCookie.setMaxAge(0);  // 쿠키 만료
+        authTokenCookie.setPath("/");  // 쿠키의 유효 경로
+        authTokenCookie.setDomain("ukki.site");  // 쿠키 도메인 설정 (필요시)
+        authTokenCookie.setSecure(true);  // HTTPS에서만 전송
+        authTokenCookie.setHttpOnly(true);  // JavaScript에서 접근 불가
 
-            // 쿠키 삭제
-            deleteCookie(request, response, "authToken");
-            deleteCookie(request, response, "refreshToken");
+        response.addCookie(authTokenCookie);
 
-            // JSON 응답을 명시적으로 반환
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
-        } catch (Exception e) {
-            // 서버 오류 발생 시, JSON 형식으로 반환
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
-        }
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);  // 쿠키 만료
+        refreshTokenCookie.setPath("/");  // 쿠키의 유효 경로
+        refreshTokenCookie.setDomain("ukki.site");
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok().build();
     }
+
 
     private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
-                    // 쿠키 삭제를 위한 설정
+                    // ResponseCookie를 사용하여 SameSite 설정
                     ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), null)
-                            .maxAge(0)
-                            .path("/")
-                            .domain("ukki.site")
-                            .secure(true)
-                            .httpOnly(true)
-                            .sameSite("None")
+                            .maxAge(0) // 만료 시간을 0으로 설정하여 쿠키 삭제
+                            .path("/") // 전체 경로에 대해 유효하도록 설정
+                            .domain("ukki.site") // 도메인 설정
+                            .secure(true) // HTTPS에서만 전송되도록 설정
+                            .httpOnly(true) // HttpOnly 설정
+                            .sameSite("None") // SameSite 설정
                             .build();
 
-                    response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString()); // 쿠키 삭제 응답에 추가
+                    // 응답에 쿠키 삭제 추가
+                    response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
                 }
             }
         }
     }
+
+
 
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
