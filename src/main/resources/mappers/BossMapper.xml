@@ -60,7 +60,7 @@
         <result property="status" column="STATUS"/>
     </resultMap>
 
-    <resultMap id="week" type="com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO">
+    <resultMap id="weekly" type="com.ohgiraffers.ukki.store.model.dto.WeeklyReservationCountDTO">
         <result property="mon" column="mon"/>
         <result property="tue" column="tue"/>
         <result property="wed" column="wed"/>
@@ -134,35 +134,56 @@
         WHERE r.STORE_NO = #{storeNo}
     </select>
 
-    <select id="getWeeklyReservationCount" resultType="java.util.Map">
-        SELECT
-        DAYOFWEEK(MIN(res_date)) AS day_of_week,
-        CASE
-        WHEN DAYOFWEEK(MIN(res_date)) = 1 THEN '일'
-        WHEN DAYOFWEEK(MIN(res_date)) = 2 THEN '월'
-        WHEN DAYOFWEEK(MIN(res_date)) = 3 THEN '화'
-        WHEN DAYOFWEEK(MIN(res_date)) = 4 THEN '수'
-        WHEN DAYOFWEEK(MIN(res_date)) = 5 THEN '목'
-        WHEN DAYOFWEEK(MIN(res_date)) = 6 THEN '금'
-        WHEN DAYOFWEEK(MIN(res_date)) = 7 THEN '토'
-        END AS day_name,
-        COUNT(*) AS reservation_count
-        FROM
-        (
-        SELECT RES_DATE
-        FROM TBL_RESERVATION
-        WHERE RES_DATE BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)
-        UNION ALL
-        SELECT RES_DATE
-        FROM TBL_END_RES
-        WHERE RES_DATE BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)
-        ) AS all_reservations
-        GROUP BY
-        day_of_week
-        ORDER BY
-        day_of_week;
-
+    <select id="getWeeklyReservationCount" resultMap="weekly">
+    WITH week_start AS (
+    SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday
+    )
+    SELECT
+    SUM(CASE WHEN DATE(res_date) = this_week_monday THEN 1 ELSE 0 END) AS mon,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS tue,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 2 DAY) THEN 1 ELSE 0 END) AS wed,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS thu,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 4 DAY) THEN 1 ELSE 0 END) AS fri,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 5 DAY) THEN 1 ELSE 0 END) AS sat,
+    SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 6 DAY) THEN 1 ELSE 0 END) AS sun
+    FROM (
+    SELECT res_date FROM TBL_END_RES WHERE STORE_NO = #{storeNo}
+    UNION ALL
+    SELECT res_date FROM TBL_RESERVATION WHERE STORE_NO = #{storeNo}
+    ) combined_res,
+    week_start
+    WHERE DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
     </select>
+
+<!--    <select id="getWeeklyReservationCount" resultType="java.util.Map">-->
+<!--        SELECT-->
+<!--        DAYOFWEEK(MIN(res_date)) AS day_of_week,-->
+<!--        CASE-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 1 THEN '일'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 2 THEN '월'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 3 THEN '화'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 4 THEN '수'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 5 THEN '목'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 6 THEN '금'-->
+<!--        WHEN DAYOFWEEK(MIN(res_date)) = 7 THEN '토'-->
+<!--        END AS day_name,-->
+<!--        COUNT(*) AS reservation_count-->
+<!--        FROM-->
+<!--        (-->
+<!--        SELECT RES_DATE-->
+<!--        FROM TBL_RESERVATION-->
+<!--        WHERE RES_DATE BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)-->
+<!--        UNION ALL-->
+<!--        SELECT RES_DATE-->
+<!--        FROM TBL_END_RES-->
+<!--        WHERE RES_DATE BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)-->
+<!--        ) AS all_reservations-->
+<!--        GROUP BY-->
+<!--        day_of_week-->
+<!--        ORDER BY-->
+<!--        day_of_week;-->
+
+<!--    </select>-->
 
 
 
