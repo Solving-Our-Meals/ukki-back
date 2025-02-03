@@ -109,9 +109,9 @@ public class BossController {
     @GetMapping("/weekly-reservation-count")
     public ResponseEntity<?> getWeeklyReservationCount(@RequestParam long storeNo) {
         try {
-            ThisWeekReservationDTO thisWeek = bossService.getWeeklyReservationCount(storeNo);
+            WeeklyReservationCountDTO thisWeek = bossService.getWeeklyReservationCount(storeNo);
             if(thisWeek==null){
-                thisWeek = new ThisWeekReservationDTO();
+                thisWeek = new WeeklyReservationCountDTO();
                 thisWeek.setMon(0);
                 thisWeek.setTue(0);
                 thisWeek.setWed(0);
@@ -120,7 +120,7 @@ public class BossController {
                 thisWeek.setSat(0);
                 thisWeek.setSun(0);
             }
-            System.out.println(thisWeek);
+            System.out.println("요기"+ thisWeek);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(thisWeek);
