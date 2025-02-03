@@ -72,7 +72,7 @@ public class AuthController {
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
             cookie.setHttpOnly(true); // 이것도 배포 전에 false
-            cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
+            cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
             response.addCookie(cookie);
@@ -80,7 +80,7 @@ public class AuthController {
             // 리프토 부분
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
             refreshCookie.setHttpOnly(true); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
-            refreshCookie.setSecure(false); // 배포하면 트루
+            refreshCookie.setSecure(true); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
@@ -138,7 +138,7 @@ public class AuthController {
 
             Cookie newCookie = new Cookie("authToken", newToken);
             newCookie.setHttpOnly(true);
-            newCookie.setSecure(false);
+            newCookie.setSecure(true);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
@@ -188,7 +188,7 @@ public class AuthController {
                             .maxAge(0)
                             .path("/")
                             .domain("ukki.site")
-                            .secure(false)
+                            .secure(true)
                             .httpOnly(true)
                             .sameSite("None")
                             .build();
