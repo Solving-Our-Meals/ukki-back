@@ -150,19 +150,19 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "USER_ID"'>
-                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                        b.#{category} LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='category == "STORE_NAME"'>
-                        c.${category} LIKE CONCAT('%', #{word}, '%')
+                        c.#{category} LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='word == "예약확인"'>
-                        ${category} = TRUE
+                        #{category} = TRUE
                     </when>
                     <when test='word == "노쇼"'>
-                        ${category} = FALSE
+                        #{category} = FALSE
                     </when>
                     <otherwise>
-                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                        a.#{category} LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>
