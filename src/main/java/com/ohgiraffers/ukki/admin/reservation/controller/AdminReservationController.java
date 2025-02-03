@@ -45,7 +45,7 @@ public class AdminReservationController {
                 thisWeek.setSat(0);
                 thisWeek.setSun(0);
             }
-            System.out.println(thisWeek);
+            System.out.println("이번주 예약수는 나야나"+thisWeek);
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(thisWeek);

@@ -50,6 +50,9 @@
 
     <select id="weeklyReservation" resultMap="week">
 
+        WITH week_start AS (
+        SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday
+        )
         SELECT
         SUM(CASE WHEN DATE(res_date) = this_week_monday THEN 1 ELSE 0 END) AS mon,
         SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS tue,
@@ -58,19 +61,21 @@
         SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 4 DAY) THEN 1 ELSE 0 END) AS fri,
         SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 5 DAY) THEN 1 ELSE 0 END) AS sat,
         SUM(CASE WHEN DATE(res_date) = DATE_ADD(this_week_monday, INTERVAL 6 DAY) THEN 1 ELSE 0 END) AS sun
-        FROM
-        TBL_END_RES,
-        (SELECT DATE_SUB(DATE(NOW()), INTERVAL (DAYOFWEEK(NOW()) - 2) DAY) AS this_week_monday) AS week_start
-        WHERE
-        DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
+        FROM (
+        SELECT res_date FROM TBL_END_RES
+        UNION ALL
+        SELECT res_date FROM TBL_RESERVATION
+        ) combined_res,
+        week_start
+        WHERE DATE(res_date) BETWEEN this_week_monday AND DATE_ADD(this_week_monday, INTERVAL 6 DAY);
 
     </select>
 
     <select id="todayReservation">
         SELECT
-        COUNT(*)
-        FROM TBL_RESERVATION
-        WHERE RES_DATE = DATE_FORMAT(NOW(), '%Y-%m-%d');
+        (SELECT COUNT(*) FROM TBL_RESERVATION WHERE RES_DATE = DATE_FORMAT(NOW(), '%Y-%m-%d')) +
+        (SELECT COUNT(*) FROM TBL_END_RES WHERE RES_DATE = DATE_FORMAT(NOW(), '%Y-%m-%d'))
+        as total_reservations;
     </select>
 
     <select id="monthlyNoShowReservation" resultMap="noShow">

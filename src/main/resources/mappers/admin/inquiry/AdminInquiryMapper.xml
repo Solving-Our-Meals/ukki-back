@@ -228,4 +228,8 @@
         DELETE FROM TBL_REVIEW_REPORT
         WHERE REPORT_NO = #{reportNo}
     </delete>
+
+    <select id="searchStoreNoByUserNo" resultType="int">
+        SELECT STORE_NO FROM TBL_STORE WHERE USER_NO = #{userNo}
+    </select>
 </mapper>
