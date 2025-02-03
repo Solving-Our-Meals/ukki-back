@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.admin.inquiry.controller;
 
 import com.ohgiraffers.ukki.common.service.GoogleDriveService;
+import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.http.MediaType;
 
 import com.ohgiraffers.ukki.admin.inquiry.model.dto.AnswerDTO;
@@ -25,11 +26,13 @@ public class AdminInquiryController {
     private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
     private final AdminInquiryService adminInquiryService;
     private final GoogleDriveService googleDriveService;
+    private final InquiryService inquiryService;
 
     @Autowired
-    public AdminInquiryController(AdminInquiryService adminInquiryService, GoogleDriveService googleDriveService){
+    public AdminInquiryController(AdminInquiryService adminInquiryService, GoogleDriveService googleDriveService, InquiryService inquiryService){
         this.adminInquiryService = adminInquiryService;
         this.googleDriveService = googleDriveService;
+        this.inquiryService = inquiryService;
     }
 
     @GetMapping("/processingInquiry")
@@ -268,6 +271,28 @@ public class AdminInquiryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body("파일 URL을 가져오는 중 에러가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/store/{userNo}")
+    public ResponseEntity<?> searchStoreNoByUserNo(@PathVariable int userNo) {
+        try {
+            System.out.println("zjahs");
+            int storeNo = adminInquiryService.searchStoreNoByUserNo(userNo);
+
+            Map<String, Integer> response = new HashMap<>();
+            response.put("storeNo", storeNo);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        } catch (Exception e) {
+            // 에러 메시지 로그 출력
+            e.printStackTrace();
+            // 적절한 에러 메시지와 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("가게 번호를 불러오는 도중 에러가 발생했습니다.");
         }
     }
 

@@ -31,4 +31,6 @@ public interface AdminInquiryMapper {
     void reportAnswer(AnswerDTO answer);
 
     void reportDelete(int reportNo);
+
+    int searchStoreNoByUserNo(int userNo);
 }

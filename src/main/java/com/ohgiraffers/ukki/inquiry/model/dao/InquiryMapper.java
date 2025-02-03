@@ -21,4 +21,6 @@ public interface InquiryMapper {
     int inquiryUpdate(InquiryDTO inquiryDTO);
 
     int inquiryDelete(int inquiryNo);
+
+    int searchStoreNoByUserNo(int userNo);
 }

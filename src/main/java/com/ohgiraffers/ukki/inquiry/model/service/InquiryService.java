@@ -29,5 +29,4 @@ public class InquiryService {
     public Integer lastInquiryNo() {
         return inquiryMapper.lastInquiryNo();
     }
-
 }
