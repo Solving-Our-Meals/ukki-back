@@ -1,6 +1,5 @@
 package com.ohgiraffers.ukki.store.model.dao;
 
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
 import com.ohgiraffers.ukki.store.controller.ReservationDTO;
 import com.ohgiraffers.ukki.store.model.dto.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -22,7 +21,7 @@ public interface BossMapper {
 
 //    int selectAvailableReservationPeople(long storeNo, LocalDate reservationDate);
 
-    ThisWeekReservationDTO getWeeklyReservationCount(long storeNo);
+    WeeklyReservationCountDTO getWeeklyReservationCount(long storeNo);
 
     int selectTodayReservationCount(long storeNo);
 

@@ -1,6 +1,6 @@
 package com.ohgiraffers.ukki.store.model.service;
 
-import com.ohgiraffers.ukki.admin.reservation.model.dto.ThisWeekReservationDTO;
+import com.ohgiraffers.ukki.store.model.dto.WeeklyReservationCountDTO;
 import com.ohgiraffers.ukki.store.controller.ReservationDTO;
 import com.ohgiraffers.ukki.store.model.dao.BossMapper;
 import com.ohgiraffers.ukki.store.model.dto.*;
@@ -62,7 +62,7 @@ public class BossService {
 //    }
 
     // 기타 로직은 동일
-    public ThisWeekReservationDTO getWeeklyReservationCount(long storeNo) {
+    public WeeklyReservationCountDTO getWeeklyReservationCount(long storeNo) {
         return bossMapper.getWeeklyReservationCount(storeNo);
     }
 
