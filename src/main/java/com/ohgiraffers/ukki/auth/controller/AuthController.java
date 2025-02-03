@@ -9,9 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -186,13 +184,16 @@ public class AuthController {
             for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     // 쿠키 삭제를 위한 설정
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    cookie.setDomain("ukki.site");
-                    cookie.setSecure(true);
-                    cookie.setHttpOnly(true);
+                    ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), null)
+                            .maxAge(0)
+                            .path("/")
+                            .domain("ukki.site")
+                            .secure(false)
+                            .httpOnly(true)
+                            .sameSite("None")
+                            .build();
 
-                    response.addCookie(cookie);
+                    response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString()); // 쿠키 삭제 응답에 추가
                 }
             }
         }
