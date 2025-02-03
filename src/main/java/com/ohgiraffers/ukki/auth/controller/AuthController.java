@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseCookie;
 
 import java.util.Map;
 
@@ -152,51 +153,57 @@ public class AuthController {
         }
     }
 
-    // 로그아웃 관련
+/*// 로그아웃 처리 예시
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // 세션 무효화
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();  // 세션 종료
-            }
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 삭제를 위한 설정
+        Cookie authTokenCookie = new Cookie("authToken", null);
+        authTokenCookie.setMaxAge(0);
+        authTokenCookie.setPath("/");
+        authTokenCookie.setDomain("ukki.site");
+        authTokenCookie.setSecure(true);
+        authTokenCookie.setHttpOnly(true);
 
-            // 쿠키 삭제
-            deleteCookie(request, response, "authToken");
-            deleteCookie(request, response, "refreshToken");
+        response.addCookie(authTokenCookie);
 
-            // JSON 응답을 명시적으로 반환
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
-        } catch (Exception e) {
-            // 서버 오류 발생 시, JSON 형식으로 반환
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
-        }
-    }
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setDomain("ukki.site");
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
 
-    private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookieName.equals(cookie.getName())) {
-                    // 쿠키 삭제를 위한 설정
-                    ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), null)
-                            .maxAge(0)
-                            .path("/")
-                            .domain("ukki.site")
-                            .secure(true)
-                            .httpOnly(true)
-                            .sameSite("None")
-                            .build();
+        response.addCookie(refreshTokenCookie);
 
-                    response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString()); // 쿠키 삭제 응답에 추가
-                }
-            }
-        }
+        return ResponseEntity.ok().build();
+    }*/
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // authToken 쿠키 설정
+        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
+                .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        // refreshToken 쿠키 설정
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
+                .maxAge(0)
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader("Set-Cookie", authTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/check-auth")
