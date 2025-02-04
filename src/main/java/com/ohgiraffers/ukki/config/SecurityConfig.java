@@ -50,15 +50,6 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
                 .cors(withDefaults());
-/*                .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("authToken", "refreshToken")
-                        .permitAll());*/
 
         return http.build();
     }
