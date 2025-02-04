@@ -155,9 +155,11 @@ public class AuthController {
         }
     }
 
-/*// 로그아웃 처리 예시
+// 로그아웃 처리 예시
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("로그아웃");
+        request.getSession().invalidate();
         // 쿠키 삭제를 위한 설정
         Cookie authTokenCookie = new Cookie("authToken", null);
         authTokenCookie.setMaxAge(0);
@@ -176,38 +178,6 @@ public class AuthController {
         refreshTokenCookie.setHttpOnly(true);
 
         response.addCookie(refreshTokenCookie);
-
-        return ResponseEntity.ok().build();
-    }*/
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader("Cache-Control", "no-store");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", 0);
-
-        // authToken 쿠키 설정
-        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
-                .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
-                .path("/")
-                .domain("ukki.site")
-                .secure(true)
-                .httpOnly(true)
-                .sameSite("None")
-                .build();
-
-        // refreshToken 쿠키 설정
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
-                .maxAge(0)
-                .path("/")
-                .domain("ukki.site")
-                .secure(true)
-                .httpOnly(true)
-                .sameSite("None")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
