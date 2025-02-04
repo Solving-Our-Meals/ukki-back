@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.config;
 
 import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,14 +56,27 @@ public class SecurityConfig {
                         .logoutUrl("/auth/logout") // 로그아웃 URL 설정
                         .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout", "POST"))
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
+                            // 로그아웃 성공 시 쿠키 삭제
+                            deleteCookie(response, "authToken"); // authToken 쿠키 삭제
+                            deleteCookie(response, "refreshToken"); // refreshToken 쿠키 삭제
+
+                            response.setStatus(HttpServletResponse.SC_OK); // 로그아웃 성공 시 상태 코드 200 OK
                         })
                         .invalidateHttpSession(true)  // 세션 무효화
                         .clearAuthentication(true)    // 인증 정보 초기화
                         .deleteCookies("authToken", "refreshToken")  // 쿠키 삭제
                         .permitAll());
-
         return http.build();
+    }
+
+    private void deleteCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setDomain("ukki.site");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
     @Bean
