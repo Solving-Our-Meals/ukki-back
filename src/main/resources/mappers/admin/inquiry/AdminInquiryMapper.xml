@@ -136,10 +136,10 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
-                        AND b.#{category} LIKE CONCAT('%', #{word}, '%')
+                        AND b.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <otherwise>
-                        AND a.#{category} LIKE CONCAT('%', #{word}, '%')
+                        AND a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>

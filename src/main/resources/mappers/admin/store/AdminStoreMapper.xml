@@ -125,7 +125,7 @@
                 LIKE CONCAT('%', convert(#{word} using utf8), '%')
             </if>
         </where>
-        ORDER BY a.STORE_REGIST_DATE DESC
+        ORDER BY a.STORE_REGIST_DATE
     </select>
 
     <select id="searchStoreInfo" resultMap="storeInfoResultMap">
