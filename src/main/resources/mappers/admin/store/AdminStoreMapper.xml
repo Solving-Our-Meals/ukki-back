@@ -89,29 +89,43 @@
 
     <select id="searchBy" resultMap="storeListResultMap" parameterType="map">
         SELECT
-        a.STORE_NO,
-        a.STORE_NAME,
-        b.CATEGORY_NAME,
-        a.STORE_ADDRESS,
-        a.STORE_REGIST_DATE
+            a.STORE_NO,
+            a.STORE_NAME,
+            b.CATEGORY_NAME,
+            a.STORE_ADDRESS,
+            a.STORE_REGIST_DATE
         FROM TBL_STORE a
         LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
         <where>
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
-                        b.${category} LIKE CONCAT('%', #{word}, '%')
+                        b.CATEGORY_NAME LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                    </when>
+                    <when test='category == "STORE_NAME"'>
+                        a.STORE_NAME LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                    </when>
+                    <when test='category == "STORE_ADDRESS"'>
+                        a.STORE_ADDRESS LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                    </when>
+                    <when test='category == "STORE_REGIST_DATE"'>
+                        a.STORE_REGIST_DATE LIKE CONCAT('%', (#{word} using utf8), '%')
                     </when>
                     <otherwise>
-                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                        a.STORE_NO LIKE CONCAT('%',(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>
             <if test="category == null and word != null">
-                CONCAT(a.STORE_NO, ' ', a.STORE_NAME, ' ', b.CATEGORY_NAME, ' ', a.STORE_ADDRESS, ' ', a.STORE_REGIST_DATE) LIKE CONCAT('%', #{word}, '%')
+                CONCAT(IFNULL(a.STORE_NO, ''), ' ',
+                      IFNULL(a.STORE_NAME, ''), ' ',
+                      IFNULL(b.CATEGORY_NAME, ''), ' ',
+                      IFNULL(a.STORE_ADDRESS, ''), ' ',
+                      IFNULL(a.STORE_REGIST_DATE, ''))
+                LIKE CONCAT('%', convert(#{word} using utf8), '%')
             </if>
         </where>
-        ORDER BY a.STORE_REGIST_DATE;
+        ORDER BY a.STORE_REGIST_DATE DESC
     </select>
 
     <select id="searchStoreInfo" resultMap="storeInfoResultMap">
