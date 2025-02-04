@@ -180,6 +180,10 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
         // authToken 쿠키 설정
         ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
                 .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
