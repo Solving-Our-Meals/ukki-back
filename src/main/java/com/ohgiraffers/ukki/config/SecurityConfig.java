@@ -1,6 +1,7 @@
 package com.ohgiraffers.ukki.config;
 
 import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,7 +49,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
-                .cors(withDefaults());
+                .cors(withDefaults())
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout") // 로그아웃 URL 설정
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                        .invalidateHttpSession(true)  // 세션 무효화
+                        .clearAuthentication(true)    // 인증 정보 초기화
+                        .deleteCookies("authToken", "refreshToken")  // 쿠키 삭제
+                        .permitAll());
 
         return http.build();
     }
@@ -62,7 +72,6 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);  // 쿠키를 포함한 요청을 허용
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
