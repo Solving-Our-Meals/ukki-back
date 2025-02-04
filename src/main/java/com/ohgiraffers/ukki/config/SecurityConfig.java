@@ -49,8 +49,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
-                .cors(withDefaults())
-                .logout(logout -> logout
+                .cors(withDefaults());
+/*                .logout(logout -> logout
                         .logoutUrl("/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("authToken", "refreshToken")
-                        .permitAll());
+                        .permitAll());*/
 
         return http.build();
     }
