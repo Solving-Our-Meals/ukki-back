@@ -182,35 +182,37 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        // 모든 쿠키 삭제
-        deleteAllCookies(request, response);
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
-        // 로그아웃 처리
+        // authToken 쿠키 설정
+        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
+                .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        // refreshToken 쿠키 설정
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
+                .maxAge(0)
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity.ok().build();
-    }
-
-    public static void deleteAllCookies(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                // 모든 쿠키를 삭제
-                ResponseCookie deleteCookie = ResponseCookie.from(cookie.getName(), "")
-                        .domain("ukki.site")  // 쿠키의 도메인 설정
-                        .path("/")  // 쿠키 경로 설정
-                        .httpOnly(true)  // HttpOnly 설정
-                        .maxAge(0)  // 쿠키 만료 시간 0 설정
-                        .secure(true)  // 보안을 위해 HTTPS에서만 쿠키 전송
-                        .sameSite("None")  // SameSite 설정
-                        .build();
-
-                // 쿠키 삭제를 위한 Set-Cookie 헤더 추가
-                response.addHeader("Set-Cookie", deleteCookie.toString());
-            }
-        }
     }
 
     @GetMapping("/check-auth")
