@@ -155,10 +155,10 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "USER_ID"'>
-                        b.#{category} LIKE CONCAT('%', #{word}, '%')
+                        b.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <when test='category == "STORE_NAME"'>
-                        c.#{category} LIKE CONCAT('%', #{word}, '%')
+                        c.#{category} LIKE CONCAT('%',convert(#{word} using utf8), '%')
                     </when>
                     <when test='word == "예약확인"'>
                         a.QR_CONFIRM = TRUE
@@ -167,7 +167,7 @@
                         a.QR_CONFIRM = FALSE
                     </when>
                     <otherwise>
-                        a.#{category} LIKE CONCAT('%', #{word}, '%')
+                        a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>

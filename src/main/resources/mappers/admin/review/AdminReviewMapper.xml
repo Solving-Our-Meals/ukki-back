@@ -63,16 +63,16 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "USER_ID"'>
-                        b.USER_ID LIKE CONCAT('%', #{word}, '%')
+                        b.USER_ID LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <when test='category == "STORE_NAME"'>
-                        c.STORE_NAME LIKE CONCAT('%', #{word}, '%')
+                        c.STORE_NAME LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <when test='category == "REVIEW_DATE"'>
-                        a.REVIEW_DATE LIKE CONCAT('%', #{word}, '%')
+                        a.REVIEW_DATE LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <otherwise>
-                        a.#{category} LIKE CONCAT('%', #{word}, '%')
+                        a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>
