@@ -50,12 +50,12 @@
 
     <select id="searchReview" parameterType="map" resultMap="reviewList">
         SELECT
-        a.REVIEW_NO,
-        a.REVIEW_CONTENT,
-        a.REVIEW_DATE,
-        a.REVIEW_SCOPE,
-        b.USER_ID,
-        c.STORE_NAME
+            a.REVIEW_NO,
+            a.REVIEW_CONTENT,
+            a.REVIEW_DATE,
+            a.REVIEW_SCOPE,
+            b.USER_ID,
+            c.STORE_NAME
         FROM TBL_REVIEW a
         LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
         LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
@@ -79,15 +79,21 @@
                         a.REVIEW_DATE = #{word}
                     </when>
                     <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
-                        a.REVIEW_DATE LIKE CONCAT (#{word}, '%')
+                        a.REVIEW_DATE LIKE CONCAT(#{word}, '%')
                     </when>
                     <otherwise>
-                        CONCAT(IFNULL(a.REVIEW_NO, ''), ' ', IFNULL(a.REVIEW_DATE, ''), ' ', IFNULL(b.USER_ID, ''), ' ', IFNULL(c.STORE_NAME, ''), ' ', IFNULL(a.REVIEW_CONTENT, ''), ' ', IFNULL(a.REVIEW_SCOPE, ''))
-                        LIKE CONCAT('%', #{word},'%')
+                        CONCAT(IFNULL(a.REVIEW_NO, ''), ' ',
+                              IFNULL(a.REVIEW_DATE, ''), ' ',
+                              IFNULL(b.USER_ID, ''), ' ',
+                              IFNULL(c.STORE_NAME, ''), ' ',
+                              IFNULL(a.REVIEW_CONTENT, ''), ' ',
+                              IFNULL(a.REVIEW_SCOPE, ''))
+                        LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>
         </where>
+        ORDER BY a.REVIEW_DATE DESC
     </select>
 
     <select id="searchReviewInfo" resultMap="reviewInfo">
