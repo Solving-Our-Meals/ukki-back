@@ -31,7 +31,7 @@
         <if test="searchWord != null">
             WHERE (NOTICE_TITLE LIKE CONCAT('%', #{ searchWord }, '%'))
         </if>
-        ORDER BY DATE DESC
+        ORDER BY NOTICE_NO DESC
     </select>
 
     <select id="getSpecificNotice" parameterType="long" resultMap="getNoticeResultMap">

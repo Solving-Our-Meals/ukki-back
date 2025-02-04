@@ -9,10 +9,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseCookie;
 
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class AuthController {
             // 토큰 쿠키 저장용
             Cookie cookie = new Cookie("authToken", token);
             cookie.setHttpOnly(true); // 이것도 배포 전에 false
-            cookie.setSecure(false); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
+            cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
             response.addCookie(cookie);
@@ -82,7 +83,7 @@ public class AuthController {
             // 리프토 부분
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
             refreshCookie.setHttpOnly(true); // 리프레시 토큰은 보안을 위해 HttpOnly 설정
-            refreshCookie.setSecure(false); // 배포하면 트루
+            refreshCookie.setSecure(true); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);
@@ -140,7 +141,7 @@ public class AuthController {
 
             Cookie newCookie = new Cookie("authToken", newToken);
             newCookie.setHttpOnly(true);
-            newCookie.setSecure(false);
+            newCookie.setSecure(true);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
             response.addCookie(newCookie);
@@ -154,48 +155,64 @@ public class AuthController {
         }
     }
 
-    // 로그아웃 관련
+/*// 로그아웃 처리 예시
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // 세션 무효화
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();  // 세션 종료
-            }
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 삭제를 위한 설정
+        Cookie authTokenCookie = new Cookie("authToken", null);
+        authTokenCookie.setMaxAge(0);
+        authTokenCookie.setPath("/");
+        authTokenCookie.setDomain("ukki.site");
+        authTokenCookie.setSecure(true);
+        authTokenCookie.setHttpOnly(true);
 
-            // 쿠키 삭제
-            deleteCookie(request, response, "authToken");
-            deleteCookie(request, response, "refreshToken");
+        response.addCookie(authTokenCookie);
 
-            // JSON 응답을 명시적으로 반환
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", true, "message", "ⓘ 로그아웃 성공"));
-        } catch (Exception e) {
-            // 서버 오류 발생 시, JSON 형식으로 반환
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("success", false, "message", "ⓘ 서버 오류가 발생했습니다."));
-        }
-    }
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setDomain("ukki.site");
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
 
-    private void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookieName.equals(cookie.getName())) {
-                    // 쿠키 삭제를 위한 설정
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    cookie.setDomain("ukki.site");
-                    cookie.setSecure(true);
-                    cookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
 
-                    response.addCookie(cookie);
-                }
-            }
-        }
+        return ResponseEntity.ok().build();
+    }*/
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        // authToken 쿠키 설정
+        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
+                .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        // refreshToken 쿠키 설정
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
+                .maxAge(0)
+                .path("/")
+                .domain("ukki.site")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/check-auth")
