@@ -78,6 +78,7 @@ public class AuthController {
             cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
+            cookie.setDomain("ukki.site");
             response.addCookie(cookie);
 
             // 리프토 부분
@@ -86,6 +87,7 @@ public class AuthController {
             refreshCookie.setSecure(true); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
+            refreshCookie.setDomain("ukki.site");
             response.addCookie(refreshCookie);
 
             // 로그인 성공 후 유저 역할 정보도 함께 반환
@@ -144,6 +146,7 @@ public class AuthController {
             newCookie.setSecure(true);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
+            newCookie.setDomain("ukki.site");
             response.addCookie(newCookie);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
