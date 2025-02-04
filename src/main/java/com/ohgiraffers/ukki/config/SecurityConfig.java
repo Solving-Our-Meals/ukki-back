@@ -1,15 +1,11 @@
 package com.ohgiraffers.ukki.config;
 
 import com.ohgiraffers.ukki.auth.Filter.JwtFilter;
-import com.ohgiraffers.ukki.auth.Filter.LogoutFilter;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,11 +22,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-    private final LogoutFilter logoutFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter, LogoutFilter logoutFilter) {
+    public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
-        this.logoutFilter = logoutFilter;
     }
 
     @Bean
@@ -55,16 +49,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터
-                .addFilterBefore(logoutFilter, JwtFilter.class) // 로그아웃 필터 추가 (JwtFilter 전)
                 .cors(withDefaults())
                 .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
+                        .logoutUrl("/auth/logout") // 로그아웃 URL 설정
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
                         })
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("authToken", "refreshToken")
+                        .invalidateHttpSession(true)  // 세션 무효화
+                        .clearAuthentication(true)    // 인증 정보 초기화
+                        .deleteCookies("authToken", "refreshToken")  // 쿠키 삭제
                         .permitAll());
 
         return http.build();
@@ -74,14 +67,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//                     configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:3000"));
-       configuration.setAllowedOrigins(Arrays.asList(
-               "https://ukki.site"
-       ));
+//         configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:3000"));
+       configuration.setAllowedOrigins(Arrays.asList("https://ukki.site"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        
+        configuration.setAllowCredentials(true);  // 쿠키를 포함한 요청을 허용
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

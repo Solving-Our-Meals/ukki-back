@@ -72,7 +72,7 @@
                         a.REVIEW_DATE LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <otherwise>
-                        a.${category} LIKE CONCAT('%', #{word}, '%')
+                        a.#{category} LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>

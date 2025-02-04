@@ -68,5 +68,8 @@ logging:
     root: error
     org.springframework: error
     org.mybatis: error
+    com.ohgiraffers.ukki.auth: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.springframework.security: DEBUG
   pattern:
     console:     # 콘솔 로깅 패턴 비우기
