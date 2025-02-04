@@ -37,7 +37,7 @@
         SELECT * FROM TBL_USER
         WHERE USER_ROLE NOT IN ('ADMIN', 'STORE')
         <if test="category != null and word != null">
-            AND #{category} LIKE CONCAT('%', #{word}, '%')
+            AND #{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
         </if>
         <if test="category == null and word != null">
             AND CONCAT(EMAIL, ' ', USER_NAME, ' ', USER_ID, ' ', USER_NO) LIKE CONCAT('%', #{word}, '%')
