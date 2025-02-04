@@ -78,7 +78,6 @@ public class AuthController {
             cookie.setSecure(true); // HTTPS에서만 전송되게 설정 -> 보안땜시 cookie.setSecure(false);  // 배포전엔 false 사용
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 유효기간 -> 1 시간 -> 24시간 : (60 * 60 * 24)
-            cookie.setDomain("ukki.site");
             response.addCookie(cookie);
 
             // 리프토 부분
@@ -87,7 +86,6 @@ public class AuthController {
             refreshCookie.setSecure(true); // 배포하면 트루
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
-            refreshCookie.setDomain("ukki.site");
             response.addCookie(refreshCookie);
 
             // 로그인 성공 후 유저 역할 정보도 함께 반환
@@ -146,7 +144,6 @@ public class AuthController {
             newCookie.setSecure(true);
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60); // 1시간
-            newCookie.setDomain("ukki.site");
             response.addCookie(newCookie);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -185,37 +182,30 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader("Cache-Control", "no-store");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", 0);
-
-        // authToken 쿠키 설정
-        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
-                .maxAge(0)  // 쿠키 만료입니다.~@!#~#~@#!@
-                .path("/")
-                .domain("ukki.site")
-                .secure(true)
-                .httpOnly(true)
-                .sameSite("None")
-                .build();
-
-        // refreshToken 쿠키 설정
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
-                .maxAge(0)
-                .path("/")
-                .domain("ukki.site")
-                .secure(true)
-                .httpOnly(true)
-                .sameSite("None")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
+        deleteCookie(request, response, "authToken");
+        deleteCookie(request, response, "refreshToken");
+        
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity.ok().build();
+    }
+
+
+    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    cookie.setValue("");        // 쿠키 값 비우기
+                    cookie.setPath("/");        // 경로 설정
+                    cookie.setMaxAge(0);        // 만료 시간을 0으로 설정하여 삭제
+
+                    response.addCookie(cookie); // 쿠키를 HTTP 응답에 추가
+                }
+            }
+        }
     }
 
     @GetMapping("/check-auth")
