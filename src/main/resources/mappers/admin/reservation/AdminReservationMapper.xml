@@ -88,13 +88,13 @@
 
     <select id="searchRes" resultMap="resList">
         SELECT
-        a.RES_NO,
-        a.RES_DATE,
-        b.USER_ID,
-        c.STORE_NAME,
-        a.RES_TIME,
-        a.QR_CONFIRM,
-        'Y' AS isToday
+            a.RES_NO,
+            a.RES_DATE,
+            b.USER_ID,
+            c.STORE_NAME,
+            a.RES_TIME,
+            a.QR_CONFIRM,
+            'Y' AS isToday
         FROM TBL_RESERVATION a
         LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
         LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
@@ -102,47 +102,52 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "USER_ID"'>
-                        b.#{category} LIKE CONCAT('%', #{word}, '%')
+                        b.${category} LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='category == "STORE_NAME"'>
-                        c.#{category} LIKE CONCAT('%', #{word}, '%')
+                        c.${category} LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='word == "예약대기중"'>
-
+                        a.QR_CONFIRM IS NULL
                     </when>
                     <otherwise>
-                        a.#{category} LIKE CONCAT('%', #{word}, '%')
+                        a.${category} LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>
             <if test="category == null and word != null">
-            <choose>
-                <when test="word.matches('^\\d{4}-\\d{2}-\\d{2}$')">
-                    a.RES_DATE = #{word}
-                </when>
-                <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
-                    a.RES_DATE LIKE CONCAT (#{word}, '%')
-                </when>
-                <otherwise>
-                    CONCAT(IFNULL(a.RES_NO, ''), ' ', IFNULL(a.RES_DATE, ''), ' ', IFNULL(b.USER_ID, ''), ' ', IFNULL(c.STORE_NAME, ''), ' ', IFNULL(a.RES_TIME, ''), ' ', IFNULL(a.QR_CONFIRM, ''))
-                    LIKE CONCAT('%', #{word},'%')
-                </otherwise>
-            </choose>
+                <choose>
+                    <when test="word.matches('^\\d{4}-\\d{2}-\\d{2}$')">
+                        a.RES_DATE = #{word}
+                    </when>
+                    <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
+                        a.RES_DATE LIKE CONCAT(#{word}, '%')
+                    </when>
+                    <otherwise>
+                        CONCAT(IFNULL(a.RES_NO, ''), ' ',
+                              IFNULL(a.RES_DATE, ''), ' ',
+                              IFNULL(b.USER_ID, ''), ' ',
+                              IFNULL(c.STORE_NAME, ''), ' ',
+                              IFNULL(a.RES_TIME, ''), ' ',
+                              IFNULL(a.QR_CONFIRM, ''))
+                        LIKE CONCAT('%', #{word}, '%')
+                    </otherwise>
+                </choose>
             </if>
         </where>
-        ORDER BY a.RES_NO DESC;
+        ORDER BY a.RES_NO DESC
     </select>
 
 
     <select id="searchEndRes" resultMap="resList">
         SELECT
-        a.RES_NO,
-        a.RES_DATE,
-        b.USER_ID,
-        c.STORE_NAME,
-        a.RES_TIME,
-        a.QR_CONFIRM,
-        'N' AS isToday
+            a.RES_NO,
+            a.RES_DATE,
+            b.USER_ID,
+            c.STORE_NAME,
+            a.RES_TIME,
+            a.QR_CONFIRM,
+            'N' AS isToday
         FROM TBL_END_RES a
         LEFT JOIN TBL_USER b ON a.USER_NO = b.USER_NO
         LEFT JOIN TBL_STORE c ON a.STORE_NO = c.STORE_NO
@@ -156,10 +161,10 @@
                         c.#{category} LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='word == "예약확인"'>
-                        #{category} = TRUE
+                        a.QR_CONFIRM = TRUE
                     </when>
                     <when test='word == "노쇼"'>
-                        #{category} = FALSE
+                        a.QR_CONFIRM = FALSE
                     </when>
                     <otherwise>
                         a.#{category} LIKE CONCAT('%', #{word}, '%')
@@ -172,22 +177,27 @@
                         a.RES_DATE = #{word}
                     </when>
                     <when test="word.matches('^\\d{4}-\\d{2}-\\d{1}$')">
-                        a.RES_DATE LIKE CONCAT (#{word}, '%')
+                        a.RES_DATE LIKE CONCAT(#{word}, '%')
                     </when>
                     <when test='word == "예약확인"'>
-                        QR_CONFIRM = TRUE
+                        a.QR_CONFIRM = TRUE
                     </when>
                     <when test='word == "노쇼"'>
-                        QR_CONFIRM = FALSE
+                        a.QR_CONFIRM = FALSE
                     </when>
                     <otherwise>
-                        CONCAT(IFNULL(a.RES_NO, ''), ' ', IFNULL(a.RES_DATE, ''), ' ', IFNULL(b.USER_ID, ''), ' ', IFNULL(c.STORE_NAME, ''), ' ', IFNULL(a.RES_TIME, ''), ' ', IFNULL(a.QR_CONFIRM, ''))
-                        LIKE CONCAT('%', #{word},'%')
+                        CONCAT(IFNULL(a.RES_NO, ''), ' ',
+                              IFNULL(a.RES_DATE, ''), ' ',
+                              IFNULL(b.USER_ID, ''), ' ',
+                              IFNULL(c.STORE_NAME, ''), ' ',
+                              IFNULL(a.RES_TIME, ''), ' ',
+                              IFNULL(a.QR_CONFIRM, ''))
+                        LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>
         </where>
-        ORDER BY a.RES_NO DESC;
+        ORDER BY a.RES_NO DESC
     </select>
 
     <select id="totalTodayReservation">

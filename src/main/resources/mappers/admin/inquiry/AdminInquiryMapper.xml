@@ -83,13 +83,22 @@
                     <when test='category == "CATEGORY_NAME"'>
                         AND b.#{category} LIKE CONCAT('%', #{word}, '%')
                     </when>
+                    <when test='category == "STATE"'>
+                        AND a.${category} = #{word}
+                    </when>
                     <otherwise>
                         AND a.#{category} LIKE CONCAT('%', #{word}, '%')
                     </otherwise>
                 </choose>
             </if>
             <if test="category == null and word != null">
-                AND CONCAT(a.INQ_NO, ' ', a.INQ_DATE, ' ', b.CATEGORY_NAME, ' ', a.INQ_TITLE, ' ', a.INQ_CONTENT, ' ', a.STATE) LIKE CONCAT('%', #{word}, '%')
+                AND CONCAT(IFNULL(a.INQ_NO, ''), ' ',
+                          IFNULL(a.INQ_DATE, ''), ' ',
+                          IFNULL(b.CATEGORY_NAME, ''), ' ',
+                          IFNULL(a.INQ_TITLE, ''), ' ',
+                          IFNULL(a.INQ_CONTENT, ''), ' ',
+                          IFNULL(a.STATE, ''))
+                LIKE CONCAT('%', #{word}, '%')
             </if>
         </where>
         ORDER BY 
@@ -99,7 +108,7 @@
                 WHEN 'CHECK' THEN 3
                 ELSE 4
             END,
-            INQ_DATE;
+            INQ_DATE
     </select>
 
     <select id="totalInquiry">
