@@ -52,8 +52,8 @@ public class QrService {
         try {
             // QR 코드에 예약번호를 포함한 URL 생성
             Integer reservationNo = qrMapper.getLastReservationNo();
-            reservationNo = (reservationNo == null || reservationNo == 0) ? 1 : reservationNo + 1;
-            String url = "https:/ukki.site/qr/" + reservationNo;
+            int reservation = (reservationNo == null || reservationNo == 0) ? 1 : reservationNo + 1;
+            String url = "https:/ukki.site/qr/" + reservation;
             
             // QR 코드 생성
             QRCodeWriter qrCodeWriter = new QRCodeWriter();

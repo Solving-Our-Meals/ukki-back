@@ -60,19 +60,26 @@
     <insert id="insertReservation" parameterType="com.ohgiraffers.ukki.reservation.model.dto.ReservationInfoDTO">
         INSERT INTO TBL_RESERVATION
         (
-               RES_DATE
-             , RES_TIME
-             , USER_NO
-             , STORE_NO
-             , QR
+            RES_NO,
+            RES_DATE,
+            RES_TIME,
+            USER_NO,
+            STORE_NO,
+            QR
         )
         VALUES
         (
-               #{ resDate }
-             , #{ resTime }
-             , #{ userNo }
-             , #{ storeNo }
-             , #{ qr }
+            (SELECT MAX(max_res_no) + 1
+             FROM (
+                 SELECT MAX(RES_NO) as max_res_no FROM TBL_RESERVATION
+                 UNION ALL
+                 SELECT MAX(RES_NO) as max_res_no FROM TBL_END_RES
+             ) combined),
+            #{resDate},
+            #{resTime},
+            #{userNo},
+            #{storeNo},
+            #{qr}
         )
     </insert>
 

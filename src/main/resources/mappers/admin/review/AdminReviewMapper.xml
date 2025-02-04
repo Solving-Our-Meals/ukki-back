@@ -63,10 +63,13 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "USER_ID"'>
-                        b.#{category} LIKE CONCAT('%', #{word}, '%')
+                        b.USER_ID LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <when test='category == "STORE_NAME"'>
-                        c.#{category} LIKE CONCAT('%', #{word}, '%')
+                        c.STORE_NAME LIKE CONCAT('%', #{word}, '%')
+                    </when>
+                    <when test='category == "REVIEW_DATE"'>
+                        a.REVIEW_DATE LIKE CONCAT('%', #{word}, '%')
                     </when>
                     <otherwise>
                         a.#{category} LIKE CONCAT('%', #{word}, '%')
