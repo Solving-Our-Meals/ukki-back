@@ -89,11 +89,11 @@
 
     <select id="searchBy" resultMap="storeListResultMap" parameterType="map">
         SELECT
-        a.STORE_NO,
-        a.STORE_NAME,
-        b.CATEGORY_NAME,
-        a.STORE_ADDRESS,
-        a.STORE_REGIST_DATE
+            a.STORE_NO,
+            a.STORE_NAME,
+            b.CATEGORY_NAME,
+            a.STORE_ADDRESS,
+            a.STORE_REGIST_DATE
         FROM TBL_STORE a
         LEFT JOIN TBL_STORE_CATEGORY b ON a.STORE_CATEGORY_NO = b.CATEGORY_NO
         <where>
@@ -108,10 +108,15 @@
                 </choose>
             </if>
             <if test="category == null and word != null">
-                CONCAT(a.STORE_NO, ' ', a.STORE_NAME, ' ', b.CATEGORY_NAME, ' ', a.STORE_ADDRESS, ' ', a.STORE_REGIST_DATE) LIKE CONCAT('%', #{word}, '%')
+                CONCAT(IFNULL(a.STORE_NO, ''), ' ',
+                      IFNULL(a.STORE_NAME, ''), ' ',
+                      IFNULL(b.CATEGORY_NAME, ''), ' ',
+                      IFNULL(a.STORE_ADDRESS, ''), ' ',
+                      IFNULL(a.STORE_REGIST_DATE, ''))
+                LIKE CONCAT('%', #{word}, '%')
             </if>
         </where>
-        ORDER BY a.STORE_REGIST_DATE;
+        ORDER BY a.STORE_REGIST_DATE
     </select>
 
     <select id="searchStoreInfo" resultMap="storeInfoResultMap">
