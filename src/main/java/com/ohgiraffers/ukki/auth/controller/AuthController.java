@@ -182,28 +182,33 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        deleteCookie(request, response, "authToken");
-        deleteCookie(request, response, "refreshToken");
-        
+        // 모든 쿠키 삭제
+        deleteAllCookies(request, response);
+
+        // 로그아웃 처리
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity.ok().build();
     }
 
-
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public static void deleteAllCookies(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
-                if (name.equals(cookie.getName())) {
-                    cookie.setValue("");        // 쿠키 값 비우기
-                    cookie.setPath("/");        // 경로 설정
-                    cookie.setMaxAge(0);        // 만료 시간을 0으로 설정하여 삭제
+                // 모든 쿠키를 삭제
+                ResponseCookie deleteCookie = ResponseCookie.from(cookie.getName(), "")
+                        .domain("ukki.site")  // 쿠키의 도메인 설정
+                        .path("/")  // 쿠키 경로 설정
+                        .httpOnly(true)  // HttpOnly 설정
+                        .maxAge(0)  // 쿠키 만료 시간 0 설정
+                        .secure(true)  // 보안을 위해 HTTPS에서만 쿠키 전송
+                        .sameSite("None")  // SameSite 설정
+                        .build();
 
-                    response.addCookie(cookie); // 쿠키를 HTTP 응답에 추가
-                }
+                // 쿠키 삭제를 위한 Set-Cookie 헤더 추가
+                response.addHeader("Set-Cookie", deleteCookie.toString());
             }
         }
     }
