@@ -155,7 +155,7 @@ public class AuthController {
         }
     }
 
-/*// 로그아웃 처리 예시
+// 로그아웃 처리 예시
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         // 쿠키 삭제를 위한 설정
@@ -178,49 +178,7 @@ public class AuthController {
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok().build();
-    }*/
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("로그아웃 실행");
-
-        // Cache 관련 설정 (브라우저 캐시 방지)
-        response.setHeader("Cache-Control", "no-store");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", 0);
-
-        // authToken 쿠키 설정
-        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", null)
-                .maxAge(0)  // 쿠키 만료 시간 0으로 설정
-                .path("/")  // 모든 경로에 대해 쿠키 유효
-                .domain("ukki.site")  // 도메인 설정
-                .secure(true)  // HTTPS에서만 쿠키 전송
-                .httpOnly(true)  // 자바스크립트에서 쿠키 접근 불가
-                .sameSite("None")  // SameSite 속성 설정 (None은 Cross-Site 요청에서도 쿠키를 허용)
-                .build();
-
-        // refreshToken 쿠키 설정
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", null)
-                .maxAge(0)  // 쿠키 만료 시간 0으로 설정
-                .path("/")  // 모든 경로에 대해 쿠키 유효
-                .domain("ukki.site")  // 도메인 설정
-                .secure(true)  // HTTPS에서만 쿠키 전송
-                .httpOnly(true)  // 자바스크립트에서 쿠키 접근 불가
-                .sameSite("None")  // SameSite 속성 설정 (None은 Cross-Site 요청에서도 쿠키를 허용)
-                .build();
-
-        // 쿠키를 응답 헤더에 추가
-        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
-        // SecurityContext에서 로그아웃 처리
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-
-        return ResponseEntity.ok().build();
     }
-
-
 
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
