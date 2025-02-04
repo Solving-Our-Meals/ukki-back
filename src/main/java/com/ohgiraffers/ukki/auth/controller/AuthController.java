@@ -200,8 +200,9 @@ public class AuthController {
                 .sameSite("None")
                 .build();
 
-        response.addHeader("Set-Cookie", authTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
 
         return ResponseEntity.ok().build();
     }
