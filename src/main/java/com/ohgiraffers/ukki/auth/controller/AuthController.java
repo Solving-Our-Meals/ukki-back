@@ -155,6 +155,31 @@ public class AuthController {
         }
     }
 
+// 로그아웃 처리 예시
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 삭제를 위한 설정
+        Cookie authTokenCookie = new Cookie("authToken", null);
+        authTokenCookie.setMaxAge(0);
+        authTokenCookie.setPath("/");
+        authTokenCookie.setDomain("ukki.site");
+        authTokenCookie.setSecure(true);
+        authTokenCookie.setHttpOnly(true);
+
+        response.addCookie(authTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setDomain("ukki.site");
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/check-auth")
     public ResponseEntity<?> checkAuth(HttpServletRequest request) {
         // 쿠키에서 엑세스 토큰 찾아서 유효한지 확인하는 과정입니다.
