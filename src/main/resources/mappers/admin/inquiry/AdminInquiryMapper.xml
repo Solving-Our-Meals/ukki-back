@@ -183,16 +183,16 @@
                         1=0
                     </when>
                     <when test="category == 'INQ_DATE'">
-                        REPORT_DATE = convert(#{word} using utf8)
+                        AND REPORT_DATE = convert(#{word} using utf8)
                     </when>
                     <when test="category == 'INQ_TITLE'">
-                        REPORT_TITLE = convert(#{word} using utf8)
+                        AND REPORT_TITLE = convert(#{word} using utf8)
                     </when>
                     <when test="category == 'INQ_CONTENT'">
-                        REPORT_CONTENT = convert(#{word} using utf8)
+                        AND REPORT_CONTENT = convert(#{word} using utf8)
                     </when>
                     <otherwise>
-                        ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                        AND ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>
