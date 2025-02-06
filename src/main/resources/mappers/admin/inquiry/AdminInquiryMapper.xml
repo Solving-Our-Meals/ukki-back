@@ -176,12 +176,6 @@
                     <when test='category == "STATUS"'>
                         AND STATE = convert(#{word} using utf8)
                     </when>
-                    <when test="category == 'CATEGORY_NAME' and word == '리뷰신고'">
-                        1=1
-                    </when>
-                    <when test="category == 'CATEGORY_NAME' and word != '리뷰신고'">
-                        1=0
-                    </when>
                     <when test="category == 'INQ_DATE'">
                         AND REPORT_DATE = convert(#{word} using utf8)
                     </when>
@@ -190,6 +184,12 @@
                     </when>
                     <when test="category == 'INQ_CONTENT'">
                         AND REPORT_CONTENT = convert(#{word} using utf8)
+                    </when>
+                    <when test="category == 'CATEGORY_NAME' and word == '리뷰신고'">
+                        1=1
+                    </when>
+                    <when test="category == 'CATEGORY_NAME' and word != '리뷰신고'">
+                        1=0
                     </when>
                     <otherwise>
                         AND ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
