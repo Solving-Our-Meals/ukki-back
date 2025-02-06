@@ -34,4 +34,6 @@ public interface AdminReservationMapper {
     void deleteTodayRes(int resNo);
 
     void deleteEndRes(int resNo);
+
+    void decreaseResCount(int userNo);
 }

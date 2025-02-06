@@ -75,4 +75,8 @@ public class AdminReservationService {
     public void deleteEndRes(int resNo) {
         adminReservationMapper.deleteEndRes(resNo);
     }
+
+    public void decreaseResCount(int userNo) {
+        adminReservationMapper.decreaseResCount(userNo);
+    }
 }

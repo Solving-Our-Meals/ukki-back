@@ -46,7 +46,6 @@ public class AdminNoticeController {
     @GetMapping("/list/user")
     public ResponseEntity<?> searchUserNotice(@RequestParam(required = false) String word) {
         try {
-            System.out.println(word);
             List<AdminNoticeDTO> userNoticeList = adminNoticeService.searchUserNotice(word);
 
             return ResponseEntity.ok()
