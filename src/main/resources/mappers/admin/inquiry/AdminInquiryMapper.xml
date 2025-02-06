@@ -182,13 +182,13 @@
                     <when test="category == 'CATEGORY_NAME' and word != '리뷰신고'">
                         1=0
                     </when>
-                    <when test="category == 'REPORT_DATE'">
+                    <when test="category == 'INQ_DATE'">
                         REPORT_DATE = convert(#{word} using utf8)
                     </when>
-                    <when test="category == 'REPORT_TITLE'">
+                    <when test="category == 'INQ_TITLE'">
                         REPORT_TITLE = convert(#{word} using utf8)
                     </when>
-                    <when test="category == 'REPORT_CONTENT'">
+                    <when test="category == 'INQ_CONTENT'">
                         REPORT_CONTENT = convert(#{word} using utf8)
                     </when>
                     <otherwise>
