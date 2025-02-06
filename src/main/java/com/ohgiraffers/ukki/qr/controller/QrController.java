@@ -35,18 +35,15 @@ public class QrController {
         String jwtToken = cookieService.getJWTCookie(request);
 
         if (jwtToken == null) {
-            System.out.println("토큰 일치안함");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String userId = jwtService.getUserInfoFromTokenId(jwtToken);
 
         if (userId == null) {
-            System.out.println("유효토큰 아님");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        System.out.println("토큰 통과");
         int isConfirm = qrService.qrConfirmation(resNo, userId);
 
         if(isConfirm!=0) {
@@ -65,35 +62,5 @@ public class QrController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"none\"}");
         }
     }
-
-//     @GetMapping(value = "{qrName}/api/qrImage")
-//     public ResponseEntity<Resource> getQrImage(@PathVariable String qrName){
-
-//         try {
-
-//             System.out.println("QR이미지 왔다");
-//             System.out.println(qrName);
-//             Path file = Paths.get(SHARED_FOLDER).resolve(qrName + ".png");
-//             if(!Files.exists(file)){
-//                 file = Paths.get(SHARED_FOLDER).resolve(qrName + ".jpg");
-//             }
-
-//             // 디버깅 확인
-// //            System.out.println("프로필 파일 경로 : " + file);
-//             Resource resource = new UrlResource(file.toUri());
-
-//             System.out.println(resource);
-//             System.out.println(file);
-//             if(resource.exists() && resource.isReadable()){
-//                 return ResponseEntity.ok()
-//                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; qrName=\"" + resource.getFilename() + "\"")
-//                         .body(resource);
-//             } else {
-//                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//             }
-//         } catch (MalformedURLException e) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//         }
-//     }
 }
 

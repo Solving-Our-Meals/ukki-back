@@ -19,4 +19,6 @@ public interface AdminReviewMapper {
     AdminReviewInfoDTO searchReviewInfo(String reviewNo);
 
     int deleteReview(int reviewNo);
+
+    void decreaseReviewCount(int userNo);
 }

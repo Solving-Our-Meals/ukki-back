@@ -125,4 +125,10 @@
     <delete id="deleteReview">
         DELETE FROM TBL_REVIEW WHERE REVIEW_NO = #{reviewNo}
     </delete>
+
+    <update id="decreaseReviewCount">
+        UPDATE TBL_USER_ACT_INFO
+        SET REVIEW_COUNT = REVIEW_COUNT - 1
+        WHERE USER_NO = #{userNo} AND REVIEW_COUNT > 0
+    </update>
 </mapper>

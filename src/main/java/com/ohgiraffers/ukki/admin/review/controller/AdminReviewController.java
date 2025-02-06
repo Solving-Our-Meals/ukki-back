@@ -55,7 +55,6 @@ public class AdminReviewController {
     public ResponseEntity<?> searchReview(@RequestParam(required = false) String category, @RequestParam(required = false) String word){
         try {
             List<AdminReviewListDTO> reviewList = adminReviewService.searchReview(category, word);
-            System.out.println(reviewList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +73,6 @@ public class AdminReviewController {
     public ResponseEntity<?> searchReviewInfo(@PathVariable String reviewNo){
         try {
             AdminReviewInfoDTO reviewInfo = adminReviewService.searchReviewInfo(reviewNo);
-            System.out.println(reviewInfo);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -93,14 +91,14 @@ public class AdminReviewController {
     public ResponseEntity<?> deleteReview(@PathVariable int reviewNo, @RequestBody String content){
         try {
             ObjectMapper mapper = new ObjectMapper();
-            System.out.println("삭제왔당");
             String reviewImg = mapper.readTree(content).get("reviewImg").asText();
-            System.out.println(reviewImg);
+            int userNo = mapper.readTree(content).get("userNo").asInt();
 
             int result = adminReviewService.deleteReview(reviewNo);
 
 
             if(result > 0){
+                adminReviewService.decreaseReviewCount(userNo);
                 if(!reviewImg.equals("DEFAULT_REVIEW_IMG.png")) {
                     googleDriveService.deleteFile(reviewImg);
                 }

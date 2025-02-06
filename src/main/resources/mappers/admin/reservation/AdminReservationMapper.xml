@@ -259,4 +259,10 @@
     <delete id="deleteEndRes">
         DELETE FROM TBL_END_RES WHERE RES_NO = #{resNo}
     </delete>
+
+    <update id="decreaseResCount">
+        UPDATE TBL_USER_ACT_INFO
+        SET RES_COUNT = RES_COUNT - 1
+        WHERE USER_NO = #{userNo} AND RES_COUNT > 0
+    </update>
 </mapper>

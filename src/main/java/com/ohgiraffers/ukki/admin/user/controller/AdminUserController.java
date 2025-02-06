@@ -46,7 +46,6 @@ public class AdminUserController {
                 List<AdminUserResDTO> resList = adminReservationService.userResList();
                 List<AdminUserReviewDTO> reviewList = adminReviewService.userReviewList();
                 List<AdminUserActInfoDTO> actInfoList = new ArrayList<>();
-
                 // userNo를 키로 사용하여 AdminUserActInfoDTO를 저장할 Map
                 Map<Integer, AdminUserActInfoDTO> userActInfoMap = new HashMap<>();
 
@@ -130,8 +129,6 @@ public class AdminUserController {
 
         String newSaneName = "건전한우끼"+saneNo;
 
-        System.out.println(saneNo);
-
         int result = adminUserService.updateUserName(userNo, newSaneName);
         Map<String, Object> responseMap = new HashMap<>();
         if (result > 0) {
@@ -181,7 +178,6 @@ public class AdminUserController {
     @PutMapping("/info/{userNo}/noshow")
     public ResponseEntity<?> minusNoShow(@PathVariable int userNo, @RequestBody Map<String, Integer> minusCount){
         try {
-            System.out.println(minusCount);
             adminUserService.minusNoShow(userNo, minusCount.get("noShow"));
             Map<String, String> response = new HashMap<>();
             response.put("message", "노쇼카운트가 감소했습니다.");
