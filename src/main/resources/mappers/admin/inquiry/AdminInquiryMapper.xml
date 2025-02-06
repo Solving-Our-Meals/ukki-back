@@ -136,7 +136,7 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
-                        AND b.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                        AND b.CATEGORY_NAME LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <when test='category == "STATUS"'>
                         AND a.STATE = convert(#{word} using utf8)
@@ -171,11 +171,18 @@
         false AS IS_INQUIRY
         FROM TBL_REVIEW_REPORT
         <where>
-            <if test="category == 'CATEGORY_NAME' and word == '리뷰신고'">
-                1=1
-            </if>
             <if test="category != null and word != null">
-                ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                <choose>
+                    <when test='category == "STATUS"'>
+                        AND STATE = convert(#{word} using utf8)
+                    </when>
+                    <when test="category == 'CATEGORY_NAME' and word == '리뷰신고'">
+                        1=1
+                    </when>
+                    <otherwise>
+                        ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                    </otherwise>
+                </choose>
             </if>
             <choose>
                 <when test="category == null and word != null and word.matches('(리|뷰|신|고|리뷰|뷰신|신고|리뷰신|뷰신고|리뷰신고)')">
