@@ -22,8 +22,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/admin/inquiries")
 public class AdminInquiryController {
-
-    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
     private final AdminInquiryService adminInquiryService;
     private final GoogleDriveService googleDriveService;
     private final InquiryService inquiryService;
@@ -39,8 +37,6 @@ public class AdminInquiryController {
     public ResponseEntity<?> processingInquiry() {
         try {
             int processingInquiryCount = adminInquiryService.processingInquiry();
-
-            System.out.println(processingInquiryCount);
 
             Map<String, Integer> response = new HashMap<>();
             response.put("processing", processingInquiryCount);
@@ -78,7 +74,6 @@ public class AdminInquiryController {
                 word = InquiryState.fromValue(word).name(); // "처리완료" => "COMPLETE"로 변환 }
             }
             List<AdminInquiryListDTO> userInquiryList = adminInquiryService.searchUserInquiry(category, word);
-            System.out.println(userInquiryList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +98,6 @@ public class AdminInquiryController {
             List<AdminInquiryListDTO> storeReportList = adminInquiryService.searchStoreReportInquiry(category, word);
 
             storeInquiryList.addAll(storeReportList);
-            System.out.println(storeInquiryList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -121,9 +115,7 @@ public class AdminInquiryController {
     @GetMapping("/info/{inquiryNo}")
     public ResponseEntity<?> inquiryInfo(@PathVariable int inquiryNo) {
         try {
-            System.out.println("왔당");
             AdminInquiryInfoDTO inquiryInfo = adminInquiryService.inquiryInfo(inquiryNo);
-            System.out.println(inquiryInfo);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -141,9 +133,7 @@ public class AdminInquiryController {
     @GetMapping("/info/report/{reportNo}")
     public ResponseEntity<?> reportInfo(@PathVariable int reportNo) {
         try {
-            System.out.println("리뷰신고왔다");
             AdminReportInfoDTO reportInfo = adminInquiryService.reportInfo(reportNo);
-            System.out.println(reportInfo);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -277,7 +267,6 @@ public class AdminInquiryController {
     @GetMapping("/store/{userNo}")
     public ResponseEntity<?> searchStoreNoByUserNo(@PathVariable int userNo) {
         try {
-            System.out.println("zjahs");
             int storeNo = adminInquiryService.searchStoreNoByUserNo(userNo);
 
             Map<String, Integer> response = new HashMap<>();

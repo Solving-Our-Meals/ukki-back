@@ -5,6 +5,7 @@ import com.ohgiraffers.ukki.inquiry.model.dto.InquiryCategoryDTO;
 import com.ohgiraffers.ukki.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.ukki.inquiry.model.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,11 @@ import static com.ohgiraffers.ukki.common.InquiryState.PROCESSING;
 @RestController
 @RequestMapping("/inquiries")
 public class InquiryController {
-
-//    private final String SHARED_FOLDER = "\\\\192.168.0.138\\ukki_nas\\inquiry";
-private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
     private final InquiryService inquiryService;
     private final GoogleDriveService googleDriveService;
-    private static final String INQUIRY_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+
+    @Value("${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}")
+    private String INQUIRY_FOLDER_ID;
 
 
     @Autowired
@@ -53,7 +53,6 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
                 // Google Drive에 파일 업로드 (파일명 지정)
                 String fileId = googleDriveService.uploadFile(file, INQUIRY_FOLDER_ID, fileName);
                 String fileUrl = googleDriveService.getFileUrl(fileId);
-                System.out.println(fileUrl);
                 inquiryDTO.setFile(fileUrl);
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -64,7 +63,6 @@ private final String SHARED_FOLDER = "C:\\Users\\admin\\Desktop\\ukkiImg";
 
         inquiryDTO.setInquiryDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
         inquiryDTO.setState(PROCESSING);
-        System.out.println(inquiryDTO);
 
         Map<String, Object> responseMap = new HashMap<>();
         int result = inquiryService.addInquiry(inquiryDTO);

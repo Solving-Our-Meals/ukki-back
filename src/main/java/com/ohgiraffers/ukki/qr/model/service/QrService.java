@@ -8,6 +8,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.ohgiraffers.ukki.qr.model.dao.QrMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
@@ -26,7 +27,9 @@ public class QrService {
 
     private final GoogleDriveService googleDriveService;
     private final QrMapper qrMapper;
-    private final String QR_FOLDER_ID = "1Bzigy3LlWfu5wAj7vB5Xdp_QapW76eQG";
+
+    @Value("${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}")
+    private String QR_FOLDER_ID;
     
     @Autowired
     public QrService(QrMapper qrMapper, GoogleDriveService googleDriveService ) {

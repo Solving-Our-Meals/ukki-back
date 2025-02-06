@@ -45,7 +45,6 @@ public class AdminReservationController {
                 thisWeek.setSat(0);
                 thisWeek.setSun(0);
             }
-            System.out.println("이번주 예약수는 나야나"+thisWeek);
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(thisWeek);
@@ -63,7 +62,6 @@ public class AdminReservationController {
     public ResponseEntity<?> todayReservation() {
         try {
             int today = adminReservationService.todayReservation();
-            System.out.println(today);
             Map<String, Integer> response = new HashMap<>();
             response.put("todayReservation", today);
             return ResponseEntity.ok()
@@ -84,9 +82,6 @@ public class AdminReservationController {
         try {
             MonthlyNoShowDTO noShow = adminReservationService.monthlyNoShowReservation();
 
-
-            System.out.println(noShow);
-
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(noShow);
@@ -103,8 +98,6 @@ public class AdminReservationController {
     @GetMapping("/list")
     public ResponseEntity<?> listReservations(@RequestParam(required = false) String category, @RequestParam(required = false) String word) {
         try {
-            System.out.println(category);
-            System.out.println(word);
 
             List<AdminReservationListDTO> resTodayList = adminReservationService.searchRes(category, word);
             List<AdminReservationListDTO> resEndList = adminReservationService.searchEndRes(category, word);
@@ -113,7 +106,6 @@ public class AdminReservationController {
 
             resList.addAll(resEndList);
 
-            System.out.println(resList);
 
             return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -148,7 +140,6 @@ public class AdminReservationController {
     public ResponseEntity<?> todayResInfo(@PathVariable int resNo) {
         try {
 
-            System.out.println(resNo);
 
             AdminReservationInfoDTO resInfo = adminReservationService.todayResInfo(resNo);
 
@@ -188,6 +179,7 @@ public class AdminReservationController {
             if(resInfo.getQr() != "expired"){
                 googleDriveService.deleteFile(resInfo.getQr());
             }
+            adminReservationService.decreaseResCount(resInfo.getUserNo());
 
             adminReservationService.deleteTodayRes(resNo);
             Map<String, String> response = new HashMap<>();
@@ -207,9 +199,7 @@ public class AdminReservationController {
     @DeleteMapping("/info/end/{resNo}")
     public ResponseEntity<?> deleteEndRes(@PathVariable int resNo) {
         try{
-            System.out.println("왔다 " + resNo);
             AdminReservationInfoDTO resInfo = adminReservationService.endResInfo(resNo);
-            System.out.println(resInfo);
             
             if (resInfo == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)

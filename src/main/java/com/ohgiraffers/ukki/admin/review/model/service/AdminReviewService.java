@@ -44,4 +44,8 @@ public class AdminReviewService {
         return adminReviewMapper.deleteReview(reviewNo);
 
     }
+
+    public void decreaseReviewCount(int userNo) {
+        adminReviewMapper.decreaseReviewCount(userNo);
+    }
 }

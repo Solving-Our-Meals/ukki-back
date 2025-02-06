@@ -34,12 +34,11 @@ import org.springframework.http.MediaType;
 @RequestMapping("/admin/stores")
 public class AdminStoreController {
 
-//    private final String SHARED_FOLDER = "\\\\DESKTOP-KLQ0O04\\Users\\admin\\Desktop\\ukkiImg";
-//private final String SHARED_FOLDER = "\\\\I7E-74\\ukki_nas\\store";
     private final AdminStoreService adminStoreService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final GoogleDriveService googleDriveService;
-    @Value("${google.drive.inquiry-folder-id}")
+
+    @Value("${GOOGLE_DRIVE_INQUIRY_FOLDER_ID}")
     private String STORE_FOLDER_ID;
     
     @Autowired
@@ -293,8 +292,6 @@ public class AdminStoreController {
 
             // 기존 배너 정보 유지 (클라이언트가 삭제하지 않은 배너)
             if (bannerStatusParse != null) {
-                System.out.println("bannerStatus = " + bannerStatusParse.length);
-                System.out.println("bannerStatus = " + bannerStatus);
                 String[] temp = new String[5];
                 for(int i = 0; i < bannerStatusParse.length; i++){
                     temp[i] = bannerStatusParse[i];
@@ -335,7 +332,6 @@ public class AdminStoreController {
             // 배너 정보 업데이트
             AdminStoreBannerDTO adminStoreBannerDTO = new AdminStoreBannerDTO(storeNo, bannerNameArr[0], bannerNameArr[1],
                 bannerNameArr[2], bannerNameArr[3], bannerNameArr[4]);
-            System.out.println("bannerDTO : "+ adminStoreBannerDTO);
             adminStoreService.editBanner(adminStoreBannerDTO);
 
             if (storeData != null) {
@@ -358,17 +354,10 @@ public class AdminStoreController {
     public ResponseEntity<?> registerUser(@RequestBody AdminStoreUserDTO userDTO, HttpSession session) {
         // 세션에 저장해서 보내기
 //        form을 이용해 클라이언트 쪽에서 직접 보내는 것은 보안성과 코드 일관성에 좋지 않은 영향을 줄 수 있기때문에 세션방식 채택
-        System.out.println(userDTO);
-        System.out.println(userDTO.getUserId());
         session.setAttribute("userId", userDTO.getUserId());
         session.setAttribute("userPassword", userDTO.getUserPassword());
         session.setAttribute("userName", userDTO.getUserName());
         session.setAttribute("email", userDTO.getEmail());
-        System.out.println(session.getAttribute("userId"));
-        System.out.println(session.getAttribute("userPassword"));
-        System.out.println(session.getAttribute("userName"));
-        System.out.println(session.getAttribute("email"));
-        System.out.println(session.getId());
         
         Map<String, String> response = new HashMap<>();
         response.put("message", "User registered and session created successfully");
@@ -378,12 +367,6 @@ public class AdminStoreController {
 
     @GetMapping("regist/store")
     public ResponseEntity<?> ShowStoreInfoRegistPage(HttpSession session) {
-
-        System.out.println(session.getId());
-        System.out.println(session.getAttribute("userId"));
-        System.out.println(session.getAttribute("userPassword"));
-        System.out.println(session.getAttribute("userName"));
-        System.out.println(session.getAttribute("email"));
         List<AdminStoreCategoryDTO> adminStoreCategoryDTO = adminStoreService.getCategory();
         AdminStoreUserDTO userDTO = new AdminStoreUserDTO();
         userDTO.setUserId(session.getAttribute("userId").toString());
