@@ -83,11 +83,11 @@
                     <when test='category == "CATEGORY_NAME"'>
                         AND b.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
-                    <when test='category == "STATE"'>
-                        AND a.STATE = #{word}
+                    <when test='category == "STATUS"'>
+                        AND a.STATE = convert(#{word} using utf8)
                     </when>
                     <otherwise>
-                        AND a.#{category} LIKE CONCAT('%', #{word}, '%')
+                        AND a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>
@@ -137,6 +137,9 @@
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
                         AND b.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                    </when>
+                    <when test='category == "STATUS"'>
+                        AND a.STATE = convert(#{word} using utf8)
                     </when>
                     <otherwise>
                         AND a.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
