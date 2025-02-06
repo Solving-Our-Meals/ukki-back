@@ -71,8 +71,11 @@
                     <when test='category == "REVIEW_DATE"'>
                         a.REVIEW_DATE LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
+                    <when test='category == "REVIEW_SCOPE"'>
+                        a.REVIEW_SCOPE = #{word}
+                    </when>
                     <otherwise>
-                        a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                        a.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>

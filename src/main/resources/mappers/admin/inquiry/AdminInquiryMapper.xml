@@ -81,10 +81,10 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
-                        AND b.#{category} LIKE CONCAT('%', #{word}, '%')
+                        AND b.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <when test='category == "STATE"'>
-                        AND a.${category} = #{word}
+                        AND a.STATE = #{word}
                     </when>
                     <otherwise>
                         AND a.#{category} LIKE CONCAT('%', #{word}, '%')
@@ -136,10 +136,10 @@
             <if test="category != null and word != null">
                 <choose>
                     <when test='category == "CATEGORY_NAME"'>
-                        AND b.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                        AND b.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </when>
                     <otherwise>
-                        AND a.#{category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
+                        AND a.${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
                     </otherwise>
                 </choose>
             </if>
@@ -172,7 +172,7 @@
                 1=1
             </if>
             <if test="category != null and word != null">
-                #{category} LIKE CONCAT('%', #{word}, '%')
+                ${category} LIKE CONCAT('%', convert(#{word} using utf8), '%')
             </if>
             <choose>
                 <when test="category == null and word != null and word.matches('(리|뷰|신|고|리뷰|뷰신|신고|리뷰신|뷰신고|리뷰신고)')">
