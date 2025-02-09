@@ -39,7 +39,7 @@
 
 <br>
 
-## 3. Team Rules (팀 규칙) - 수정 예정
+## 3. Team Rules (팀 규칙)
 >- #### [Team Rules](https://github.com/Solving-Our-Meals/ukki-back/blob/main/.github/team_rules/team_rules/team_rules.md)
 >- #### [Team Policy](https://github.com/Solving-Our-Meals/ukki-back/blob/main/.github/team_rules/team_rules/team_guideline.md)
 [목차로 이동](https://github.com/Solving-Our-Meals/ukki?tab=readme-ov-file#%EB%AA%A9%EC%B0%A8)
@@ -112,7 +112,7 @@
 
 <br>
 
-## 5. Project Work Division (업무 구분) - 수정 예정
+## 5. Project Work Division (업무 구분)
 ### 조형석
 >__1. QR 코드__ <br>
 >__2. 관리자 페이지 구현__ <br>
@@ -153,8 +153,8 @@
 
 <br>
 
-## 8. Project Link (프로젝트 링크) - 수정 예정
-__프로젝트 도메인__
+## 8. Project Link (프로젝트 링크)
+https://ukki.site
 
 [목차로 이동](https://github.com/Solving-Our-Meals/ukki?tab=readme-ov-file#%EB%AA%A9%EC%B0%A8)
 
@@ -162,7 +162,7 @@ __프로젝트 도메인__
 
 ## 9. Development Period (개발 기간)
 
-### 전체 개발 기간 : 24/11/20 ~
+### 전체 개발 기간 : 24/11/20 ~ 25/02/01
 
 
 >
